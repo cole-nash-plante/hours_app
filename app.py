@@ -139,39 +139,52 @@ selected_page = st.sidebar.radio("Go to", pages)
 if selected_page == "Data Entry":
     st.title("Data Entry")
 
-    # Log Hours
+    # -------------------------
+    # Log Hours (Top)
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Log Hours")
     df_clients = pd.read_csv(CLIENTS_FILE)
     if len(df_clients) == 0:
         st.warning("Add clients first!")
     else:
         client = st.selectbox("Select Client", df_clients["Client"].tolist())
-        date = st.date_input("Date", datetime.today())
+        date_val = st.date_input("Date", datetime.today())
         hours = st.number_input("Hours Worked", min_value=0.0, step=0.25)
         description = st.text_area("Description of Work")
         if st.button("Save Hours"):
             df_hours = pd.read_csv(HOURS_FILE)
-            df_hours.loc[len(df_hours)] = [str(date), client, hours, description]
+            df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
             df_hours.to_csv(HOURS_FILE, index=False)
             st.success("Hours logged successfully!")
             push_to_github("data/hours.csv", "Updated hours log")
-  # Add Client
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # -------------------------
+    # Add New Client (Middle)
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Add New Client")
     new_client = st.text_input("Client Name")
+    client_color = st.color_picker("Pick Client Color", "#FFFFFF")
     if st.button("Add Client"):
         if new_client.strip():
             df_clients = pd.read_csv(CLIENTS_FILE)
             if new_client not in df_clients["Client"].values:
-                df_clients.loc[len(df_clients)] = [new_client]
+                df_clients.loc[len(df_clients)] = [new_client, client_color]
                 df_clients.to_csv(CLIENTS_FILE, index=False)
-                st.success(f"Client '{new_client}' added!")
+                st.success(f"Client '{new_client}' added with color {client_color}!")
                 push_to_github("data/clients.csv", "Updated clients list")
             else:
                 st.warning("Client already exists.")
         else:
             st.error("Please enter a valid client name.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # Set Goals
+    # -------------------------
+    # Set Hour Goals (Bottom)
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Set Hour Goals")
     month = st.selectbox("Month", [f"{m:02d}" for m in range(1, 13)])
     goal_hours = st.number_input("Goal Hours", min_value=0.0, step=1.0)
@@ -181,6 +194,7 @@ if selected_page == "Data Entry":
         df_goals.to_csv(GOALS_FILE, index=False)
         st.success("Goal saved successfully!")
         push_to_github("data/goals.csv", "Updated goals list")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------------------------
 # Page: To-Do
@@ -194,8 +208,9 @@ elif selected_page == "To-Do":
     df_todos = pd.read_csv(TODOS_FILE)
 
     # -------------------------------
-    # Add Category (One Line Layout)
+    # Add Category
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Add Category")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -215,10 +230,12 @@ elif selected_page == "To-Do":
                     df_categories = pd.read_csv(CATEGORIES_FILE)
                 else:
                     st.error("Please enter a valid category name.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------------
-    # Add To-Do Item (One Line Layout)
+    # Add To-Do Item
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Add To-Do Item")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -246,10 +263,12 @@ elif selected_page == "To-Do":
                     df_todos = pd.read_csv(TODOS_FILE)
                 else:
                     st.error("Please enter a valid task and category.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------------
-    # Active To-Dos (Editable Tables)
+    # Active To-Dos
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Active To-Dos")
     active_todos = df_todos[df_todos["DateCompleted"].isna() | (df_todos["DateCompleted"] == "")].copy()
 
@@ -273,13 +292,13 @@ elif selected_page == "To-Do":
 
                     # Save changes button
                     if st.button(f"Save Changes for {client}"):
-                        # Replace rows for this client with edited data
                         df_todos = df_todos[df_todos["Client"] != client]
                         edited_table["Client"] = client
                         df_todos = pd.concat([df_todos, edited_table], ignore_index=True)
                         df_todos.to_csv(TODOS_FILE, index=False)
                         push_to_github("data/todos.csv", "Updated To-Do list")
                         st.success(f"Changes saved for {client}!")
+    st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -339,7 +358,10 @@ elif selected_page == "Reports":
     remaining_annual_hours = max(annual_goal_hours - annual_actual_hours, 0)
     annual_avg_left = remaining_annual_hours / remaining_weekdays_annual if remaining_weekdays_annual > 0 else 0
 
-    # Display BANs above date filter
+    # -------------------------
+    # BAN Metrics + Annual End Date
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         st.metric("Avg Hours Left per Day (Monthly)", f"{monthly_avg_left:.2f}")
@@ -351,21 +373,28 @@ elif selected_page == "Reports":
             pd.DataFrame({"EndDate": [str(new_end_date)]}).to_csv(ANNUAL_TARGET_FILE, index=False)
             push_to_github("data/annual_target.csv", "Updated annual end date")
             st.success("Annual end date updated!")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # Date filter in one line
-    st.markdown("---")
+    # -------------------------
+    # Date Filter
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col_start, col_end = st.columns([1, 1])
     with col_start:
         start_date = st.date_input("Start Date", date(now.year, now.month, 1))
     with col_end:
         end_date = st.date_input("End Date", last_day)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Filter data for charts
     filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(start_date)) & (hours_df["Date"] <= pd.to_datetime(end_date))]
     filtered_merged = merged[(pd.to_datetime(merged["Month"] + "-01") >= pd.to_datetime(start_date)) &
                               (pd.to_datetime(merged["Month"] + "-01") <= pd.to_datetime(end_date))]
 
-    # Side-by-side charts
+    # -------------------------
+    # Charts
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Monthly Actual vs Planned Hours")
@@ -385,9 +414,8 @@ elif selected_page == "Reports":
             st.plotly_chart(pie_fig, use_container_width=True)
         else:
             st.info("No hours logged in this range.")
-
-
-
+    st.markdown('</div>', unsafe_allow_html=True)
+    
 elif selected_page == "History":
     st.title("History")
 
@@ -398,16 +426,20 @@ elif selected_page == "History":
     # -------------------------------
     # Client Filter
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Filter by Client")
     all_clients = sorted(set(df_hours["Client"].dropna().tolist() + df_todos["Client"].dropna().tolist()))
-    selected_clients = st.multiselect("Filter by Client", all_clients, default=all_clients)
+    selected_clients = st.multiselect("Select Clients", all_clients, default=all_clients)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Apply filter
     filtered_hours = df_hours[df_hours["Client"].isin(selected_clients)] if len(selected_clients) > 0 else df_hours
     filtered_todos = df_todos[df_todos["Client"].isin(selected_clients)] if len(selected_clients) > 0 else df_todos
 
     # -------------------------------
-    # Layout: Editable Hours + To-Do History
+    # Editable Hours + To-Do History
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
 
     # Editable Hours History
@@ -444,9 +476,6 @@ elif selected_page == "History":
                 push_to_github("data/todos.csv", "Updated To-Do history")
                 st.success("To-Do history updated!")
 
-
-
-
 elif selected_page == "Archive":
     st.title("Archive Clients")
 
@@ -464,7 +493,7 @@ elif selected_page == "Archive":
 
     # Ensure archive files exist
     archive_files = [
-        (ARCHIVE_CLIENTS, ["Client"]),
+        (ARCHIVE_CLIENTS, ["Client", "Color"]),
         (ARCHIVE_CATEGORIES, ["Client", "Category"]),
         (ARCHIVE_TODOS, ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]),
         (ARCHIVE_HOURS, ["Date", "Client", "Hours", "Description"])
@@ -482,6 +511,7 @@ elif selected_page == "Archive":
     # -------------------------------
     # Archive Client Action
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Archive a Client")
     if len(df_clients) == 0:
         st.warning("No clients available to archive.")
@@ -521,10 +551,12 @@ elif selected_page == "Archive":
             push_to_github("data/archive_hours.csv", "Updated archive hours")
 
             st.success(f"Client '{selected_client}' archived successfully!")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------------
     # Undo Archive Client Action
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Undo Archive")
     if len(df_archive_clients) == 0:
         st.warning("No archived clients available.")
@@ -564,22 +596,43 @@ elif selected_page == "Archive":
             push_to_github("data/archive_hours.csv", "Updated archive hours after restore")
 
             st.success(f"Client '{undo_client}' restored successfully!")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # -------------------------------
+    # Edit Client Colors
+    # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Edit Client Colors")
+    if len(df_clients) > 0:
+        for i, row in df_clients.iterrows():
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                st.text(row["Client"])
+            with col2:
+                new_color = st.color_picker("", row["Color"], key=f"color_{i}")
+                df_clients.at[i, "Color"] = new_color
+        if st.button("Save Color Changes"):
+            df_clients.to_csv(CLIENTS_FILE, index=False)
+            st.success("Client colors updated!")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------------
     # Show Archive History Tables
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Archive History")
     col1, col2 = st.columns(2)
-
     with col1:
         st.markdown("### Archived Hours")
         st.dataframe(df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), width="stretch", hide_index=True)
-
     with col2:
         st.markdown("### Archived To-Dos")
         st.dataframe(df_archive_todos.sort_values(by="DateCreated", ascending=False)[
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
 
 
 elif selected_page == "Days Off":
@@ -598,6 +651,7 @@ elif selected_page == "Days Off":
     # -------------------------------
     # Add New Day Off
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Add a Day Off")
     new_date = st.date_input("Select Date")
     new_reason = st.text_input("Reason for Day Off")
@@ -609,10 +663,12 @@ elif selected_page == "Days Off":
             st.success("Day off added successfully!")
         else:
             st.error("Please enter a reason.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------------
     # Editable Days Off Table
     # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Manage Days Off")
     edited_days_off = st.data_editor(
         df_days_off.reset_index(drop=True),
@@ -625,10 +681,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
-
-
-
-
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 
