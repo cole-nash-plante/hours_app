@@ -247,32 +247,41 @@ elif selected_page == "History":
     df_hours = pd.read_csv(HOURS_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
 
-    # -------------------------------
+    # Client Filter
+    all_clients = sorted(set(df_hours["Client"].dropna().tolist() + df_todos["Client"].dropna().tolist()))
+    selected_clients = st.multiselect("Filter by Client", all_clients, default=all_clients)
+
+    # Apply filter
+    filtered_hours = df_hours[df_hours["Client"].isin(selected_clients)] if len(selected_clients) > 0 else df_hours
+    filtered_todos = df_todos[df_todos["Client"].isin(selected_clients)] if len(selected_clients) > 0 else df_todos
+
     # Layout: Hours History + To-Do History
-    # -------------------------------
     col1, col2 = st.columns(2)
 
-    # Hours History
     with col1:
         st.subheader("Logged Hours History")
-        if len(df_hours) == 0:
-            st.info("No hours logged yet.")
+        if len(filtered_hours) == 0:
+            st.info("No hours logged for selected client(s).")
         else:
-            st.dataframe(df_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), width="stretch")
+            st.dataframe(
+                filtered_hours.sort_values(by="Date", ascending=False).reset_index(drop=True),
+                width="stretch",
+                hide_index=True
+            )
 
-    # To-Do History
     with col2:
         st.subheader("To-Do History")
-        if len(df_todos) == 0:
-            st.info("No tasks recorded yet.")
+        if len(filtered_todos) == 0:
+            st.info("No tasks recorded for selected client(s).")
         else:
-            # Show all tasks including completed ones
             st.dataframe(
-                df_todos.sort_values(by="DateCreated", ascending=False)[
+                filtered_todos.sort_values(by="DateCreated", ascending=False)[
                     ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
                 ].reset_index(drop=True),
-                width="stretch"
+                width="stretch",
+                hide_index=True
             )
+
 
 
 
