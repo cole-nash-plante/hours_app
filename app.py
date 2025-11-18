@@ -21,8 +21,62 @@ HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
 GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
 CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
-
 os.makedirs(DATA_DIR, exist_ok=True)
+
+# -----------------------------
+# Inject Custom CSS for Dark Theme
+# -----------------------------
+st.markdown("""
+    <style>
+    /* Global */
+    body {
+        background-color: #121212;
+        color: #FFFFFF;
+    }
+
+    /* Buttons */
+    div.stButton > button {
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: bold;
+        border: none;
+    }
+    div.stButton > button:hover {
+        background-color: #45a049;
+    }
+
+    /* Headers */
+    h1, h2, h3 {
+        color: #4CAF50;
+    }
+
+    /* Inputs */
+    input, textarea, select {
+        background-color: #1E1E1E !important;
+        color: #FFFFFF !important;
+        border-radius: 6px;
+        border: 1px solid #4CAF50;
+    }
+
+    /* Tables */
+    .stDataFrame, .stDataEditor {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .stDataFrame table, .stDataEditor table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .stDataFrame tr:nth-child(even), .stDataEditor tr:nth-child(even) {
+        background-color: #1E1E1E;
+    }
+    .stDataFrame tr:hover, .stDataEditor tr:hover {
+        background-color: #333333;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # GitHub Functions
@@ -41,14 +95,11 @@ def push_to_github(file_path, commit_message):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
     with open(file_path, "rb") as f:
         content = base64.b64encode(f.read()).decode("utf-8")
-
     response = requests.get(url, headers={"Authorization": f"token {GITHUB_TOKEN}"})
     sha = response.json().get("sha")
-
     data = {"message": commit_message, "content": content, "branch": BRANCH}
     if sha:
         data["sha"] = sha
-
     r = requests.put(url, json=data, headers={"Authorization": f"token {GITHUB_TOKEN}"})
     if r.status_code not in [200, 201]:
         st.error(f"Failed to push {file_path}: {r.json()}")
@@ -134,7 +185,6 @@ if selected_page == "Data Entry":
 # -----------------------------
 elif selected_page == "To-Do":
     st.title("To-Do List")
-
     df_clients = pd.read_csv(CLIENTS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
@@ -182,8 +232,6 @@ elif selected_page == "To-Do":
     else:
         active_todos = active_todos.sort_values(by="Priority", ascending=False)
         edited_todos = st.data_editor(active_todos, num_rows="dynamic", use_container_width=True)
-
-        # Save edits
         if st.button("Save Changes"):
             df_todos.update(edited_todos)
             df_todos.to_csv(TODOS_FILE, index=False)
