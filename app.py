@@ -301,30 +301,32 @@ elif selected_page == "To-Do":
         clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
 
-        cols = st.columns(len(selected_clients))
-        for i, client in enumerate(selected_clients):
-            client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
-            with cols[i]:
-                st.markdown(f"### {client}")
-                edited_table = st.data_editor(
-                    client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]],
-                    num_rows="dynamic",
-                    use_container_width=True
-                )
+        if len(selected_clients) > 0:
+            cols = st.columns(len(selected_clients))
+            for i, client in enumerate(selected_clients):
+                client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+                with cols[i]:
+                    st.markdown(f"### {client}")
+                    edited_table = st.data_editor(
+                        client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
+                        num_rows="dynamic",
+                        width="stretch"
+                    )
 
-                # Save changes button
-                if st.button(f"Save Changes for {client}"):
-                    # Update original df_todos with edits
-                    df_todos.update(edited_table)
-                    df_todos.to_csv(TODOS_FILE, index=False)
-                    push_to_github("data/todos.csv", "Updated To-Do list")
-                    st.success(f"Changes saved for {client}!")
+                    # Save changes button
+                    if st.button(f"Save Changes for {client}"):
+                        # Replace rows for this client with edited data
+                        df_todos = df_todos[df_todos["Client"] != client]
+                        edited_table["Client"] = client
+                        df_todos = pd.concat([df_todos, edited_table], ignore_index=True)
+                        df_todos.to_csv(TODOS_FILE, index=False)
+                        push_to_github("data/todos.csv", "Updated To-Do list")
+                        st.success(f"Changes saved for {client}!")
 
-                # Delete selected rows
-                if st.button(f"Delete Selected for {client}"):
-                    # Remove rows that were deleted in editor
-                    remaining_tasks = edited_table.dropna(subset=["Task"])
-                    df_todos = df_todos[df_todos["Task"].isin(remaining_tasks["Task"])]
-                    df_todos.to_csv(TODOS_FILE, index=False)
-                    push_to_github("data/todos.csv", "Deleted tasks")
-                    st.success(f"Deleted tasks for {client}!")
+                    # Delete rows where Task is empty
+                    if st.button(f"Delete Empty Tasks for {client}"):
+                        df_todos = df_todos[~((df_todos["Client"] == client) & (df_todos["Task"].isna() | (df_todos["Task"] == "")))]
+                        df_todos.to_csv(TODOS_FILE, index=False)
+                        push_to_github("data/todos.csv", "Deleted empty tasks")
+                        st.success(f"Empty tasks deleted for {client}!")
+
