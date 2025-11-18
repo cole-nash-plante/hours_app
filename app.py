@@ -216,8 +216,11 @@ elif selected_page == "To-Do":
         for i, client in enumerate(selected_clients):
             client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
             with cols[i]:
-                st.markdown(f"**{client}**")
-                st.dataframe(client_tasks[["Category", "Task", "Priority", "DateCreated"]], use_container_width=True)
+                st.markdown(f"### {client}")
+                st.dataframe(
+                    client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]],
+                    use_container_width=True
+                )
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -226,6 +229,7 @@ elif selected_page == "Reports":
     st.write("Coming soon: charts and summaries.")
 elif selected_page == "History":
     st.title("History")
+
 
 
 
