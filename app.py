@@ -5,31 +5,27 @@ import os
 import requests
 import base64
 
-# -----------------------------
+# -------------------------------------------------
 # GitHub Config (from Streamlit Secrets)
-# GitHub Config
-# -----------------------------
-print("Hello World")
-
+# -------------------------------------------------
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
 GITHUB_REPO = st.secrets["GITHUB_REPO"]
 BRANCH = "main"
 
-# -----------------------------
+# -------------------------------------------------
 # Data Setup
-# -----------------------------
+# -------------------------------------------------
 DATA_DIR = "data"
 CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")
 HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
 GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
 CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
-
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# -----------------------------
+# -------------------------------------------------
 # GitHub Functions
-# -----------------------------
+# -------------------------------------------------
 def fetch_from_github(file_path):
     """Fetch file content from GitHub and save locally."""
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}?ref={BRANCH}"
@@ -40,7 +36,6 @@ def fetch_from_github(file_path):
             f.write(content)
         st.info(f"Fetched latest {file_path} from GitHub.")
     else:
-        st.warning(f"{file_path} not found in GitHub. Will create it locally.")
         st.warning(f"{file_path} not found in GitHub. Will create locally.")
 
 def push_to_github(file_path, commit_message):
@@ -48,67 +43,55 @@ def push_to_github(file_path, commit_message):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
     with open(file_path, "rb") as f:
         content = base64.b64encode(f.read()).decode("utf-8")
-
-    # Check if file exists to get SHA
     response = requests.get(url, headers={"Authorization": f"token {GITHUB_TOKEN}"})
     sha = response.json().get("sha")
-
     data = {
         "message": commit_message,
         "content": content,
         "branch": BRANCH
     }
-    data = {"message": commit_message, "content": content, "branch": BRANCH}
     if sha:
         data["sha"] = sha
-
     r = requests.put(url, json=data, headers={"Authorization": f"token {GITHUB_TOKEN}"})
     if r.status_code in [200, 201]:
         st.success(f"Pushed {file_path} to GitHub!")
     else:
-    if r.status_code not in [200, 201]:
         st.error(f"Failed to push {file_path}: {r.json()}")
 
-# -----------------------------
+# -------------------------------------------------
 # Initialize Data
+# -------------------------------------------------
 # Sync Files from GitHub
-# -----------------------------
-for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv"]:
 for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv", "data/categories.csv", "data/todos.csv"]:
     fetch_from_github(file)
 
 # Ensure files exist locally
-for file, cols in [
-# Initialize files if missing
 init_files = [
     (CLIENTS_FILE, ["Client"]),
     (HOURS_FILE, ["Date", "Client", "Hours", "Description"]),
-    (GOALS_FILE, ["Month", "GoalHours"])
-]:
     (GOALS_FILE, ["Month", "GoalHours"]),
     (CATEGORIES_FILE, ["Client", "Category"]),
     (TODOS_FILE, ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"])
 ]
+
 for file, cols in init_files:
     if not os.path.exists(file):
         pd.DataFrame(columns=cols).to_csv(file, index=False)
         push_to_github(file, f"Created {file}")
 
-# -----------------------------
+# -------------------------------------------------
 # Sidebar Navigation
-# -----------------------------
+# -------------------------------------------------
 st.sidebar.title("Navigation")
-pages = ["Data Entry", "Reports", "To-Do", "History"]
 pages = ["Data Entry", "To-Do", "Reports", "History"]
 selected_page = st.sidebar.radio("Go to", pages)
 
-# -----------------------------
+# -------------------------------------------------
 # Page: Data Entry
-# -----------------------------
+# -------------------------------------------------
 if selected_page == "Data Entry":
     st.title("Data Entry")
 
-    # Form 1: Add New Client
     # Add Client
     st.subheader("Add New Client")
     new_client = st.text_input("Client Name")
@@ -125,7 +108,6 @@ if selected_page == "Data Entry":
         else:
             st.error("Please enter a valid client name.")
 
-    # Form 2: Log Hours
     # Log Hours
     st.subheader("Log Hours")
     df_clients = pd.read_csv(CLIENTS_FILE)
@@ -143,7 +125,6 @@ if selected_page == "Data Entry":
             st.success("Hours logged successfully!")
             push_to_github("data/hours.csv", "Updated hours log")
 
-    # Form 3: Set Hour Goals
     # Set Goals
     st.subheader("Set Hour Goals")
     month = st.selectbox("Month", [f"{m:02d}" for m in range(1, 13)])
@@ -155,79 +136,79 @@ if selected_page == "Data Entry":
         st.success("Goal saved successfully!")
         push_to_github("data/goals.csv", "Updated goals list")
 
-# -----------------------------
+# -------------------------------------------------
 # Page: To-Do
-# -----------------------------
+# -------------------------------------------------
 elif selected_page == "To-Do":
     st.title("To-Do List")
-
     df_clients = pd.read_csv(CLIENTS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
 
-    # Add Category
+    # Add Category (One Line)
     st.subheader("Add Category")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
     else:
-        cat_client = st.selectbox("Select Client for Category", df_clients["Client"].tolist())
-        new_category = st.text_input("New Category")
-        if st.button("Add Category"):
-            if new_category.strip():
-                df_categories.loc[len(df_categories)] = [cat_client, new_category]
-                df_categories.to_csv(CATEGORIES_FILE, index=False)
-                st.success(f"Category '{new_category}' added for client '{cat_client}'!")
-                push_to_github("data/categories.csv", "Updated categories list")
-            else:
-                st.error("Please enter a valid category name.")
+        col1, col2, col3 = st.columns([2, 2, 1])
+        with col1:
+            cat_client = st.selectbox("Client", df_clients["Client"].tolist(), key="cat_client")
+        with col2:
+            new_category = st.text_input("New Category", key="new_category")
+        with col3:
+            if st.button("Add Category"):
+                if new_category.strip():
+                    df_categories.loc[len(df_categories)] = [cat_client, new_category]
+                    df_categories.to_csv(CATEGORIES_FILE, index=False)
+                    st.success(f"Category '{new_category}' added for '{cat_client}'!")
+                    push_to_github("data/categories.csv", "Updated categories list")
+                else:
+                    st.error("Please enter a valid category name.")
 
-    # Add To-Do
+    # Add To-Do Item (One Line)
     st.subheader("Add To-Do Item")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
     else:
-        todo_client = st.selectbox("Select Client", df_clients["Client"].tolist())
-        client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
-        if len(client_categories) == 0:
-            st.warning("Add categories for this client first!")
-        else:
-            todo_category = st.selectbox("Select Category", client_categories)
-            todo_task = st.text_input("Task Description")
-            priority = st.slider("Priority (1=Low, 5=High)", 1, 5, 3)
+        col1, col2, col3, col4, col5 = st.columns([2, 2, 3, 2, 1])
+        with col1:
+            todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
+        with col2:
+            client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
+            todo_category = st.selectbox("Category", client_categories, key="todo_category")
+        with col3:
+            todo_task = st.text_input("Task", key="todo_task")
+        with col4:
+            priority = st.slider("Priority", 1, 5, 3, key="priority")
+        with col5:
             if st.button("Add Task"):
                 df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(datetime.today().date()), ""]
                 df_todos.to_csv(TODOS_FILE, index=False)
                 st.success("Task added successfully!")
                 push_to_github("data/todos.csv", "Updated To-Do list")
 
-    # Active To-Dos
+    # Active To-Dos: Side-by-Side Tables by Client
     st.subheader("Active To-Dos")
     active_todos = df_todos[df_todos["DateCompleted"] == ""].copy()
     if len(active_todos) == 0:
         st.info("No active tasks.")
     else:
-        active_todos = active_todos.sort_values(by="Priority", ascending=False)
-        edited_todos = st.data_editor(active_todos, num_rows="dynamic", use_container_width=True)
+        clients_with_tasks = active_todos["Client"].unique().tolist()
+        selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
 
-        # Save edits
-        if st.button("Save Changes"):
-            df_todos.update(edited_todos)
-            df_todos.to_csv(TODOS_FILE, index=False)
-            st.success("Changes saved!")
-            push_to_github("data/todos.csv", "Updated To-Do list")
+        # Display tables side by side
+        cols = st.columns(len(selected_clients))
+        for i, client in enumerate(selected_clients):
+            client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+            with cols[i]:
+                st.markdown(f"**{client}**")
+                st.dataframe(client_tasks[["Category", "Task", "Priority", "DateCreated"]], use_container_width=True)
 
-# -----------------------------
+# -------------------------------------------------
 # Placeholder Pages
-# -----------------------------
+# -------------------------------------------------
 elif selected_page == "Reports":
     st.title("Reports")
     st.write("Coming soon: charts and summaries.")
-
-elif selected_page == "To-Do":
-    st.title("To-Do")
-    st.write("Coming soon: task management.")
-
 elif selected_page == "History":
     st.title("History")
-    st.write("Coming soon: view past entries.")
-
