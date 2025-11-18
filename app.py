@@ -244,39 +244,35 @@ elif selected_page == "History":
     st.title("History")
 
     # Load data
-    df_clients = pd.read_csv(CLIENTS_FILE)
     df_hours = pd.read_csv(HOURS_FILE)
+    df_todos = pd.read_csv(TODOS_FILE)
 
     # -------------------------------
-    # History: Editable Tables
+    # Layout: Hours History + To-Do History
     # -------------------------------
-    st.subheader("Logged Hours History")
-    if len(df_hours) == 0:
-        st.info("No history available yet.")
-    else:
-        clients_with_history = df_hours["Client"].dropna().unique().tolist()
-        selected_clients = st.multiselect("Filter by Client", clients_with_history, default=clients_with_history)
+    col1, col2 = st.columns(2)
 
-        if len(selected_clients) > 0:
-            cols = st.columns(len(selected_clients))
-            for i, client in enumerate(selected_clients):
-                client_history = df_hours[df_hours["Client"] == client].sort_values(by="Date", ascending=False)
-                with cols[i]:
-                    st.markdown(f"### {client}")
-                    edited_table = st.data_editor(
-                        client_history[["Date", "Hours", "Description"]].reset_index(drop=True),
-                        num_rows="dynamic",
-                        width="stretch"
-                    )
+    # Hours History
+    with col1:
+        st.subheader("Logged Hours History")
+        if len(df_hours) == 0:
+            st.info("No hours logged yet.")
+        else:
+            st.dataframe(df_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), width="stretch")
 
-                    # Save changes button
-                    if st.button(f"Save Changes for {client}"):
-                        # Replace rows for this client with edited data
-                        df_hours = df_hours[df_hours["Client"] != client]
-                        edited_table["Client"] = client
-                        df_hours = pd.concat([df_hours, edited_table], ignore_index=True)
-                        df_hours.to_csv(HOURS_FILE, index=False)
-                        push_to_github("data/hours.csv", "Updated history log")
-                        st.success(f"Changes saved for {client}!")
+    # To-Do History
+    with col2:
+        st.subheader("To-Do History")
+        if len(df_todos) == 0:
+            st.info("No tasks recorded yet.")
+        else:
+            # Show all tasks including completed ones
+            st.dataframe(
+                df_todos.sort_values(by="DateCreated", ascending=False)[
+                    ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
+                ].reset_index(drop=True),
+                width="stretch"
+            )
+
 
 
