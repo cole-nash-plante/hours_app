@@ -433,53 +433,48 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
 
+
 elif selected_page == "Days Off":
     st.title("Days Off")
 
+    # File path
     DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
+
+    # Ensure file exists
     if not os.path.exists(DAYS_OFF_FILE):
         pd.DataFrame(columns=["Date", "Reason"]).to_csv(DAYS_OFF_FILE, index=False)
 
+    # Load data
     df_days_off = pd.read_csv(DAYS_OFF_FILE)
 
-    col1, col2 = st.columns([2, 3])
-
-    # Left: Calendar View
-    with col1:
-        st.subheader("Calendar View")
-        from streamlit_calendar import calendar
-        events = [{"title": row["Reason"], "start": row["Date"], "end": row["Date"]} for _, row in df_days_off.iterrows()]
-        calendar_options = {
-            "initialView": "dayGridMonth",
-            "editable": False,
-            "selectable": False,
-            "headerToolbar": {
-                "left": "prev,next today",
-                "center": "title",
-                "right": "dayGridMonth,timeGridWeek,timeGridDay"
-            }
-        }
-        calendar(events=events, options=calendar_options)
-
-    # Right: Add and Edit Days Off
-    with col2:
-        st.subheader("Manage Days Off")
-        new_date = st.date_input("Select Date")
-        new_reason = st.text_input("Reason for Day Off")
-        if st.button("Add Day Off"):
-            if new_reason.strip():
-                df_days_off.loc[len(df_days_off)] = [str(new_date), new_reason]
-                df_days_off.to_csv(DAYS_OFF_FILE, index=False)
-                push_to_github("data/days_off.csv", "Added new day off")
-                st.success("Day off added successfully!")
-            else:
-                st.error("Please enter a reason.")
-
-        st.markdown("### Edit Days Off")
-        edited_days_off = st.data_editor(df_days_off.reset_index(drop=True), num_rows="dynamic", width="stretch")
-        if st.button("Save Changes"):
-            df_days_off = edited_days_off
+    # -------------------------------
+    # Add New Day Off
+    # -------------------------------
+    st.subheader("Add a Day Off")
+    new_date = st.date_input("Select Date")
+    new_reason = st.text_input("Reason for Day Off")
+    if st.button("Add Day Off"):
+        if new_reason.strip():
+            df_days_off.loc[len(df_days_off)] = [str(new_date), new_reason]
             df_days_off.to_csv(DAYS_OFF_FILE, index=False)
-            push_to_github("data/days_off.csv", "Updated days off list")
-            st.success("Changes saved!")
+            push_to_github("data/days_off.csv", "Added new day off")
+            st.success("Day off added successfully!")
+        else:
+            st.error("Please enter a reason.")
+
+    # -------------------------------
+    # Editable Days Off Table
+    # -------------------------------
+    st.subheader("Manage Days Off")
+    edited_days_off = st.data_editor(
+        df_days_off.reset_index(drop=True),
+        num_rows="dynamic",
+        width="stretch"
+    )
+
+    if st.button("Save Changes"):
+        df_days_off = edited_days_off
+        df_days_off.to_csv(DAYS_OFF_FILE, index=False)
+        push_to_github("data/days_off.csv", "Updated days off list")
+        st.success("Changes saved!")
 
