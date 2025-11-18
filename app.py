@@ -82,7 +82,7 @@ for file, cols in init_files:
 # Sidebar Navigation
 # -------------------------------------------------
 st.sidebar.title("Navigation")
-pages = ["Data Entry", "To-Do", "s", "History", "Days Off", "Archive"]
+pages = ["Data Entry", "To-Do", "Reports", "History", "Days Off", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
 
 # -------------------------------------------------
@@ -569,6 +569,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
