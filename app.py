@@ -35,6 +35,17 @@ st.set_page_config(layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
+/* Form boxes with light gray border */
+.form-box {
+    background-color: #1E1E1E; /* Dark inner background */
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    border: 1px solid #444; /* Light gray border */
+}
+</style>
+<style>
 /* Sidebar background */
 [data-testid="stSidebar"] {
     background-color: #1E1E1E !important;
@@ -614,6 +625,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
