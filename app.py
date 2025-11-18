@@ -34,7 +34,6 @@ def fetch_from_github(file_path):
         content = base64.b64decode(response.json()["content"]).decode("utf-8")
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
-        st.info(f"Fetched latest {file_path} from GitHub.")
     else:
         st.warning(f"{file_path} not found in GitHub. Will create locally.")
 
@@ -227,4 +226,5 @@ elif selected_page == "Reports":
     st.write("Coming soon: charts and summaries.")
 elif selected_page == "History":
     st.title("History")
+
 
