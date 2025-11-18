@@ -265,17 +265,20 @@ elif selected_page == "Reports":
     hours_df["Date"] = pd.to_datetime(hours_df["Date"])
     days_off_df["Date"] = pd.to_datetime(days_off_df["Date"])
 
-    # -------------------------------
-    # BAN Calculations
-    # -------------------------------
+    # Current date
     now = datetime.today()
-    current_month = now.strftime("%Y-%m")
+    last_day = date(now.year, now.month, calendar.monthrange(now.year, now.month)[1])
 
-    # Monthly goal and actual
+    # Date range filter (applies to both charts)
+    st.subheader("Filter Reports by Date Range")
+    start_date = st.date_input("Start Date", date(now.year, now.month, 1))
+    end_date = st.date_input("End Date", last_day)
+
+    # BAN Calculations
+    current_month = now.strftime("%Y-%m")
     hours_df["Month"] = hours_df["Date"].dt.strftime("%Y-%m")
     monthly_actual = hours_df.groupby("Month")["Hours"].sum().reset_index()
     monthly_actual.rename(columns={"Hours": "ActualHours"}, inplace=True)
-
     goals_df["Month"] = goals_df["Month"].apply(lambda m: f"{now.year}-{m}")
     merged = pd.merge(goals_df, monthly_actual, on="Month", how="left").fillna(0)
 
@@ -283,14 +286,11 @@ elif selected_page == "Reports":
     actual_hours = merged.loc[merged["Month"] == current_month, "ActualHours"].sum()
     remaining_hours = max(goal_hours - actual_hours, 0)
 
-    # Remaining weekdays this month
-    last_day = date(now.year, now.month, calendar.monthrange(now.year, now.month)[1])
     remaining_days = pd.date_range(start=now, end=last_day, freq="B")
     days_off_this_month = days_off_df[(days_off_df["Date"].dt.month == now.month) & (days_off_df["Date"].dt.year == now.year)]
     remaining_weekdays = len(remaining_days) - len(days_off_this_month)
     monthly_avg_left = remaining_hours / remaining_weekdays if remaining_weekdays > 0 else 0
 
-    # Annual BAN
     annual_end_date = pd.to_datetime(annual_target_df["EndDate"].iloc[0])
     remaining_days_annual = pd.date_range(start=now, end=annual_end_date, freq="B")
     days_off_annual = days_off_df[(days_off_df["Date"] >= now) & (days_off_df["Date"] <= annual_end_date)]
@@ -306,35 +306,39 @@ elif selected_page == "Reports":
         st.metric("Avg Hours Left per Day (Monthly)", f"{monthly_avg_left:.2f}")
     with col2:
         st.metric("Avg Hours Left per Day (Annual)", f"{annual_avg_left:.2f}")
-        new_end_date = st.date_input("Set Annual End Date", annual_end_date.date())
-        if st.button("Update End Date"):
-            pd.DataFrame({"EndDate": [str(new_end_date)]}).to_csv(ANNUAL_TARGET_FILE, index=False)
-            push_to_github("data/annual_target.csv", "Updated annual end date")
-            st.success("Annual end date updated!")
 
-    # -------------------------------
-    # Line Chart: Actual vs Planned
-    # -------------------------------
-    st.subheader("Monthly Actual vs Planned Hours")
-    fig_line = go.Figure()
-    fig_line.add_trace(go.Scatter(x=merged["Month"], y=merged["GoalHours"], mode="lines+markers", name="Planned Hours"))
-    fig_line.add_trace(go.Scatter(x=merged["Month"], y=merged["ActualHours"], mode="lines+markers", name="Actual Hours"))
-    fig_line.update_layout(title="Monthly Actual vs Planned Hours", xaxis_title="Month", yaxis_title="Hours")
-    st.plotly_chart(fig_line, use_container_width=True)
+    new_end_date = st.date_input("Set Annual End Date", annual_end_date.date())
+    if st.button("Update End Date"):
+        pd.DataFrame({"EndDate": [str(new_end_date)]}).to_csv(ANNUAL_TARGET_FILE, index=False)
+        push_to_github("data/annual_target.csv", "Updated annual end date")
+        st.success("Annual end date updated!")
 
-    # -------------------------------
-    # Pie Chart: Hours by Client
-    # -------------------------------
-    st.subheader("Hours by Client")
-    start_date = st.date_input("Start Date", date(now.year, now.month, 1))
-    end_date = st.date_input("End Date", last_day)
+    # Filter data for charts
     filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(start_date)) & (hours_df["Date"] <= pd.to_datetime(end_date))]
-    if len(filtered_hours) > 0:
-        pie_fig = px.pie(filtered_hours, names="Client", values="Hours", title=f"Hours by Client ({start_date} to {end_date})")
-        st.plotly_chart(pie_fig, use_container_width=True)
-    else:
-        st.info("No hours logged in this range.")
+    filtered_merged = merged[(pd.to_datetime(merged["Month"] + "-01") >= pd.to_datetime(start_date)) &
+                              (pd.to_datetime(merged["Month"] + "-01") <= pd.to_datetime(end_date))]
 
+    # Side-by-side charts
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Monthly Actual vs Planned Hours")
+        fig_line = go.Figure()
+        fig_line.add_trace(go.Scatter(x=filtered_merged["Month"], y=filtered_merged["GoalHours"],
+                                      mode="lines+markers", name="Planned Hours"))
+        fig_line.add_trace(go.Scatter(x=filtered_merged["Month"], y=filtered_merged["ActualHours"],
+                                      mode="lines+markers", name="Actual Hours"))
+        fig_line.update_layout(title="Monthly Actual vs Planned Hours", xaxis_title="Month", yaxis_title="Hours")
+        st.plotly_chart(fig_line, use_container_width=True)
+
+    with col2:
+        st.subheader("Hours by Client")
+        if len(filtered_hours) > 0:
+            pie_fig = px.pie(filtered_hours, names="Client", values="Hours",
+                             title=f"Hours by Client ({start_date} to {end_date})")
+            st.plotly_chart(pie_fig, use_container_width=True)
+        else:
+            st.info("No hours logged in this range.")
 elif selected_page == "History":
     st.title("History")
 
@@ -572,6 +576,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
