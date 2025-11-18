@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import os
+import requests
+import base64
+
+# -----------------------------
+# GitHub Config (from Streamlit Secrets)
+# -----------------------------
+GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
+GITHUB_REPO = st.secrets["GITHUB_REPO"]
 
 # -----------------------------
 # Data Setup
@@ -21,6 +29,32 @@ for file, cols in [
 ]:
     if not os.path.exists(file):
         pd.DataFrame(columns=cols).to_csv(file, index=False)
+
+# -----------------------------
+# Function to Push File to GitHub
+# -----------------------------
+def push_to_github(file_path, commit_message):
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+    with open(file_path, "rb") as f:
+        content = base64.b64encode(f.read()).decode("utf-8")
+
+    # Check if file exists to get SHA
+    response = requests.get(url, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+    sha = response.json().get("sha")
+
+    data = {
+        "message": commit_message,
+        "content": content,
+        "branch": "main"
+    }
+    if sha:
+        data["sha"] = sha
+
+    r = requests.put(url, json=data, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+    if r.status_code in [200, 201]:
+        st.success(f"Pushed {file_path} to GitHub!")
+    else:
+        st.error(f"Failed to push {file_path}: {r.json()}")
 
 # -----------------------------
 # Sidebar Navigation
@@ -45,6 +79,7 @@ if selected_page == "Data Entry":
                 df_clients.loc[len(df_clients)] = [new_client]
                 df_clients.to_csv(CLIENTS_FILE, index=False)
                 st.success(f"Client '{new_client}' added!")
+                push_to_github("data/clients.csv", "Updated clients list")
             else:
                 st.warning("Client already exists.")
         else:
@@ -65,6 +100,7 @@ if selected_page == "Data Entry":
             df_hours.loc[len(df_hours)] = [str(date), client, hours, description]
             df_hours.to_csv(HOURS_FILE, index=False)
             st.success("Hours logged successfully!")
+            push_to_github("data/hours.csv", "Updated hours log")
 
     # Form 3: Set Hour Goals
     st.subheader("Set Hour Goals")
@@ -75,6 +111,7 @@ if selected_page == "Data Entry":
         df_goals.loc[len(df_goals)] = [month, goal_hours]
         df_goals.to_csv(GOALS_FILE, index=False)
         st.success("Goal saved successfully!")
+        push_to_github("data/goals.csv", "Updated goals list")
 
 # -----------------------------
 # Placeholder Pages
