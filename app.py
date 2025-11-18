@@ -269,11 +269,6 @@ elif selected_page == "Reports":
     now = datetime.today()
     last_day = date(now.year, now.month, calendar.monthrange(now.year, now.month)[1])
 
-    # Date range filter (applies to both charts)
-    st.subheader("Filter Reports by Date Range")
-    start_date = st.date_input("Start Date", date(now.year, now.month, 1))
-    end_date = st.date_input("End Date", last_day)
-
     # BAN Calculations
     current_month = now.strftime("%Y-%m")
     hours_df["Month"] = hours_df["Date"].dt.strftime("%Y-%m")
@@ -300,18 +295,26 @@ elif selected_page == "Reports":
     remaining_annual_hours = max(annual_goal_hours - annual_actual_hours, 0)
     annual_avg_left = remaining_annual_hours / remaining_weekdays_annual if remaining_weekdays_annual > 0 else 0
 
-    # Display BANs
-    col1, col2 = st.columns(2)
+    # Display BANs above date filter
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         st.metric("Avg Hours Left per Day (Monthly)", f"{monthly_avg_left:.2f}")
     with col2:
         st.metric("Avg Hours Left per Day (Annual)", f"{annual_avg_left:.2f}")
+    with col3:
+        new_end_date = st.date_input("Annual End Date", annual_end_date.date(), label_visibility="collapsed")
+        if st.button("Update End Date", use_container_width=True):
+            pd.DataFrame({"EndDate": [str(new_end_date)]}).to_csv(ANNUAL_TARGET_FILE, index=False)
+            push_to_github("data/annual_target.csv", "Updated annual end date")
+            st.success("Annual end date updated!")
 
-    new_end_date = st.date_input("Set Annual End Date", annual_end_date.date())
-    if st.button("Update End Date"):
-        pd.DataFrame({"EndDate": [str(new_end_date)]}).to_csv(ANNUAL_TARGET_FILE, index=False)
-        push_to_github("data/annual_target.csv", "Updated annual end date")
-        st.success("Annual end date updated!")
+    # Date filter in one line
+    st.markdown("---")
+    col_start, col_end = st.columns([1, 1])
+    with col_start:
+        start_date = st.date_input("Start Date", date(now.year, now.month, 1))
+    with col_end:
+        end_date = st.date_input("End Date", last_day)
 
     # Filter data for charts
     filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(start_date)) & (hours_df["Date"] <= pd.to_datetime(end_date))]
@@ -320,7 +323,6 @@ elif selected_page == "Reports":
 
     # Side-by-side charts
     col1, col2 = st.columns(2)
-
     with col1:
         st.subheader("Monthly Actual vs Planned Hours")
         fig_line = go.Figure()
@@ -339,6 +341,9 @@ elif selected_page == "Reports":
             st.plotly_chart(pie_fig, use_container_width=True)
         else:
             st.info("No hours logged in this range.")
+
+
+
 elif selected_page == "History":
     st.title("History")
 
@@ -576,6 +581,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
