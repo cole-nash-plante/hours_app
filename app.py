@@ -230,39 +230,101 @@ elif selected_page == "Reports":
 
 
 
-elif selected_page == "History":
-    st.title("History")
+elif selected_page == "To-Do":
+    st.title("To-Do List")
 
     # Load data
+    df_clients = pd.read_csv(CLIENTS_FILE)
+    df_categories = pd.read_csv(CATEGORIES_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
-    df_hours = pd.read_csv(HOURS_FILE)
 
-    # Filter by Client
-    all_clients = sorted(set(df_todos["Client"].dropna().tolist() + df_hours["Client"].dropna().tolist()))
-    selected_clients = st.multiselect("Filter by Client", all_clients, default=all_clients)
+    # -------------------------------
+    # Add Category (One Line Layout)
+    # -------------------------------
+    st.subheader("Add Category")
+    if len(df_clients) == 0:
+        st.warning("Add clients first!")
+    else:
+        col1, col2, col3 = st.columns([2, 2, 1])
+        with col1:
+            cat_client = st.selectbox("Client", df_clients["Client"].tolist(), key="cat_client")
+        with col2:
+            new_category = st.text_input("New Category", key="new_category")
+        with col3:
+            if st.button("Add Category"):
+                if new_category.strip():
+                    df_categories.loc[len(df_categories)] = [cat_client, new_category]
+                    df_categories.to_csv(CATEGORIES_FILE, index=False)
+                    st.success(f"Category '{new_category}' added for '{cat_client}'!")
+                    push_to_github("data/categories.csv", "Updated categories list")
+                    df_categories = pd.read_csv(CATEGORIES_FILE)
+                else:
+                    st.error("Please enter a valid category name.")
 
-    # Apply filter
-    filtered_todos = df_todos[df_todos["Client"].isin(selected_clients)].copy()
-    filtered_hours = df_hours[df_hours["Client"].isin(selected_clients)].copy()
+    # -------------------------------
+    # Add To-Do Item (One Line Layout)
+    # -------------------------------
+    st.subheader("Add To-Do Item")
+    if len(df_clients) == 0:
+        st.warning("Add clients first!")
+    else:
+        col1, col2, col3, col4, col5 = st.columns([2, 2, 3, 2, 1])
+        with col1:
+            todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
+        with col2:
+            client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
+            todo_category = st.selectbox("Category", client_categories, key="todo_category")
+        with col3:
+            todo_task = st.text_input("Task", key="todo_task")
+        with col4:
+            priority = st.slider("Priority", 1, 5, 3, key="priority")
+        with col5:
+            if st.button("Add Task"):
+                df_todos.loc[len(df_todos)] = [
+                    todo_client, todo_category, todo_task, priority,
+                    str(datetime.today().date()), ""
+                ]
+                df_todos.to_csv(TODOS_FILE, index=False)
+                st.success("Task added successfully!")
+                push_to_github("data/todos.csv", "Updated To-Do list")
+                df_todos = pd.read_csv(TODOS_FILE)
 
-    # Display tables side by side
-    col1, col2 = st.columns(2)
+    # -------------------------------
+    # Active To-Dos (Editable Tables)
+    # -------------------------------
+    st.subheader("Active To-Dos")
+    active_todos = df_todos[df_todos["DateCompleted"].isna() | (df_todos["DateCompleted"] == "")].copy()
 
-    with col1:
-        st.subheader("To-Do History")
-        st.dataframe(
-            filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]],
-            use_container_width=True
-        )
+    if len(active_todos) == 0:
+        st.info("No active tasks.")
+    else:
+        clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
+        selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
 
-    with col2:
-        st.subheader("Hours History")
-        st.dataframe(
-            filtered_hours[["Date", "Client", "Hours", "Description"]],
-            use_container_width=True
-        )
+        cols = st.columns(len(selected_clients))
+        for i, client in enumerate(selected_clients):
+            client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+            with cols[i]:
+                st.markdown(f"### {client}")
+                edited_table = st.data_editor(
+                    client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]],
+                    num_rows="dynamic",
+                    use_container_width=True
+                )
 
+                # Save changes button
+                if st.button(f"Save Changes for {client}"):
+                    # Update original df_todos with edits
+                    df_todos.update(edited_table)
+                    df_todos.to_csv(TODOS_FILE, index=False)
+                    push_to_github("data/todos.csv", "Updated To-Do list")
+                    st.success(f"Changes saved for {client}!")
 
-
-
-
+                # Delete selected rows
+                if st.button(f"Delete Selected for {client}"):
+                    # Remove rows that were deleted in editor
+                    remaining_tasks = edited_table.dropna(subset=["Task"])
+                    df_todos = df_todos[df_todos["Task"].isin(remaining_tasks["Task"])]
+                    df_todos.to_csv(TODOS_FILE, index=False)
+                    push_to_github("data/todos.csv", "Deleted tasks")
+                    st.success(f"Deleted tasks for {client}!")
