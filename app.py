@@ -298,6 +298,7 @@ elif selected_page == "History":
 
 
 
+
 elif selected_page == "Archive":
     st.title("Archive Clients")
 
@@ -337,7 +338,7 @@ elif selected_page == "Archive":
     if len(df_clients) == 0:
         st.warning("No clients available to archive.")
     else:
-        selected_client = st.selectbox("Select Client to Archive", df_clients["Client"].tolist())
+        selected_client = st.selectbox("Select Client to Archive", df_clients["Client"].tolist(), key="archive_client")
         if st.button("Archive Client"):
             # Move data to archive
             df_archive_clients = pd.concat([df_archive_clients, df_clients[df_clients["Client"] == selected_client]], ignore_index=True)
@@ -374,6 +375,49 @@ elif selected_page == "Archive":
             st.success(f"Client '{selected_client}' archived successfully!")
 
     # -------------------------------
+    # Undo Archive Client Action
+    # -------------------------------
+    st.subheader("Undo Archive")
+    if len(df_archive_clients) == 0:
+        st.warning("No archived clients available.")
+    else:
+        undo_client = st.selectbox("Select Archived Client to Restore", df_archive_clients["Client"].tolist(), key="undo_client")
+        if st.button("Restore Client"):
+            # Move data back to active
+            df_clients = pd.concat([df_clients, df_archive_clients[df_archive_clients["Client"] == undo_client]], ignore_index=True)
+            df_categories = pd.concat([df_categories, df_archive_categories[df_archive_categories["Client"] == undo_client]], ignore_index=True)
+            df_todos = pd.concat([df_todos, df_archive_todos[df_archive_todos["Client"] == undo_client]], ignore_index=True)
+            df_hours = pd.concat([df_hours, df_archive_hours[df_archive_hours["Client"] == undo_client]], ignore_index=True)
+
+            # Remove from archive files
+            df_archive_clients = df_archive_clients[df_archive_clients["Client"] != undo_client]
+            df_archive_categories = df_archive_categories[df_archive_categories["Client"] != undo_client]
+            df_archive_todos = df_archive_todos[df_archive_todos["Client"] != undo_client]
+            df_archive_hours = df_archive_hours[df_archive_hours["Client"] != undo_client]
+
+            # Save all files
+            df_clients.to_csv(CLIENTS_FILE, index=False)
+            df_categories.to_csv(CATEGORIES_FILE, index=False)
+            df_todos.to_csv(TODOS_FILE, index=False)
+            df_hours.to_csv(HOURS_FILE, index=False)
+            df_archive_clients.to_csv(ARCHIVE_CLIENTS, index=False)
+            df_archive_categories.to_csv(ARCHIVE_CATEGORIES, index=False)
+            df_archive_todos.to_csv(ARCHIVE_TODOS, index=False)
+            df_archive_hours.to_csv(ARCHIVE_HOURS, index=False)
+
+            # Push to GitHub
+            push_to_github("data/clients.csv", "Restored client")
+            push_to_github("data/categories.csv", "Restored client categories")
+            push_to_github("data/todos.csv", "Restored client todos")
+            push_to_github("data/hours.csv", "Restored client hours")
+            push_to_github("data/archive_clients.csv", "Updated archive clients after restore")
+            push_to_github("data/archive_categories.csv", "Updated archive categories after restore")
+            push_to_github("data/archive_todos.csv", "Updated archive todos after restore")
+            push_to_github("data/archive_hours.csv", "Updated archive hours after restore")
+
+            st.success(f"Client '{undo_client}' restored successfully!")
+
+    # -------------------------------
     # Show Archive History Tables
     # -------------------------------
     st.subheader("Archive History")
@@ -381,13 +425,13 @@ elif selected_page == "Archive":
 
     with col1:
         st.markdown("### Archived Hours")
-        st.dataframe(df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), width="stretch")
+        st.dataframe(df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), width="stretch", hide_index=True)
 
     with col2:
         st.markdown("### Archived To-Dos")
         st.dataframe(df_archive_todos.sort_values(by="DateCreated", ascending=False)[
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
-        ].reset_index(drop=True), width="stretch")
+        ].reset_index(drop=True), width="stretch", hide_index=True)
 
 
 
