@@ -82,7 +82,7 @@ for file, cols in init_files:
 # Sidebar Navigation
 # -------------------------------------------------
 st.sidebar.title("Navigation")
-pages = ["Data Entry", "To-Do", "Reports", "History"]
+pages = ["Data Entry", "To-Do", "Reports", "History", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
 
 # -------------------------------------------------
@@ -388,5 +388,6 @@ elif selected_page == "Archive":
         st.dataframe(df_archive_todos.sort_values(by="DateCreated", ascending=False)[
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch")
+
 
 
