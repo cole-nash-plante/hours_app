@@ -82,7 +82,7 @@ for file, cols in init_files:
 # Sidebar Navigation
 # -------------------------------------------------
 st.sidebar.title("Navigation")
-pages = ["Data Entry", "To-Do", "Reports", "History", "Archive"]
+pages = ["Data Entry", "To-Do", "Reports", "History", "Days Off", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
 
 # -------------------------------------------------
@@ -433,5 +433,60 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
 
+elif selected_page == "Days Off":
+    st.title("Days Off")
+
+    # File path
+    DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
+
+    # Ensure file exists
+    if not os.path.exists(DAYS_OFF_FILE):
+        pd.DataFrame(columns=["Date", "Reason"]).to_csv(DAYS_OFF_FILE, index=False)
+
+    # Load data
+    df_days_off = pd.read_csv(DAYS_OFF_FILE)
+
+    # -------------------------------
+    # Layout: Calendar + Table
+    # -------------------------------
+    col1, col2 = st.columns([2, 3])
+
+    # Left: Calendar (placeholder for now)
+    with col1:
+        st.subheader("Calendar View")
+        if len(df_days_off) > 0:
+            st.write("Planned Days Off:")
+            for _, row in df_days_off.iterrows():
+                st.markdown(f"- **{row['Date']}**: {row['Reason']}")
+        else:
+            st.info("No days off planned yet.")
+
+    # Right: Add new day off + Editable table
+    with col2:
+        st.subheader("Manage Days Off")
+        new_date = st.date_input("Select Date")
+        new_reason = st.text_input("Reason for Day Off")
+        if st.button("Add Day Off"):
+            if new_reason.strip():
+                df_days_off.loc[len(df_days_off)] = [str(new_date), new_reason]
+                df_days_off.to_csv(DAYS_OFF_FILE, index=False)
+                push_to_github("data/days_off.csv", "Added new day off")
+                st.success("Day off added successfully!")
+            else:
+                st.error("Please enter a reason.")
+
+        # Editable table
+        st.markdown("### Edit Days Off")
+        edited_days_off = st.data_editor(
+            df_days_off.reset_index(drop=True),
+            num_rows="dynamic",
+            width="stretch"
+        )
+
+        if st.button("Save Changes"):
+            df_days_off = edited_days_off
+            df_days_off.to_csv(DAYS_OFF_FILE, index=False)
+            push_to_github("data/days_off.csv", "Updated days off list")
+            st.success("Changes saved!")
 
 
