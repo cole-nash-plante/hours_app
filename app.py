@@ -227,8 +227,41 @@ elif selected_page == "To-Do":
 elif selected_page == "Reports":
     st.title("Reports")
     st.write("Coming soon: charts and summaries.")
+
+
+
 elif selected_page == "History":
     st.title("History")
+
+    # Load data
+    df_todos = pd.read_csv(TODOS_FILE)
+    df_hours = pd.read_csv(HOURS_FILE)
+
+    # Filter by Client
+    all_clients = sorted(set(df_todos["Client"].dropna().tolist() + df_hours["Client"].dropna().tolist()))
+    selected_clients = st.multiselect("Filter by Client", all_clients, default=all_clients)
+
+    # Apply filter
+    filtered_todos = df_todos[df_todos["Client"].isin(selected_clients)].copy()
+    filtered_hours = df_hours[df_hours["Client"].isin(selected_clients)].copy()
+
+    # Display tables side by side
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("To-Do History")
+        st.dataframe(
+            filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]],
+            use_container_width=True
+        )
+
+    with col2:
+        st.subheader("Hours History")
+        st.dataframe(
+            filtered_hours[["Date", "Client", "Hours", "Description"]],
+            use_container_width=True
+        )
+
 
 
 
