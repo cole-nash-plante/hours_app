@@ -22,7 +22,7 @@ GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
 CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
 os.makedirs(DATA_DIR, exist_ok=True)
-
+st.set_page_config(layout="wide")
 # -------------------------------------------------
 # GitHub Functions
 # -------------------------------------------------
@@ -226,5 +226,6 @@ elif selected_page == "Reports":
     st.write("Coming soon: charts and summaries.")
 elif selected_page == "History":
     st.title("History")
+
 
 
