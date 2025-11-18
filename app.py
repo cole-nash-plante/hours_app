@@ -9,6 +9,8 @@ import base64
 # GitHub Config (from Streamlit Secrets)
 # GitHub Config
 # -----------------------------
+print("Hello World")
+
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
 GITHUB_REPO = st.secrets["GITHUB_REPO"]
 BRANCH = "main"
@@ -228,3 +230,4 @@ elif selected_page == "To-Do":
 elif selected_page == "History":
     st.title("History")
     st.write("Coming soon: view past entries.")
+
