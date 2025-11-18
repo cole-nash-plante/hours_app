@@ -141,11 +141,15 @@ if selected_page == "Data Entry":
 # -------------------------------------------------
 elif selected_page == "To-Do":
     st.title("To-Do List")
+
+    # Load data
     df_clients = pd.read_csv(CLIENTS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
 
-    # Add Category (One Line)
+    # -------------------------------
+    # Add Category (One Line Layout)
+    # -------------------------------
     st.subheader("Add Category")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -162,10 +166,14 @@ elif selected_page == "To-Do":
                     df_categories.to_csv(CATEGORIES_FILE, index=False)
                     st.success(f"Category '{new_category}' added for '{cat_client}'!")
                     push_to_github("data/categories.csv", "Updated categories list")
+                    # Reload categories
+                    df_categories = pd.read_csv(CATEGORIES_FILE)
                 else:
                     st.error("Please enter a valid category name.")
 
-    # Add To-Do Item (One Line)
+    # -------------------------------
+    # Add To-Do Item (One Line Layout)
+    # -------------------------------
     st.subheader("Add To-Do Item")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -182,18 +190,26 @@ elif selected_page == "To-Do":
             priority = st.slider("Priority", 1, 5, 3, key="priority")
         with col5:
             if st.button("Add Task"):
-                df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(datetime.today().date()), ""]
+                df_todos.loc[len(df_todos)] = [
+                    todo_client, todo_category, todo_task, priority,
+                    str(datetime.today().date()), ""
+                ]
                 df_todos.to_csv(TODOS_FILE, index=False)
                 st.success("Task added successfully!")
                 push_to_github("data/todos.csv", "Updated To-Do list")
+                # Reload todos
+                df_todos = pd.read_csv(TODOS_FILE)
 
-    # Active To-Dos: Side-by-Side Tables by Client
+    # -------------------------------
+    # Active To-Dos (Side-by-Side Tables)
+    # -------------------------------
     st.subheader("Active To-Dos")
-    active_todos = df_todos[df_todos["DateCompleted"] == ""].copy()
+    active_todos = df_todos[df_todos["DateCompleted"].isna() | (df_todos["DateCompleted"] == "")].copy()
+
     if len(active_todos) == 0:
         st.info("No active tasks.")
     else:
-        clients_with_tasks = active_todos["Client"].unique().tolist()
+        clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
 
         # Display tables side by side
@@ -203,7 +219,6 @@ elif selected_page == "To-Do":
             with cols[i]:
                 st.markdown(f"**{client}**")
                 st.dataframe(client_tasks[["Category", "Task", "Priority", "DateCreated"]], use_container_width=True)
-
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -212,3 +227,4 @@ elif selected_page == "Reports":
     st.write("Coming soon: charts and summaries.")
 elif selected_page == "History":
     st.title("History")
+
