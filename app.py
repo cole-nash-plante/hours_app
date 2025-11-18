@@ -33,39 +33,67 @@ st.set_page_config(layout="wide")
 # -------------------------------------------------
 # Improved Dark Theme CSS
 # -------------------------------------------------
+
 st.markdown("""
 <style>
-/* Form boxes with light gray border */
-.form-box {
-    background-color: #1E1E1E; /* Dark inner background */
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    border: 1px solid #444; /* Light gray border */
+/* Main container */
+[data-testid="stAppViewContainer"] {
+    background-color: #121212 !important;
+    color: #E0E0E0 !important;
 }
-</style>
-<style>
-/* Sidebar background */
+
+/* Sidebar */
 [data-testid="stSidebar"] {
     background-color: #1E1E1E !important;
-}
-
-/* Sidebar text and labels */
-[data-testid="stSidebar"] * {
     color: #E0E0E0 !important;
 }
 
-/* Radio button labels */
-div[role="radiogroup"] label {
+/* Force all text to light */
+html, body, [class*="css"] {
     color: #E0E0E0 !important;
-    font-weight: 500;
 }
 
-/* Selected radio button indicator */
-div[role="radiogroup"] input:checked + div {
+/* Headings */
+h1, h2, h3 {
     color: #BB86FC !important;
+    font-weight: 600;
+}
+
+/* Form boxes */
+.form-box {
+    background-color: #1E1E1E;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px solid #444;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Inputs */
+[data-testid="stTextInput"] input,
+[data-testid="stNumberInput"] input,
+[data-testid="stDateInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stSelectbox"] div {
+    background-color: #2C2C2C !important;
+    color: #E0E0E0 !important;
+    border-radius: 6px;
+    border: 1px solid #555;
+    padding: 10px;
+}
+
+/* Buttons */
+.stButton>button {
+    background-color: #BB86FC !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 10px 20px;
     font-weight: bold;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.stButton>button:hover {
+    background-color: #9A67EA !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -682,6 +710,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
