@@ -303,7 +303,7 @@ elif selected_page == "Reports":
         st.metric("Avg Hours Left per Day (Annual)", f"{annual_avg_left:.2f}")
     with col3:
         new_end_date = st.date_input("Annual End Date", annual_end_date.date(), label_visibility="collapsed")
-        if st.button("Update End Date", use_container_width=True):
+        if st.button("Update Year-End Date", use_container_width=True):
             pd.DataFrame({"EndDate": [str(new_end_date)]}).to_csv(ANNUAL_TARGET_FILE, index=False)
             push_to_github("data/annual_target.csv", "Updated annual end date")
             st.success("Annual end date updated!")
@@ -581,6 +581,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
