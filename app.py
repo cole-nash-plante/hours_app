@@ -298,3 +298,95 @@ elif selected_page == "History":
 
 
 
+elif selected_page == "Archive":
+    st.title("Archive Clients")
+
+    # Load active data
+    df_clients = pd.read_csv(CLIENTS_FILE)
+    df_categories = pd.read_csv(CATEGORIES_FILE)
+    df_todos = pd.read_csv(TODOS_FILE)
+    df_hours = pd.read_csv(HOURS_FILE)
+
+    # Archive file paths
+    ARCHIVE_CLIENTS = os.path.join(DATA_DIR, "archive_clients.csv")
+    ARCHIVE_CATEGORIES = os.path.join(DATA_DIR, "archive_categories.csv")
+    ARCHIVE_TODOS = os.path.join(DATA_DIR, "archive_todos.csv")
+    ARCHIVE_HOURS = os.path.join(DATA_DIR, "archive_hours.csv")
+
+    # Ensure archive files exist
+    archive_files = [
+        (ARCHIVE_CLIENTS, ["Client"]),
+        (ARCHIVE_CATEGORIES, ["Client", "Category"]),
+        (ARCHIVE_TODOS, ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]),
+        (ARCHIVE_HOURS, ["Date", "Client", "Hours", "Description"])
+    ]
+    for file, cols in archive_files:
+        if not os.path.exists(file):
+            pd.DataFrame(columns=cols).to_csv(file, index=False)
+
+    # Load archive data
+    df_archive_clients = pd.read_csv(ARCHIVE_CLIENTS)
+    df_archive_categories = pd.read_csv(ARCHIVE_CATEGORIES)
+    df_archive_todos = pd.read_csv(ARCHIVE_TODOS)
+    df_archive_hours = pd.read_csv(ARCHIVE_HOURS)
+
+    # -------------------------------
+    # Archive Client Action
+    # -------------------------------
+    st.subheader("Archive a Client")
+    if len(df_clients) == 0:
+        st.warning("No clients available to archive.")
+    else:
+        selected_client = st.selectbox("Select Client to Archive", df_clients["Client"].tolist())
+        if st.button("Archive Client"):
+            # Move data to archive
+            df_archive_clients = pd.concat([df_archive_clients, df_clients[df_clients["Client"] == selected_client]], ignore_index=True)
+            df_archive_categories = pd.concat([df_archive_categories, df_categories[df_categories["Client"] == selected_client]], ignore_index=True)
+            df_archive_todos = pd.concat([df_archive_todos, df_todos[df_todos["Client"] == selected_client]], ignore_index=True)
+            df_archive_hours = pd.concat([df_archive_hours, df_hours[df_hours["Client"] == selected_client]], ignore_index=True)
+
+            # Remove from active files
+            df_clients = df_clients[df_clients["Client"] != selected_client]
+            df_categories = df_categories[df_categories["Client"] != selected_client]
+            df_todos = df_todos[df_todos["Client"] != selected_client]
+            df_hours = df_hours[df_hours["Client"] != selected_client]
+
+            # Save all files
+            df_clients.to_csv(CLIENTS_FILE, index=False)
+            df_categories.to_csv(CATEGORIES_FILE, index=False)
+            df_todos.to_csv(TODOS_FILE, index=False)
+            df_hours.to_csv(HOURS_FILE, index=False)
+            df_archive_clients.to_csv(ARCHIVE_CLIENTS, index=False)
+            df_archive_categories.to_csv(ARCHIVE_CATEGORIES, index=False)
+            df_archive_todos.to_csv(ARCHIVE_TODOS, index=False)
+            df_archive_hours.to_csv(ARCHIVE_HOURS, index=False)
+
+            # Push to GitHub
+            push_to_github("data/clients.csv", "Archived client")
+            push_to_github("data/categories.csv", "Archived client categories")
+            push_to_github("data/todos.csv", "Archived client todos")
+            push_to_github("data/hours.csv", "Archived client hours")
+            push_to_github("data/archive_clients.csv", "Updated archive clients")
+            push_to_github("data/archive_categories.csv", "Updated archive categories")
+            push_to_github("data/archive_todos.csv", "Updated archive todos")
+            push_to_github("data/archive_hours.csv", "Updated archive hours")
+
+            st.success(f"Client '{selected_client}' archived successfully!")
+
+    # -------------------------------
+    # Show Archive History Tables
+    # -------------------------------
+    st.subheader("Archive History")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### Archived Hours")
+        st.dataframe(df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), width="stretch")
+
+    with col2:
+        st.markdown("### Archived To-Dos")
+        st.dataframe(df_archive_todos.sort_values(by="DateCreated", ascending=False)[
+            ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
+        ].reset_index(drop=True), width="stretch")
+
+
