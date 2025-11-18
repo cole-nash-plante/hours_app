@@ -35,31 +35,44 @@ st.set_page_config(layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
-/* Main background */
+/* Main container background and text */
 [data-testid="stAppViewContainer"] {
-    background-color: #121212;
-    color: #E0E0E0;
+    background-color: #121212 !important;
+    color: #E0E0E0 !important;
 }
 
-/* Sidebar */
+/* Sidebar background and text */
 [data-testid="stSidebar"] {
-    background-color: #1E1E1E;
-    color: #E0E0E0;
+    background-color: #1E1E1E !important;
+    color: #E0E0E0 !important;
+}
+
+/* Force all text to light color */
+html, body, [class*="css"] {
+    color: #E0E0E0 !important;
 }
 
 /* Headings */
-h1, h2, h3 {
-    color: #BB86FC;
+h1, h2, h3, h4 {
+    color: #BB86FC !important;
     font-weight: 600;
+}
+
+/* Metrics */
+[data-testid="stMetricValue"] {
+    color: #E0E0E0 !important;
+}
+[data-testid="stMetricLabel"] {
+    color: #AAAAAA !important;
 }
 
 /* Form boxes */
 .form-box {
     background-color: #1E1E1E;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 /* Inputs */
@@ -68,19 +81,25 @@ h1, h2, h3 {
     color: #E0E0E0 !important;
     border-radius: 6px;
     border: 1px solid #444;
+    padding: 10px;
 }
 
 /* Buttons */
 .stButton>button {
-    background-color: #BB86FC;
-    color: white;
+    background-color: #BB86FC !important;
+    color: white !important;
     border-radius: 8px;
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-weight: bold;
     border: none;
+    transition: background-color 0.3s ease;
+}
+.stButton>button:hover {
+    background-color: #9A67EA !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 # -------------------------------------------------
 # GitHub Functions
@@ -637,6 +656,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
