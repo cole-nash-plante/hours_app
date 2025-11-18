@@ -53,7 +53,7 @@ def push_to_github(file_path, commit_message):
         data["sha"] = sha
     r = requests.put(url, json=data, headers={"Authorization": f"token {GITHUB_TOKEN}"})
     if r.status_code in [200, 201]:
-        st.success(f"Pushed {file_path} to GitHub!")
+        True
     else:
         st.error(f"Failed to push {file_path}: {r.json()}")
 
@@ -436,32 +436,32 @@ elif selected_page == "Archive":
 elif selected_page == "Days Off":
     st.title("Days Off")
 
-    # File path
     DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
-
-    # Ensure file exists
     if not os.path.exists(DAYS_OFF_FILE):
         pd.DataFrame(columns=["Date", "Reason"]).to_csv(DAYS_OFF_FILE, index=False)
 
-    # Load data
     df_days_off = pd.read_csv(DAYS_OFF_FILE)
 
-    # -------------------------------
-    # Layout: Calendar + Table
-    # -------------------------------
     col1, col2 = st.columns([2, 3])
 
-    # Left: Calendar (placeholder for now)
+    # Left: Calendar View
     with col1:
         st.subheader("Calendar View")
-        if len(df_days_off) > 0:
-            st.write("Planned Days Off:")
-            for _, row in df_days_off.iterrows():
-                st.markdown(f"- **{row['Date']}**: {row['Reason']}")
-        else:
-            st.info("No days off planned yet.")
+        from streamlit_calendar import calendar
+        events = [{"title": row["Reason"], "start": row["Date"], "end": row["Date"]} for _, row in df_days_off.iterrows()]
+        calendar_options = {
+            "initialView": "dayGridMonth",
+            "editable": False,
+            "selectable": False,
+            "headerToolbar": {
+                "left": "prev,next today",
+                "center": "title",
+                "right": "dayGridMonth,timeGridWeek,timeGridDay"
+            }
+        }
+        calendar(events=events, options=calendar_options)
 
-    # Right: Add new day off + Editable table
+    # Right: Add and Edit Days Off
     with col2:
         st.subheader("Manage Days Off")
         new_date = st.date_input("Select Date")
@@ -475,18 +475,11 @@ elif selected_page == "Days Off":
             else:
                 st.error("Please enter a reason.")
 
-        # Editable table
         st.markdown("### Edit Days Off")
-        edited_days_off = st.data_editor(
-            df_days_off.reset_index(drop=True),
-            num_rows="dynamic",
-            width="stretch"
-        )
-
+        edited_days_off = st.data_editor(df_days_off.reset_index(drop=True), num_rows="dynamic", width="stretch")
         if st.button("Save Changes"):
             df_days_off = edited_days_off
             df_days_off.to_csv(DAYS_OFF_FILE, index=False)
             push_to_github("data/days_off.csv", "Updated days off list")
             st.success("Changes saved!")
-
 
