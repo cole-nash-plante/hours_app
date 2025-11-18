@@ -228,8 +228,6 @@ elif selected_page == "Reports":
     st.title("Reports")
     st.write("Coming soon: charts and summaries.")
 
-
-
 elif selected_page == "To-Do":
     st.title("To-Do List")
 
@@ -273,21 +271,24 @@ elif selected_page == "To-Do":
             todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
         with col2:
             client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
-            todo_category = st.selectbox("Category", client_categories, key="todo_category")
+            todo_category = st.selectbox("Category", client_categories if client_categories else ["No categories"], key="todo_category")
         with col3:
             todo_task = st.text_input("Task", key="todo_task")
         with col4:
             priority = st.slider("Priority", 1, 5, 3, key="priority")
         with col5:
             if st.button("Add Task"):
-                df_todos.loc[len(df_todos)] = [
-                    todo_client, todo_category, todo_task, priority,
-                    str(datetime.today().date()), ""
-                ]
-                df_todos.to_csv(TODOS_FILE, index=False)
-                st.success("Task added successfully!")
-                push_to_github("data/todos.csv", "Updated To-Do list")
-                df_todos = pd.read_csv(TODOS_FILE)
+                if todo_task.strip() and todo_category != "No categories":
+                    df_todos.loc[len(df_todos)] = [
+                        todo_client, todo_category, todo_task, priority,
+                        str(datetime.today().date()), ""
+                    ]
+                    df_todos.to_csv(TODOS_FILE, index=False)
+                    st.success("Task added successfully!")
+                    push_to_github("data/todos.csv", "Updated To-Do list")
+                    df_todos = pd.read_csv(TODOS_FILE)
+                else:
+                    st.error("Please enter a valid task and category.")
 
     # -------------------------------
     # Active To-Dos (Editable Tables)
@@ -329,4 +330,3 @@ elif selected_page == "To-Do":
                         df_todos.to_csv(TODOS_FILE, index=False)
                         push_to_github("data/todos.csv", "Deleted empty tasks")
                         st.success(f"Empty tasks deleted for {client}!")
-
