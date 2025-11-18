@@ -128,22 +128,6 @@ selected_page = st.sidebar.radio("Go to", pages)
 if selected_page == "Data Entry":
     st.title("Data Entry")
 
-    # Add Client
-    st.subheader("Add New Client")
-    new_client = st.text_input("Client Name")
-    if st.button("Add Client"):
-        if new_client.strip():
-            df_clients = pd.read_csv(CLIENTS_FILE)
-            if new_client not in df_clients["Client"].values:
-                df_clients.loc[len(df_clients)] = [new_client]
-                df_clients.to_csv(CLIENTS_FILE, index=False)
-                st.success(f"Client '{new_client}' added!")
-                push_to_github("data/clients.csv", "Updated clients list")
-            else:
-                st.warning("Client already exists.")
-        else:
-            st.error("Please enter a valid client name.")
-
     # Log Hours
     st.subheader("Log Hours")
     df_clients = pd.read_csv(CLIENTS_FILE)
@@ -160,6 +144,21 @@ if selected_page == "Data Entry":
             df_hours.to_csv(HOURS_FILE, index=False)
             st.success("Hours logged successfully!")
             push_to_github("data/hours.csv", "Updated hours log")
+  # Add Client
+    st.subheader("Add New Client")
+    new_client = st.text_input("Client Name")
+    if st.button("Add Client"):
+        if new_client.strip():
+            df_clients = pd.read_csv(CLIENTS_FILE)
+            if new_client not in df_clients["Client"].values:
+                df_clients.loc[len(df_clients)] = [new_client]
+                df_clients.to_csv(CLIENTS_FILE, index=False)
+                st.success(f"Client '{new_client}' added!")
+                push_to_github("data/clients.csv", "Updated clients list")
+            else:
+                st.warning("Client already exists.")
+        else:
+            st.error("Please enter a valid client name.")
 
     # Set Goals
     st.subheader("Set Hour Goals")
@@ -615,6 +614,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
