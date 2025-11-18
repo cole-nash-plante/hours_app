@@ -40,12 +40,14 @@ st.markdown("""
 [data-testid="stAppViewContainer"] {
     background-color: #121212 !important;
     color: #E0E0E0 !important;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 /* Sidebar */
 [data-testid="stSidebar"] {
     background-color: #1E1E1E !important;
     color: #E0E0E0 !important;
+    border-right: 1px solid #333;
 }
 
 /* Force all text to light */
@@ -57,16 +59,17 @@ html, body, [class*="css"] {
 h1, h2, h3 {
     color: #BB86FC !important;
     font-weight: 600;
+    margin-bottom: 15px;
 }
 
-/* Form boxes */
+/* Form containers */
 .form-box {
     background-color: #1E1E1E;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 25px;
-    border: 1px solid #444;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    border: 1px solid #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
 /* Inputs */
@@ -80,12 +83,13 @@ h1, h2, h3 {
     border-radius: 6px;
     border: 1px solid #555;
     padding: 10px;
+    font-size: 14px;
 }
 
 /* Buttons */
 .stButton>button {
     background-color: #BB86FC !important;
-    color: white !important;
+    color: #FFFFFF !important;
     border-radius: 8px;
     padding: 10px 20px;
     font-weight: bold;
@@ -95,8 +99,32 @@ h1, h2, h3 {
 .stButton>button:hover {
     background-color: #9A67EA !important;
 }
+
+/* Tables */
+[data-testid="stTable"] {
+    background-color: #1E1E1E !important;
+    color: #E0E0E0 !important;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1E1E1E;
+}
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # -------------------------------------------------
@@ -710,6 +738,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
