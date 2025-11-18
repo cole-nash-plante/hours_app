@@ -26,6 +26,55 @@ CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
 os.makedirs(DATA_DIR, exist_ok=True)
 st.set_page_config(layout="wide")
+
+# -------------------------------------------------
+# Custom CSS for Dark Theme and Boxed Forms
+# -------------------------------------------------
+st.markdown("""
+<style>
+/* Dark background and modern font */
+body {
+    background-color: #121212;
+    color: #E0E0E0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Inputs styling */
+.stTextInput, .stNumberInput, .stDateInput, .stTextArea, .stSelectbox {
+    background-color: #1E1E1E;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+    color: #E0E0E0;
+}
+
+/* Boxed form sections */
+.form-box {
+    background-color: #1E1E1E;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #BB86FC;
+    font-weight: 600;
+}
+
+/* Buttons */
+.stButton>button {
+    background-color: #BB86FC;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: bold;
+    border: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # -------------------------------------------------
 # GitHub Functions
 # -------------------------------------------------
@@ -581,6 +630,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
