@@ -10,6 +10,7 @@ import base64
 # -----------------------------
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
 GITHUB_REPO = st.secrets["GITHUB_REPO"]
+BRANCH = "main"
 
 # -----------------------------
 # Data Setup
@@ -21,19 +22,23 @@ GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# Initialize CSVs if they don't exist
-for file, cols in [
-    (CLIENTS_FILE, ["Client"]),
-    (HOURS_FILE, ["Date", "Client", "Hours", "Description"]),
-    (GOALS_FILE, ["Month", "GoalHours"])
-]:
-    if not os.path.exists(file):
-        pd.DataFrame(columns=cols).to_csv(file, index=False)
+# -----------------------------
+# GitHub Functions
+# -----------------------------
+def fetch_from_github(file_path):
+    """Fetch file content from GitHub and save locally."""
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}?ref={BRANCH}"
+    response = requests.get(url, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+    if response.status_code == 200:
+        content = base64.b64decode(response.json()["content"]).decode("utf-8")
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        st.info(f"Fetched latest {file_path} from GitHub.")
+    else:
+        st.warning(f"{file_path} not found in GitHub. Will create it locally.")
 
-# -----------------------------
-# Function to Push File to GitHub
-# -----------------------------
 def push_to_github(file_path, commit_message):
+    """Push local file to GitHub."""
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
     with open(file_path, "rb") as f:
         content = base64.b64encode(f.read()).decode("utf-8")
@@ -45,7 +50,7 @@ def push_to_github(file_path, commit_message):
     data = {
         "message": commit_message,
         "content": content,
-        "branch": "main"
+        "branch": BRANCH
     }
     if sha:
         data["sha"] = sha
@@ -55,6 +60,22 @@ def push_to_github(file_path, commit_message):
         st.success(f"Pushed {file_path} to GitHub!")
     else:
         st.error(f"Failed to push {file_path}: {r.json()}")
+
+# -----------------------------
+# Initialize Data
+# -----------------------------
+for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv"]:
+    fetch_from_github(file)
+
+# Ensure files exist locally
+for file, cols in [
+    (CLIENTS_FILE, ["Client"]),
+    (HOURS_FILE, ["Date", "Client", "Hours", "Description"]),
+    (GOALS_FILE, ["Month", "GoalHours"])
+]:
+    if not os.path.exists(file):
+        pd.DataFrame(columns=cols).to_csv(file, index=False)
+        push_to_github(file, f"Created {file}")
 
 # -----------------------------
 # Sidebar Navigation
@@ -126,4 +147,3 @@ elif selected_page == "To-Do":
 
 elif selected_page == "History":
     st.title("History")
-    st.write("Coming soon: view past entries.")
