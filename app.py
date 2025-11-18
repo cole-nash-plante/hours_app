@@ -30,25 +30,30 @@ st.set_page_config(layout="wide")
 # -------------------------------------------------
 # Custom CSS for Dark Theme and Boxed Forms
 # -------------------------------------------------
+# -------------------------------------------------
+# Improved Dark Theme CSS
+# -------------------------------------------------
 st.markdown("""
 <style>
-/* Dark background and modern font */
-body {
+/* Main background */
+[data-testid="stAppViewContainer"] {
     background-color: #121212;
     color: #E0E0E0;
-    font-family: 'Segoe UI', sans-serif;
 }
 
-/* Inputs styling */
-.stTextInput, .stNumberInput, .stDateInput, .stTextArea, .stSelectbox {
+/* Sidebar */
+[data-testid="stSidebar"] {
     background-color: #1E1E1E;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 15px;
     color: #E0E0E0;
 }
 
-/* Boxed form sections */
+/* Headings */
+h1, h2, h3 {
+    color: #BB86FC;
+    font-weight: 600;
+}
+
+/* Form boxes */
 .form-box {
     background-color: #1E1E1E;
     padding: 20px;
@@ -57,10 +62,12 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
-/* Headings */
-h1, h2, h3 {
-    color: #BB86FC;
-    font-weight: 600;
+/* Inputs */
+.stTextInput input, .stNumberInput input, .stDateInput input, .stTextArea textarea, .stSelectbox div {
+    background-color: #2C2C2C !important;
+    color: #E0E0E0 !important;
+    border-radius: 6px;
+    border: 1px solid #444;
 }
 
 /* Buttons */
@@ -630,6 +637,7 @@ elif selected_page == "Days Off":
         df_days_off.to_csv(DAYS_OFF_FILE, index=False)
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
+
 
 
 
