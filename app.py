@@ -117,23 +117,32 @@ for file, cols in init_files:
 st.sidebar.title("Navigation")
 pages = ["Data Entry", "To-Do", "Reports", "History", "Days Off", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
+
+
+
 st.markdown("""
 <style>
-/* Selected value text */
-.stSelectbox div[data-baseweb="select"] > div {
-    color: #FF0000 !important;
+/* Selected value container */
+.stSelectbox div[data-baseweb="select"] {
+    color: #D3D3D3 !important;
     font-size: 16px !important;
-    line-height: 1.4 !important;
+    line-height: normal !important;
+    height: auto !important; /* Prevent clipping */
+    display: flex !important; /* Restore flex layout */
+    align-items: center !important; /* Vertically center text */
+    padding: 0.25rem 0.5rem !important; /* Minimal padding */
 }
 
 /* Dropdown options */
 ul[role="listbox"] li {
-    color: #FF0000 !important;
+    color: #D3D3D3 !important;
     font-size: 16px !important;
     line-height: 1.4 !important;
+    padding: 0.5rem 1rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # -------------------------------------------------
@@ -685,6 +694,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
