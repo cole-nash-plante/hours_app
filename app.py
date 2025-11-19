@@ -145,6 +145,55 @@ ul[role="listbox"] li {
 """, unsafe_allow_html=True)
 
 
+
+# Inject custom CSS for styling
+st.markdown("""
+<style>
+/* Dark background for the entire app */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+/* Table styling */
+[data-testid="stDataFrame"] table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #1e1e1e;
+    color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Remove unnecessary borders */
+[data-testid="stDataFrame"] table th, 
+[data-testid="stDataFrame"] table td {
+    border: none !important;
+    padding: 8px 12px;
+}
+
+/* Header styling */
+[data-testid="stDataFrame"] table th {
+    font-size: 14px; /* Smaller headers */
+    font-weight: 600;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+/* Row hover effect */
+[data-testid="stDataFrame"] table tr:hover {
+    background-color: #333333;
+}
+
+/* Rounded corners for the table container */
+[data-testid="stDataFrame"] {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+</style>
+""", unsafe_allow_html=True)
+
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
@@ -718,6 +767,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
