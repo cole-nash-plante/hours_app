@@ -26,7 +26,6 @@ CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
 os.makedirs(DATA_DIR, exist_ok=True)
 st.set_page_config(layout="wide")
-st.markdown('<link rel="stylesheet" href="YOUR_GITHUB_RAW_CSS_URL">', unsafe_allow_html=True)
 
 # -------------------------------------------------
 # Custom CSS for Dark Theme and Boxed Forms
@@ -74,10 +73,30 @@ def push_to_github(file_path, commit_message):
 # -------------------------------------------------
 # Initialize Data
 # -------------------------------------------------
+def apply_css_from_github(css_path="data/style.css"):
+    """Fetch CSS from GitHub using token and apply to Streamlit app."""
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{css_path}?ref={BRANCH}"
+    response = requests.get(url, headers={"Authorization": f"token {GITHUB_TOKEN}"})
+    
+    if response.status_code == 200:
+        # Decode base64 content
+        content = base64.b64decode(response.json()["content"]).decode("utf-8")
+        # Inject CSS into Streamlit
+        st.markdown(f"<style>{content}</style>", unsafe_allow_html=True)
+    else:
+        st.warning(f"CSS file '{css_path}' not found in GitHub.")
+
+# Call this early in your app (after st.set_page_config)
+apply_css_from_github()
+
+
+
+
 # Sync Files from GitHub
-for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv", "data/categories.csv", "data/todos.csv"]:
+for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv", "data/categories.csv", "data/todos.csv", "data/style.css"]:
     fetch_from_github(file)
 
+st.markdown('<link rel="stylesheet" href="YOUR_GITHUB_RAW_CSS_URL">', unsafe_allow_html=True)
 # Ensure files exist locally
 init_files = [
     (CLIENTS_FILE, ["Client"]),
@@ -648,6 +667,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
