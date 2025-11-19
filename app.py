@@ -367,12 +367,20 @@ elif selected_page == "To-Do":
                 with cols[i]:
                     st.markdown(header_html, unsafe_allow_html=True)
     
-                    # Show editable table
+                    # Show editable table with sorting enabled
                     client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
                     edited_table = st.data_editor(
                         client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
                         num_rows="dynamic",
-                        width="stretch"
+                        width="stretch",
+                        column_config={
+                            "Category": st.column_config.TextColumn("Category", help="Task category"),
+                            "Task": st.column_config.TextColumn("Task", help="Task details"),
+                            "Priority": st.column_config.NumberColumn("Priority", help="Sort by priority"),
+                            "DateCreated": st.column_config.DateColumn("Date Created"),
+                            "DateCompleted": st.column_config.DateColumn("Date Completed")
+                        },
+                        hide_index=True
                     )
     
                     # Save changes button
@@ -383,6 +391,7 @@ elif selected_page == "To-Do":
                         df_todos.to_csv(TODOS_FILE, index=False)
                         push_to_github("data/todos.csv", "Updated To-Do list")
                         st.success(f"Changes saved for {client}!")
+    
     st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------------------------
 # Placeholder Pages
@@ -562,7 +571,14 @@ elif selected_page == "History":
             edited_hours = st.data_editor(
                 filtered_hours[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
                 num_rows="dynamic",
-                width="stretch"
+                width="stretch",
+                column_config={
+                    "Date": st.column_config.DateColumn("Date", help="Sort by date"),
+                    "Client": st.column_config.TextColumn("Client"),
+                    "Hours": st.column_config.NumberColumn("Hours", help="Sort by hours"),
+                    "Description": st.column_config.TextColumn("Description")
+                },
+                hide_index=True
             )
             if st.button("Save Hours Changes"):
                 df_hours = edited_hours
@@ -579,7 +595,16 @@ elif selected_page == "History":
             edited_todos = st.data_editor(
                 filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
                 num_rows="dynamic",
-                width="stretch"
+                width="stretch",
+                column_config={
+                    "Client": st.column_config.TextColumn("Client"),
+                    "Category": st.column_config.TextColumn("Category"),
+                    "Task": st.column_config.TextColumn("Task"),
+                    "Priority": st.column_config.NumberColumn("Priority", help="Sort by priority"),
+                    "DateCreated": st.column_config.DateColumn("Date Created"),
+                    "DateCompleted": st.column_config.DateColumn("Date Completed")
+                },
+                hide_index=True
             )
             if st.button("Save To-Do Changes"):
                 df_todos = edited_todos
@@ -587,38 +612,37 @@ elif selected_page == "History":
                 push_to_github("data/todos.csv", "Updated To-Do history")
                 st.success("To-Do history updated!")
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
 elif selected_page == "Archive":
     st.title("Archive Clients")
-
+    
     # Load active data
     df_clients = pd.read_csv(CLIENTS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
     df_hours = pd.read_csv(HOURS_FILE)
-
-    # Archive file paths
+    
+    # Archive file paths (hours removed from archive logic)
     ARCHIVE_CLIENTS = os.path.join(DATA_DIR, "archive_clients.csv")
     ARCHIVE_CATEGORIES = os.path.join(DATA_DIR, "archive_categories.csv")
     ARCHIVE_TODOS = os.path.join(DATA_DIR, "archive_todos.csv")
-    ARCHIVE_HOURS = os.path.join(DATA_DIR, "archive_hours.csv")
-
+    
     # Ensure archive files exist
     archive_files = [
         (ARCHIVE_CLIENTS, ["Client", "Color"]),
         (ARCHIVE_CATEGORIES, ["Client", "Category"]),
-        (ARCHIVE_TODOS, ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]),
-        (ARCHIVE_HOURS, ["Date", "Client", "Hours", "Description"])
+        (ARCHIVE_TODOS, ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"])
     ]
     for file, cols in archive_files:
         if not os.path.exists(file):
             pd.DataFrame(columns=cols).to_csv(file, index=False)
-
+    
     # Load archive data
     df_archive_clients = pd.read_csv(ARCHIVE_CLIENTS)
     df_archive_categories = pd.read_csv(ARCHIVE_CATEGORIES)
     df_archive_todos = pd.read_csv(ARCHIVE_TODOS)
-    df_archive_hours = pd.read_csv(ARCHIVE_HOURS)
-
+    
     # -------------------------------
     # Archive Client Action
     # -------------------------------
@@ -629,41 +653,38 @@ elif selected_page == "Archive":
     else:
         selected_client = st.selectbox("Select Client to Archive", df_clients["Client"].tolist(), key="archive_client")
         if st.button("Archive Client"):
-            # Move data to archive
+            # Move data to archive (EXCLUDE hours)
             df_archive_clients = pd.concat([df_archive_clients, df_clients[df_clients["Client"] == selected_client]], ignore_index=True)
             df_archive_categories = pd.concat([df_archive_categories, df_categories[df_categories["Client"] == selected_client]], ignore_index=True)
             df_archive_todos = pd.concat([df_archive_todos, df_todos[df_todos["Client"] == selected_client]], ignore_index=True)
-            df_archive_hours = pd.concat([df_archive_hours, df_hours[df_hours["Client"] == selected_client]], ignore_index=True)
-
-            # Remove from active files
+    
+            # Remove from active files (EXCLUDE hours)
             df_clients = df_clients[df_clients["Client"] != selected_client]
             df_categories = df_categories[df_categories["Client"] != selected_client]
             df_todos = df_todos[df_todos["Client"] != selected_client]
-            df_hours = df_hours[df_hours["Client"] != selected_client]
-
+            # df_hours remains unchanged
+    
             # Save all files
             df_clients.to_csv(CLIENTS_FILE, index=False)
             df_categories.to_csv(CATEGORIES_FILE, index=False)
             df_todos.to_csv(TODOS_FILE, index=False)
-            df_hours.to_csv(HOURS_FILE, index=False)
+            df_hours.to_csv(HOURS_FILE, index=False)  # Still save hours file unchanged
             df_archive_clients.to_csv(ARCHIVE_CLIENTS, index=False)
             df_archive_categories.to_csv(ARCHIVE_CATEGORIES, index=False)
             df_archive_todos.to_csv(ARCHIVE_TODOS, index=False)
-            df_archive_hours.to_csv(ARCHIVE_HOURS, index=False)
-
+    
             # Push to GitHub
             push_to_github("data/clients.csv", "Archived client")
             push_to_github("data/categories.csv", "Archived client categories")
             push_to_github("data/todos.csv", "Archived client todos")
-            push_to_github("data/hours.csv", "Archived client hours")
+            push_to_github("data/hours.csv", "Hours file unchanged")
             push_to_github("data/archive_clients.csv", "Updated archive clients")
             push_to_github("data/archive_categories.csv", "Updated archive categories")
             push_to_github("data/archive_todos.csv", "Updated archive todos")
-            push_to_github("data/archive_hours.csv", "Updated archive hours")
-
+    
             st.success(f"Client '{selected_client}' archived successfully!")
     st.markdown('</div>', unsafe_allow_html=True)
-
+    
     # -------------------------------
     # Undo Archive Client Action
     # -------------------------------
@@ -674,38 +695,34 @@ elif selected_page == "Archive":
     else:
         undo_client = st.selectbox("Select Archived Client to Restore", df_archive_clients["Client"].tolist(), key="undo_client")
         if st.button("Restore Client"):
-            # Move data back to active
+            # Move data back to active (EXCLUDE hours)
             df_clients = pd.concat([df_clients, df_archive_clients[df_archive_clients["Client"] == undo_client]], ignore_index=True)
             df_categories = pd.concat([df_categories, df_archive_categories[df_archive_categories["Client"] == undo_client]], ignore_index=True)
             df_todos = pd.concat([df_todos, df_archive_todos[df_archive_todos["Client"] == undo_client]], ignore_index=True)
-            df_hours = pd.concat([df_hours, df_archive_hours[df_archive_hours["Client"] == undo_client]], ignore_index=True)
-
+    
             # Remove from archive files
             df_archive_clients = df_archive_clients[df_archive_clients["Client"] != undo_client]
             df_archive_categories = df_archive_categories[df_archive_categories["Client"] != undo_client]
             df_archive_todos = df_archive_todos[df_archive_todos["Client"] != undo_client]
-            df_archive_hours = df_archive_hours[df_archive_hours["Client"] != undo_client]
-
+    
             # Save all files
             df_clients.to_csv(CLIENTS_FILE, index=False)
             df_categories.to_csv(CATEGORIES_FILE, index=False)
             df_todos.to_csv(TODOS_FILE, index=False)
-            df_hours.to_csv(HOURS_FILE, index=False)
+            df_hours.to_csv(HOURS_FILE, index=False)  # Hours remain unchanged
             df_archive_clients.to_csv(ARCHIVE_CLIENTS, index=False)
             df_archive_categories.to_csv(ARCHIVE_CATEGORIES, index=False)
             df_archive_todos.to_csv(ARCHIVE_TODOS, index=False)
-            df_archive_hours.to_csv(ARCHIVE_HOURS, index=False)
-
+    
             # Push to GitHub
             push_to_github("data/clients.csv", "Restored client")
             push_to_github("data/categories.csv", "Restored client categories")
             push_to_github("data/todos.csv", "Restored client todos")
-            push_to_github("data/hours.csv", "Restored client hours")
+            push_to_github("data/hours.csv", "Hours file unchanged")
             push_to_github("data/archive_clients.csv", "Updated archive clients after restore")
             push_to_github("data/archive_categories.csv", "Updated archive categories after restore")
             push_to_github("data/archive_todos.csv", "Updated archive todos after restore")
-            push_to_github("data/archive_hours.csv", "Updated archive hours after restore")
-
+    
             st.success(f"Client '{undo_client}' restored successfully!")
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -793,6 +810,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
