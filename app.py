@@ -636,28 +636,31 @@ elif selected_page == "History":
             elif sort_hours_by == "Hours (Low to High)":
                 filtered_hours = filtered_hours.sort_values(by="Hours", ascending=True)
 
+            st.write("Select rows to delete:")
+            selected_rows_hours = st.multiselect(
+                "Select Hours Rows",
+                options=filtered_hours.index.tolist(),
+                format_func=lambda x: f"{filtered_hours.loc[x, 'Date'].date()} | {filtered_hours.loc[x, 'Client']} | {filtered_hours.loc[x, 'Hours']} hrs"
+            )
+
             edited_hours = st.data_editor(
                 filtered_hours[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
                 num_rows="dynamic",
                 width="stretch",
-                hide_index=True,
-                selection_mode="multi-row"
+                hide_index=True
             )
 
-            # Save changes
             if st.button("Save Hours Changes"):
                 df_hours = edited_hours
                 df_hours.to_csv(HOURS_FILE, index=False)
                 push_to_github("data/hours.csv", "Updated hours history")
                 st.success("Hours history updated!")
 
-            # Delete selected rows
-            selected_rows = edited_hours.get("selected_rows", [])
-            if len(selected_rows) > 0 and st.button("Delete Selected Hours"):
-                df_hours = df_hours.drop(df_hours.index[selected_rows])
+            if len(selected_rows_hours) > 0 and st.button("Delete Selected Hours"):
+                df_hours = df_hours.drop(selected_rows_hours)
                 df_hours.to_csv(HOURS_FILE, index=False)
                 push_to_github("data/hours.csv", "Deleted selected hours")
-                st.success(f"Deleted {len(selected_rows)} hour(s).")
+                st.success(f"Deleted {len(selected_rows_hours)} hour(s).")
 
     # Editable To-Do History
     with col2:
@@ -675,28 +678,31 @@ elif selected_page == "History":
             elif sort_todos_by == "Date Created (Oldest)":
                 filtered_todos = filtered_todos.sort_values(by="DateCreated", ascending=True)
 
+            st.write("Select rows to delete:")
+            selected_rows_todos = st.multiselect(
+                "Select To-Do Rows",
+                options=filtered_todos.index.tolist(),
+                format_func=lambda x: f"{filtered_todos.loc[x, 'Client']} | {filtered_todos.loc[x, 'Task']} | Priority {filtered_todos.loc[x, 'Priority']}"
+            )
+
             edited_todos = st.data_editor(
                 filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
                 num_rows="dynamic",
                 width="stretch",
-                hide_index=True,
-                selection_mode="multi-row"
+                hide_index=True
             )
 
-            # Save changes
             if st.button("Save To-Do Changes"):
                 df_todos = edited_todos
                 df_todos.to_csv(TODOS_FILE, index=False)
                 push_to_github("data/todos.csv", "Updated To-Do history")
                 st.success("To-Do history updated!")
 
-            # Delete selected rows
-            selected_todo_rows = edited_todos.get("selected_rows", [])
-            if len(selected_todo_rows) > 0 and st.button("Delete Selected To-Dos"):
-                df_todos = df_todos.drop(df_todos.index[selected_todo_rows])
+            if len(selected_rows_todos) > 0 and st.button("Delete Selected To-Dos"):
+                df_todos = df_todos.drop(selected_rows_todos)
                 df_todos.to_csv(TODOS_FILE, index=False)
                 push_to_github("data/todos.csv", "Deleted selected To-Dos")
-                st.success(f"Deleted {len(selected_todo_rows)} to-do(s).")
+                st.success(f"Deleted {len(selected_rows_todos)} to-do(s).")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -905,6 +911,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
