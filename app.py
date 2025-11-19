@@ -180,29 +180,29 @@ if selected_page == "Data Entry":
     new_client = st.text_input("Client Name")
     client_color = st.color_picker("Pick Client Color", "#FFFFFF")
     if st.button("Add Client"):
-    if new_client.strip():
-        df_clients = pd.read_csv(CLIENTS_FILE)
-
-        # Ensure DataFrame has correct columns
-        expected_cols = ["Client", "Color"]
-        if list(df_clients.columns) != expected_cols:
-            # Fix columns if needed
-            df_clients = pd.DataFrame(df_clients.values, columns=expected_cols)
-
-        if new_client not in df_clients["Client"].values:
-            # Use concat for safer row addition
-            new_row = pd.DataFrame([[new_client, client_color]], columns=expected_cols)
-            df_clients = pd.concat([df_clients, new_row], ignore_index=True)
-
-            # Save and push
-            df_clients.to_csv(CLIENTS_FILE, index=False)
-            st.success(f"Client '{new_client}' added with color {client_color}!")
-            push_to_github("data/clients.csv", "Updated clients list")
+        if new_client.strip():
+            df_clients = pd.read_csv(CLIENTS_FILE)
+    
+            # Ensure DataFrame has correct columns
+            expected_cols = ["Client", "Color"]
+            if list(df_clients.columns) != expected_cols:
+                # Fix columns if needed
+                df_clients = pd.DataFrame(df_clients.values, columns=expected_cols)
+    
+            if new_client not in df_clients["Client"].values:
+                # Use concat for safer row addition
+                new_row = pd.DataFrame([[new_client, client_color]], columns=expected_cols)
+                df_clients = pd.concat([df_clients, new_row], ignore_index=True)
+    
+                # Save and push
+                df_clients.to_csv(CLIENTS_FILE, index=False)
+                st.success(f"Client '{new_client}' added with color {client_color}!")
+                push_to_github("data/clients.csv", "Updated clients list")
+            else:
+                st.warning("Client already exists.")
         else:
-            st.warning("Client already exists.")
-    else:
-        st.error("Please enter a valid client name.")
-st.markdown('</div>', unsafe_allow_html=True)
+            st.error("Please enter a valid client name.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
     # -------------------------
@@ -706,6 +706,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
