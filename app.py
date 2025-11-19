@@ -291,28 +291,41 @@ elif selected_page == "To-Do":
     # -------------------------------
     # Active To-Dos
     # -------------------------------
+    # Active To-Dos Section
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Active To-Dos")
-    active_todos = df_todos[df_todos["DateCompleted"].isna() | (df_todos["DateCompleted"] == "")].copy()
-
+    
+    active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
+    
     if len(active_todos) == 0:
         st.info("No active tasks.")
     else:
         clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
-
+    
         if len(selected_clients) > 0:
             cols = st.columns(len(selected_clients))
             for i, client in enumerate(selected_clients):
-                client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+                # Get client color
+                color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
+    
+                # Style the header with client color
+                header_html = f"""
+                <div style="background-color:{color}; padding:10px; border-radius:5px; text-align:center;">
+                    <h3 style="color:#fff; margin:0;">{client}</h3>
+                </div>
+                """
                 with cols[i]:
-                    st.markdown(f"### {client}")
+                    st.markdown(header_html, unsafe_allow_html=True)
+    
+                    # Show editable table
+                    client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
                     edited_table = st.data_editor(
                         client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
                         num_rows="dynamic",
                         width="stretch"
                     )
-
+    
                     # Save changes button
                     if st.button(f"Save Changes for {client}"):
                         df_todos = df_todos[df_todos["Client"] != client]
@@ -705,6 +718,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
