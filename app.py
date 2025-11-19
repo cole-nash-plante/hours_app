@@ -535,13 +535,18 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
 elif selected_page == "History":
     st.title("History")
 
     # Load data
     df_hours = pd.read_csv(HOURS_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
+
+    # Convert date columns to datetime for compatibility
+    df_hours["Date"] = pd.to_datetime(df_hours["Date"], errors="coerce")
+    df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
+    df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
 
     # -------------------------------
     # Client Filter
@@ -810,6 +815,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
