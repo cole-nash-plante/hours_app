@@ -122,15 +122,15 @@ selected_page = st.sidebar.radio("Go to", pages)
 
 st.markdown("""
 <style>
-/* Selected value container */
+/* Selected value text */
 .stSelectbox div[data-baseweb="select"] {
     color: #D3D3D3 !important;
     font-size: 16px !important;
-    line-height: normal !important;
-    height: auto !important; /* Prevent clipping */
-    display: flex !important; /* Restore flex layout */
-    align-items: center !important; /* Vertically center text */
-    padding: 0.25rem 0.5rem !important; /* Minimal padding */
+    line-height: 1.4 !important;
+    height: 40px !important; /* Restore proper height */
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 0.75rem !important; /* Horizontal padding only */
 }
 
 /* Dropdown options */
@@ -694,6 +694,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
