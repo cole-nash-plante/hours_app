@@ -279,6 +279,10 @@ elif selected_page == "To-Do":
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
 
+    # Convert date columns for compatibility
+    df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
+    df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
+
     # -------------------------------
     # Add Category
     # -------------------------------
@@ -340,25 +344,22 @@ elif selected_page == "To-Do":
     # -------------------------------
     # Active To-Dos
     # -------------------------------
-    # Active To-Dos Section
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Active To-Dos")
-    
+
     active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
-    
+
     if len(active_todos) == 0:
         st.info("No active tasks.")
     else:
         clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
-    
+
         if len(selected_clients) > 0:
             cols = st.columns(len(selected_clients))
             for i, client in enumerate(selected_clients):
-                # Get client color
                 color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
-    
-                # Style the header with client color
+
                 header_html = f"""
                 <div style="background-color:{color}; padding:10px; border-radius:5px; text-align:center;">
                     <h3 style="color:#fff; margin:0;">{client}</h3>
@@ -366,23 +367,32 @@ elif selected_page == "To-Do":
                 """
                 with cols[i]:
                     st.markdown(header_html, unsafe_allow_html=True)
-    
-                    # Show editable table with sorting enabled
-                    client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+
+                    # Sort dropdown
+                    sort_option = st.selectbox(
+                        f"Sort {client}'s Tasks By",
+                        ["Priority (High to Low)", "Priority (Low to High)", "Date Created (Newest)", "Date Created (Oldest)"],
+                        key=f"sort_{client}"
+                    )
+
+                    client_tasks = active_todos[active_todos["Client"] == client]
+                    if sort_option == "Priority (High to Low)":
+                        client_tasks = client_tasks.sort_values(by="Priority", ascending=False)
+                    elif sort_option == "Priority (Low to High)":
+                        client_tasks = client_tasks.sort_values(by="Priority", ascending=True)
+                    elif sort_option == "Date Created (Newest)":
+                        client_tasks = client_tasks.sort_values(by="DateCreated", ascending=False)
+                    elif sort_option == "Date Created (Oldest)":
+                        client_tasks = client_tasks.sort_values(by="DateCreated", ascending=True)
+
+                    # Editable table
                     edited_table = st.data_editor(
                         client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
                         num_rows="dynamic",
                         width="stretch",
-                        column_config={
-                            "Category": st.column_config.TextColumn("Category", help="Task category"),
-                            "Task": st.column_config.TextColumn("Task", help="Task details"),
-                            "Priority": st.column_config.NumberColumn("Priority", help="Sort by priority"),
-                            "DateCreated": st.column_config.DateColumn("Date Created"),
-                            "DateCompleted": st.column_config.DateColumn("Date Completed")
-                        },
                         hide_index=True
                     )
-    
+
                     # Save changes button
                     if st.button(f"Save Changes for {client}"):
                         df_todos = df_todos[df_todos["Client"] != client]
@@ -391,7 +401,7 @@ elif selected_page == "To-Do":
                         df_todos.to_csv(TODOS_FILE, index=False)
                         push_to_github("data/todos.csv", "Updated To-Do list")
                         st.success(f"Changes saved for {client}!")
-    
+
     st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------------------------
 # Placeholder Pages
@@ -763,7 +773,7 @@ elif selected_page == "Archive":
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("### Archived Hours")
-        st.dataframe(df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), width="stretch", hide_index=True)
+        st.dataframe(df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), use_container_width=True)
     with col2:
         st.markdown("### Archived To-Dos")
         st.dataframe(df_archive_todos.sort_values(by="DateCreated", ascending=False)[
@@ -821,42 +831,6 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
