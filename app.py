@@ -489,7 +489,15 @@ elif selected_page == "Reports":
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col_start, col_end = st.columns([1, 1])
     with col_start:
-        start_date = st.date_input("Start Date", date(now.year, now.month, 1))
+        
+        now = datetime.now()
+        
+        # Calculate 4 months ago safely
+        month_offset = (now.month - 4) % 12 or 12
+        year_offset = now.year if now.month > 4 else now.year - 1
+        
+        start_date = st.date_input("Start Date", date(year_offset, month_offset, 1))
+
     with col_end:
         end_date = st.date_input("End Date", last_day)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -773,7 +781,11 @@ elif selected_page == "Archive":
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("### Archived Hours")
-        st.dataframe(df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True), use_container_width=True)
+        df_archive_hours["Date"] = pd.to_datetime(df_archive_hours["Date"], errors="coerce")
+        st.dataframe(
+            df_archive_hours.sort_values(by="Date", ascending=False).reset_index(drop=True),
+            use_container_width=True
+        )
     with col2:
         st.markdown("### Archived To-Dos")
         st.dataframe(df_archive_todos.sort_values(by="DateCreated", ascending=False)[
@@ -831,6 +843,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
