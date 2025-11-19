@@ -122,11 +122,18 @@ selected_page = st.sidebar.radio("Go to", pages)
 
 st.markdown("""
 <style>
-/* Target the actual text inside the select box */
+/* Override the problematic padding */
+.stSelectbox > div > div {
+    padding: 0 !important; /* Remove extra padding */
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Style the actual text inside the select box */
 .stSelectbox div[data-baseweb="select"] span {
     color: #D3D3D3 !important;
     font-size: 16px !important;
-    white-space: nowrap !important; /* Prevent text wrapping */
+    line-height: 1.4 !important;
 }
 
 /* Dropdown options */
@@ -136,7 +143,6 @@ ul[role="listbox"] li {
 }
 </style>
 """, unsafe_allow_html=True)
-
 
 
 # -------------------------------------------------
@@ -688,6 +694,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
