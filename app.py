@@ -445,20 +445,20 @@ elif selected_page == "Reports":
     saved_end = pd.to_datetime(period_settings["EndDate"].iloc[0]).date()
 
     # -------------------------
-    # BAN Period Selection
+    # BAN Period Selection (with button inline)
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    col_start, col_end = st.columns([1, 1])
+    col_start, col_end, col_btn = st.columns([1, 1, 1])
     with col_start:
-        period_start = st.date_input("BAN Period Start", saved_start)
+        period_start = st.date_input("Performance Period Start", saved_start)
     with col_end:
-        period_end = st.date_input("BAN Period End", saved_end)
+        period_end = st.date_input("Performance Period End", saved_end)
+    with col_btn:
+        if st.button("Update Performance Period", use_container_width=True):
+            pd.DataFrame({"StartDate": [str(period_start)], "EndDate": [str(period_end)]}).to_csv(PERIOD_FILE, index=False)
+            push_to_github("data/period_settings.csv", "Updated performance period")
+            st.success("Performance period updated!")
     st.markdown('</div>', unsafe_allow_html=True)
-
-    if st.button("Update BAN Period", use_container_width=True):
-        pd.DataFrame({"StartDate": [str(period_start)], "EndDate": [str(period_end)]}).to_csv(PERIOD_FILE, index=False)
-        push_to_github("data/period_settings.csv", "Updated BAN period")
-        st.success("BAN period updated!")
 
     # -------------------------
     # BAN Calculations
@@ -882,6 +882,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
