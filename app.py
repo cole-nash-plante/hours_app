@@ -430,12 +430,11 @@ elif selected_page == "Reports":
     # Convert dates
     hours_df["Date"] = pd.to_datetime(hours_df["Date"])
     days_off_df["Date"] = pd.to_datetime(days_off_df["Date"])
-
     now = datetime.today()
     today = now.date()
 
     # -------------------------
-    # Load or Initialize Performance Period
+    # Performance Period Setup
     # -------------------------
     if not os.path.exists(PERIOD_FILE):
         default_start = date(now.year, 1, 1)
@@ -446,10 +445,7 @@ elif selected_page == "Reports":
     saved_start = pd.to_datetime(period_settings["StartDate"].iloc[0]).date()
     saved_end = pd.to_datetime(period_settings["EndDate"].iloc[0]).date()
 
-    # -------------------------
-    # Performance Period Selection (inline button)
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    # Performance Period Selection
     col_start, col_end, col_btn = st.columns([1, 1, 1])
     with col_start:
         period_start = st.date_input("Performance Period Start", saved_start)
@@ -460,23 +456,18 @@ elif selected_page == "Reports":
             pd.DataFrame({"StartDate": [str(period_start)], "EndDate": [str(period_end)]}).to_csv(PERIOD_FILE, index=False)
             push_to_github("data/period_settings.csv", "Updated performance period")
             st.success("Performance period updated!")
-    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------
     # BAN Calculations
     # -------------------------
     period_hours_df = hours_df[(hours_df["Date"].dt.date >= period_start) & (hours_df["Date"].dt.date <= period_end)]
     period_goals_df = goals_df.copy()
-
-    # Normalize month format
     period_hours_df["Month"] = period_hours_df["Date"].dt.strftime("%Y-%m")
     period_goals_df["Month"] = period_goals_df["Month"].apply(lambda m: f"{now.year}-{int(m):02d}")
 
-    # Aggregate actual hours by month
     monthly_actual_period = period_hours_df.groupby("Month")["Hours"].sum().reset_index()
     monthly_actual_period.rename(columns={"Hours": "ActualHours"}, inplace=True)
 
-    # Merge goals and actuals
     all_months_period = pd.DataFrame({"Month": sorted(set(period_hours_df["Month"]).union(set(period_goals_df["Month"])))})
     merged_period = (
         all_months_period
@@ -485,64 +476,72 @@ elif selected_page == "Reports":
         .fillna(0)
     )
 
-    # BAN metrics
     total_goal_hours = merged_period["GoalHours"].sum()
     total_actual_hours = merged_period["ActualHours"].sum()
     remaining_hours_period = max(total_goal_hours - total_actual_hours, 0)
-
     remaining_days_period = pd.date_range(start=max(now, pd.to_datetime(period_start)), end=pd.to_datetime(period_end), freq="B")
     days_off_period = days_off_df[(days_off_df["Date"].dt.date >= period_start) & (days_off_df["Date"].dt.date <= period_end)]
     remaining_weekdays_period = len(remaining_days_period) - len(days_off_period)
     avg_hours_left_period = remaining_hours_period / remaining_weekdays_period if remaining_weekdays_period > 0 else 0
-
-    # Today's hours
     todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
 
-    # -------------------------
-    # Display All 4 BAN Metrics in One Row
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    # Display BAN Metrics
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    with col1:
-        st.metric("Avg Hours Left/Day", f"{avg_hours_left_period:.2f}")
-    with col2:
-        st.metric("Goal Hours", f"{total_goal_hours:.2f}")
-    with col3:
-        st.metric("Actual Hours", f"{total_actual_hours:.2f}")
-    with col4:
-        st.metric("Today's Hours", f"{todays_hours:.2f}")
-    st.markdown('</div>', unsafe_allow_html=True)
+    with col1: st.metric("Avg Hours Left/Day", f"{avg_hours_left_period:.2f}")
+    with col2: st.metric("Goal Hours", f"{total_goal_hours:.2f}")
+    with col3: st.metric("Actual Hours", f"{total_actual_hours:.2f}")
+    with col4: st.metric("Today's Hours", f"{todays_hours:.2f}")
 
     # -------------------------
-    # Chart Date Filter (Separate Logic)
+    # Weekly Snapshot Chart
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    col_start, col_end = st.columns([1, 1])
-    with col_start:
-        # Default start date = 4 months ago
-        month_offset = (now.month - 4) % 12 or 12
-        year_offset = now.year if now.month > 4 else now.year - 1
-        chart_start = st.date_input("Chart Start Date", date(year_offset, month_offset, 1))
-    with col_end:
-        chart_end = st.date_input("Chart End Date", date(now.year, now.month, calendar.monthrange(now.year, now.month)[1]))
+    st.subheader("Weekly Snapshot: Billed Hours by Client")
+
+    if "week_offset" not in st.session_state:
+        st.session_state.week_offset = 0
+
+    nav_col1, nav_col2 = st.columns([1, 1])
+    with nav_col1:
+        if st.button("⬅ Previous Week"):
+            st.session_state.week_offset -= 1
+    with nav_col2:
+        if st.button("Next Week ➡"):
+            st.session_state.week_offset += 1
+
+    today = pd.Timestamp.today()
+    start_of_week = (today + pd.Timedelta(weeks=st.session_state.week_offset)).normalize() - pd.Timedelta(days=today.weekday())
+    end_of_week = start_of_week + pd.Timedelta(days=6)
+
+    weekly_data = hours_df[(hours_df["Date"] >= start_of_week) & (hours_df["Date"] <= end_of_week)]
+    client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
+
+    fig_weekly = go.Figure()
+    days = pd.date_range(start_of_week, end_of_week)
+    for client in weekly_data["Client"].unique():
+        client_df = weekly_data[weekly_data["Client"] == client].groupby("Date")["Hours"].sum().reindex(days, fill_value=0)
+        fig_weekly.add_trace(go.Scatter(
+            x=days.strftime("%a"), y=client_df.values,
+            mode="lines+markers", name=client,
+            line=dict(color=client_colors.get(client, "#FFFFFF"), width=3)
+        ))
+
+    fig_weekly.update_layout(
+        plot_bgcolor="#0f0f23",
+        paper_bgcolor="#0f0f23",
+        font=dict(color="#FFFFFF", size=14),
+        xaxis=dict(title="Day of Week"),
+        yaxis=dict(title="Hours"),
+        margin=dict(l=40, r=40, t=40, b=40)
+    )
+    st.plotly_chart(fig_weekly, use_container_width=True)
+
+    # -------------------------
+    # Monthly & Pie Charts
+    # -------------------------
     st.markdown('</div>', unsafe_allow_html=True)
-
-    # Filter data for charts
-    filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(chart_start)) & (hours_df["Date"] <= pd.to_datetime(chart_end))]
-    filtered_merged = merged_period[(pd.to_datetime(merged_period["Month"] + "-01") >= pd.to_datetime(chart_start)) &
-                                    (pd.to_datetime(merged_period["Month"] + "-01") <= pd.to_datetime(chart_end))]
-
-    # Sort months chronologically
-    filtered_merged["MonthDate"] = pd.to_datetime(filtered_merged["Month"] + "-01")
-    filtered_merged = filtered_merged.sort_values("MonthDate")
-    filtered_merged["MonthLabel"] = filtered_merged["MonthDate"].dt.strftime("%b %Y")
-
-    # -------------------------
-    # Charts
-    # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    col1, col2 = st.columns([2, 1])  # Line chart 2/3, Pie chart 1/3
-
+    col1, col2 = st.columns([2, 1])
     chart_bg = "#0f0f23"
     text_color = "#FFFFFF"
 
@@ -550,12 +549,12 @@ elif selected_page == "Reports":
         st.subheader("Monthly Actual vs Planned Hours")
         fig_line = go.Figure()
         fig_line.add_trace(go.Scatter(
-            x=filtered_merged["MonthLabel"], y=filtered_merged["GoalHours"],
+            x=merged_period["Month"], y=merged_period["GoalHours"],
             mode="lines+markers", name="Planned Hours",
             line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000")
         ))
         fig_line.add_trace(go.Scatter(
-            x=filtered_merged["MonthLabel"], y=filtered_merged["ActualHours"],
+            x=merged_period["Month"], y=merged_period["ActualHours"],
             mode="lines+markers", name="Actual Hours",
             line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f")
         ))
@@ -573,8 +572,8 @@ elif selected_page == "Reports":
 
     with col2:
         st.subheader("Hours by Client")
+        filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(period_start)) & (hours_df["Date"] <= pd.to_datetime(period_end))]
         if len(filtered_hours) > 0:
-            client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
             pie_fig = px.pie(filtered_hours, names="Client", values="Hours",
                              color="Client", color_discrete_map=client_colors)
             pie_fig.update_layout(
@@ -588,6 +587,10 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
 elif selected_page == "History":
     st.title("History")
 
@@ -887,6 +890,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
