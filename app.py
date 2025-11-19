@@ -406,6 +406,8 @@ elif selected_page == "To-Do":
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
+
+
 elif selected_page == "Reports":
     st.title("Reports")
 
@@ -433,7 +435,7 @@ elif selected_page == "Reports":
     today = now.date()
 
     # -------------------------
-    # Load or Initialize BAN Period
+    # Load or Initialize Performance Period
     # -------------------------
     if not os.path.exists(PERIOD_FILE):
         default_start = date(now.year, 1, 1)
@@ -445,7 +447,7 @@ elif selected_page == "Reports":
     saved_end = pd.to_datetime(period_settings["EndDate"].iloc[0]).date()
 
     # -------------------------
-    # BAN Period Selection (with button inline)
+    # Performance Period Selection (inline button)
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col_start, col_end, col_btn = st.columns([1, 1, 1])
@@ -483,6 +485,7 @@ elif selected_page == "Reports":
         .fillna(0)
     )
 
+    # BAN metrics
     total_goal_hours = merged_period["GoalHours"].sum()
     total_actual_hours = merged_period["ActualHours"].sum()
     remaining_hours_period = max(total_goal_hours - total_actual_hours, 0)
@@ -492,22 +495,23 @@ elif selected_page == "Reports":
     remaining_weekdays_period = len(remaining_days_period) - len(days_off_period)
     avg_hours_left_period = remaining_hours_period / remaining_weekdays_period if remaining_weekdays_period > 0 else 0
 
+    # Today's hours
+    todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
+
     # -------------------------
-    # BAN Metrics
+    # Display All 4 BAN Metrics in One Row
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     with col1:
-        st.metric("Avg Hours Left per Day (Period)", f"{avg_hours_left_period:.2f}")
+        st.metric("Avg Hours Left/Day", f"{avg_hours_left_period:.2f}")
     with col2:
-        st.metric("Total Goal Hours (Period)", f"{total_goal_hours:.2f}")
+        st.metric("Goal Hours", f"{total_goal_hours:.2f}")
     with col3:
-        st.metric("Total Actual Hours (Period)", f"{total_actual_hours:.2f}")
+        st.metric("Actual Hours", f"{total_actual_hours:.2f}")
+    with col4:
+        st.metric("Today's Hours", f"{todays_hours:.2f}")
     st.markdown('</div>', unsafe_allow_html=True)
-
-    # Today's hours metric
-    todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
-    st.metric("Total Hours Today", f"{todays_hours:.2f}")
 
     # -------------------------
     # Chart Date Filter (Separate Logic)
@@ -584,8 +588,6 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
-
-
 
 
 elif selected_page == "History":
@@ -882,6 +884,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
