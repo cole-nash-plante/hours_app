@@ -123,9 +123,9 @@ st.markdown("""
         color: #FFFFFF !important;
     }
     ul[role="listbox"] li {
-        color: #FFFFFF !important; /* Force white text */
+        color: ##D3D3D3 !important; /* Force white text */
         font-size: 16px !important;
-        padding: 0.75rem !important;
+        padding: 0.5rem 1rem !important
 
     }
     </style>
@@ -679,6 +679,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
