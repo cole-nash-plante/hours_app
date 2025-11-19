@@ -23,18 +23,8 @@
   --client-6: #06b6d4;
 }
 /* Force dropdown text to white */
-div[role="combobox"] * {
-    color: #FFFFFF !important;
-    font-size: 16px !important;
-}
 
 /* Also make dropdown background match dark theme */
-div[role="combobox"] {
-    background-color: var(--bg-tertiary) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 0.375rem !important;
-    padding: 0.5rem !important;
-}
 
 
 
@@ -43,10 +33,6 @@ div[role="combobox"] {
 .stTextArea textarea,
 .stSelectbox > div > div,
 .stDateInput > div > div > input {
-    color: #FFFFFF !important; /* Force white text */
-    font-size: 16px !important;
-    padding: 0.75rem !important;
-}
 /* Main Background */
 .stApp {
   background-color: var(--bg-primary) !important;
@@ -73,10 +59,7 @@ section[data-testid="stSidebar"] label {
 section[data-testid="stSidebar"] [role="radiogroup"] label {
   color: var(--text-primary) !important;
 }
-/* Force selected value text color in selectbox */
-.stSelectbox div[data-baseweb="select"] .css-1uccc91-singleValue {
-    color: #FFFFFF !important;
-}
+
 /* Selected navigation item */
 section[data-testid="stSidebar"] [data-baseweb="radio"] input:checked ~ div {
   background-color: var(--accent) !important;
@@ -121,12 +104,6 @@ h1 {
 .stTextArea textarea,
 .stSelectbox > div > div,
 .stDateInput > div > div > input {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 0.375rem !important;
-  padding: 0.5rem !important;
-}
 
 .stTextInput > div > div > input:focus,
 .stNumberInput > div > div > input:focus,
@@ -173,11 +150,6 @@ h1 {
 }
 
 .streamlit-expanderContent {
-  background-color: var(--bg-tertiary) !important;
-  border: 1px solid var(--border) !important;
-  border-top: none !important;
-  border-radius: 0 0 0.5rem 0.5rem !important;
-}
 
 /* Priority Color Coding for To-Do List */
 .todo-high {
@@ -267,10 +239,6 @@ h1 {
 
 /* Color Picker */
 .stColorPicker > div > div {
-  background-color: var(--bg-tertiary) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 0.375rem !important;
-}
 
 /* Success/Error Messages */
 .stSuccess {
@@ -336,9 +304,6 @@ h1 {
 .stTextArea label,
 .stSelectbox label,
 .stSlider label {
-    color: #FFFFFF !important;
-    font-weight: 600; /* Optional: make them bold */
-}
 
 /* Optional: Adjust font size for better visibility */
 .stTextInput label,
@@ -351,10 +316,6 @@ h1 {
 }
 /* Make the color picker label white and bold */
 .stColorPicker label {
-    color: #FFFFFF !important;
-    font-weight: 600;
-    font-size: 16px;
-}
 
 /* Optional: Add some spacing around the color picker box */
 .stColorPicker {
@@ -368,33 +329,11 @@ h1 {
 .stTextArea textarea,
 .stSelectbox > div > div,
 .stDateInput > div > div > input {
-    color: #FFFFFF !important;       /* White text */
-    font-size: 8px !important;      /* Bigger text */
-    padding: 0.75rem !important;     /* Taller input */
-}
 
 /* Force selectbox text to white */
-.stSelectbox div[data-baseweb="select"] * {
-    color: #FFFFFF !important;
-    font-size: 8px !important;
-}
 
 /* Dropdown menu options */
-ul[role="listbox"] li {
-    color: #FFFFFF !important;
-    background-color: var(--bg-tertiary) !important;
-}
 
-/* Fix selected value background in selectbox */
-.stSelectbox div[data-baseweb="select"] {
-    background-color: var(--bg-tertiary) !important;
-    color: #FFFFFF !important;
-}
 
 
 /* Dropdown menu options */
-ul[role="listbox"] li {
-    color: #FFFFFF !important;
-    background-color: var(--bg-tertiary) !important;
-}
-
