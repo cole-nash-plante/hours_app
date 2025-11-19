@@ -73,7 +73,10 @@ section[data-testid="stSidebar"] label {
 section[data-testid="stSidebar"] [role="radiogroup"] label {
   color: var(--text-primary) !important;
 }
-
+/* Force selected value text color in selectbox */
+.stSelectbox div[data-baseweb="select"] .css-1uccc91-singleValue {
+    color: #FFFFFF !important;
+}
 /* Selected navigation item */
 section[data-testid="stSidebar"] [data-baseweb="radio"] input:checked ~ div {
   background-color: var(--accent) !important;
