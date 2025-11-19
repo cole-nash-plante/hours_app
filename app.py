@@ -409,99 +409,91 @@ elif selected_page == "To-Do":
 
 elif selected_page == "Reports":
     st.title("Reports")
-
+    
     # Ensure data directory exists
     os.makedirs(DATA_DIR, exist_ok=True)
-
+    
     # File paths
     HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
     GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
     DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
-    ANNUAL_TARGET_FILE = os.path.join(DATA_DIR, "annual_target.csv")
     CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")
-
-    # Ensure annual target file exists
-    if not os.path.exists(ANNUAL_TARGET_FILE):
-        pd.DataFrame({"EndDate": [str(datetime(datetime.today().year, 12, 31).date())]}).to_csv(ANNUAL_TARGET_FILE, index=False)
-
+    
     # Load data
     hours_df = pd.read_csv(HOURS_FILE)
     goals_df = pd.read_csv(GOALS_FILE)
     days_off_df = pd.read_csv(DAYS_OFF_FILE)
-    annual_target_df = pd.read_csv(ANNUAL_TARGET_FILE)
     df_clients = pd.read_csv(CLIENTS_FILE)
-
+    
     # Convert dates
     hours_df["Date"] = pd.to_datetime(hours_df["Date"])
     days_off_df["Date"] = pd.to_datetime(days_off_df["Date"])
-
+    
     # Current date
     now = datetime.today()
     today = now.date()
-    last_day = date(now.year, now.month, calendar.monthrange(now.year, now.month)[1])
-
-    # BAN Calculations
-    current_month = now.strftime("%Y-%m")
     
-    # Normalize month format for both datasets
-    hours_df["Month"] = hours_df["Date"].dt.strftime("%Y-%m")
-    goals_df["Month"] = goals_df["Month"].apply(lambda m: f"{now.year}-{int(m):02d}")
-    
-    # Aggregate actual hours by month
-    monthly_actual = hours_df.groupby("Month")["Hours"].sum().reset_index()
-    monthly_actual.rename(columns={"Hours": "ActualHours"}, inplace=True)
-    
-    # Create a complete list of months from both sources
-    all_months = pd.DataFrame({"Month": sorted(set(hours_df["Month"]).union(set(goals_df["Month"])))})
-    
-    # Merge goals and actuals into full month list, fill missing values with 0
-    merged = (
-        all_months
-        .merge(goals_df, on="Month", how="left")
-        .merge(monthly_actual, on="Month", how="left")
-        .fillna(0)
-    )
-
-    # Calculate BAN metrics for current month
-    goal_hours = merged.loc[merged["Month"] == current_month, "GoalHours"].sum()
-    actual_hours = merged.loc[merged["Month"] == current_month, "ActualHours"].sum()
-    remaining_hours = max(goal_hours - actual_hours, 0)
-
-    remaining_days = pd.date_range(start=now, end=last_day, freq="B")
-    days_off_this_month = days_off_df[(days_off_df["Date"].dt.month == now.month) & (days_off_df["Date"].dt.year == now.year)]
-    remaining_weekdays = len(remaining_days) - len(days_off_this_month)
-    monthly_avg_left = remaining_hours / remaining_weekdays if remaining_weekdays > 0 else 0
-
-    annual_end_date = pd.to_datetime(annual_target_df["EndDate"].iloc[0])
-    remaining_days_annual = pd.date_range(start=now, end=annual_end_date, freq="B")
-    days_off_annual = days_off_df[(days_off_df["Date"] >= now) & (days_off_df["Date"] <= annual_end_date)]
-    remaining_weekdays_annual = len(remaining_days_annual) - len(days_off_annual)
-    annual_goal_hours = goals_df["GoalHours"].sum()
-    annual_actual_hours = hours_df["Hours"].sum()
-    remaining_annual_hours = max(annual_goal_hours - annual_actual_hours, 0)
-    annual_avg_left = remaining_annual_hours / remaining_weekdays_annual if remaining_weekdays_annual > 0 else 0
-
     # -------------------------
-    # BAN Metrics + Annual End Date
+    # Select Period
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    with col1:
-        st.metric("Avg Hours Left per Day (Monthly)", f"{monthly_avg_left:.2f}")
-    with col2:
-        st.metric("Avg Hours Left per Day (Annual)", f"{annual_avg_left:.2f}")
-    with col3:
-        # Today's hours only
-        todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
-        st.metric("Total Hours Today", f"{todays_hours:.2f}")
-    with col4:
-        new_end_date = st.date_input("Annual End Date", annual_end_date.date(), label_visibility="collapsed")
-        if st.button("Update Year-End Date", use_container_width=True):
-            pd.DataFrame({"EndDate": [str(new_end_date)]}).to_csv(ANNUAL_TARGET_FILE, index=False)
-            push_to_github("data/annual_target.csv", "Updated annual end date")
-            st.success("Annual end date updated!")
+    col_start, col_end = st.columns([1, 1])
+    with col_start:
+        period_start = st.date_input("Period Start", date(now.year, 1, 1))
+    with col_end:
+        period_end = st.date_input("Period End", date(now.year, 12, 31))
     st.markdown('</div>', unsafe_allow_html=True)
-
+    
+    # Filter data for selected period
+    period_hours_df = hours_df[(hours_df["Date"].dt.date >= period_start) & (hours_df["Date"].dt.date <= period_end)]
+    period_goals_df = goals_df.copy()
+    
+    # Normalize month format
+    period_hours_df["Month"] = period_hours_df["Date"].dt.strftime("%Y-%m")
+    period_goals_df["Month"] = period_goals_df["Month"].apply(lambda m: f"{now.year}-{int(m):02d}")
+    
+    # Aggregate actual hours by month
+    monthly_actual_period = period_hours_df.groupby("Month")["Hours"].sum().reset_index()
+    monthly_actual_period.rename(columns={"Hours": "ActualHours"}, inplace=True)
+    
+    # Create full month list for the period
+    all_months_period = pd.DataFrame({"Month": sorted(set(period_hours_df["Month"]).union(set(period_goals_df["Month"])))})
+    
+    # Merge goals and actuals
+    merged_period = (
+        all_months_period
+        .merge(period_goals_df, on="Month", how="left")
+        .merge(monthly_actual_period, on="Month", how="left")
+        .fillna(0)
+    )
+    
+    # Calculate BAN metrics for selected period
+    total_goal_hours = merged_period["GoalHours"].sum()
+    total_actual_hours = merged_period["ActualHours"].sum()
+    remaining_hours_period = max(total_goal_hours - total_actual_hours, 0)
+    
+    # Remaining weekdays in the selected period
+    remaining_days_period = pd.date_range(start=max(now, pd.to_datetime(period_start)), end=pd.to_datetime(period_end), freq="B")
+    days_off_period = days_off_df[(days_off_df["Date"].dt.date >= period_start) & (days_off_df["Date"].dt.date <= period_end)]
+    remaining_weekdays_period = len(remaining_days_period) - len(days_off_period)
+    avg_hours_left_period = remaining_hours_period / remaining_weekdays_period if remaining_weekdays_period > 0 else 0
+    
+    # -------------------------
+    # BAN Metrics
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col1:
+        st.metric("Avg Hours Left per Day (Period)", f"{avg_hours_left_period:.2f}")
+    with col2:
+        st.metric("Total Goal Hours (Period)", f"{total_goal_hours:.2f}")
+    with col3:
+        st.metric("Total Actual Hours (Period)", f"{total_actual_hours:.2f}")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Today's hours metric
+    todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
+    st.metric("Total Hours Today", f"{todays_hours:.2f}")
     # -------------------------
     # Date Filter
     # -------------------------
@@ -874,6 +866,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
