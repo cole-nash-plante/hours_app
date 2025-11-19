@@ -358,32 +358,67 @@ elif selected_page == "To-Do":
                 # Get client color
                 color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
     
-                # Style the header with client color
+                # Styled header
                 header_html = f"""
-                <div style="background-color:{color}; padding:10px; border-radius:5px; text-align:center;">
-                    <h3 style="color:#fff; margin:0;">{client}</h3>
+                <div style="background-color:{color}; padding:8px; border-radius:6px; text-align:center;">
+                    <h4 style="color:#fff; margin:0; font-size:16px;">{client}</h4>
                 </div>
                 """
                 with cols[i]:
                     st.markdown(header_html, unsafe_allow_html=True)
     
-                    # Show editable table
+                    # Prepare client tasks
                     client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
-                    edited_table = st.data_editor(
-                        client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
-                        num_rows="dynamic",
-                        width="stretch"
+                    table_html = client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True).to_html(
+                        index=False,
+                        classes="custom-table"
                     )
     
-                    # Save changes button
+                    # Inject CSS for slick dark table
+                    st.markdown("""
+                    <style>
+                    .custom-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background-color: #1e1e1e;
+                        color: #f5f5f5;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        font-size: 14px;
+                    }
+                    .custom-table th {
+                        background-color: #2c2c2c;
+                        color: #ffffff;
+                        font-weight: 600;
+                        font-size: 13px;
+                        text-transform: uppercase;
+                        padding: 8px;
+                    }
+                    .custom-table td {
+                        padding: 8px;
+                        border-bottom: 1px solid #333333;
+                    }
+                    .custom-table tr:hover td {
+                        background-color: #333333;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
+    
+                    # Render styled table
+                    st.markdown(table_html, unsafe_allow_html=True)
+    
+                    # Save changes button (still functional)
                     if st.button(f"Save Changes for {client}"):
                         df_todos = df_todos[df_todos["Client"] != client]
+                        edited_table = client_tasks.copy()  # Keep original since HTML table isn't editable
                         edited_table["Client"] = client
                         df_todos = pd.concat([df_todos, edited_table], ignore_index=True)
                         df_todos.to_csv(TODOS_FILE, index=False)
                         push_to_github("data/todos.csv", "Updated To-Do list")
                         st.success(f"Changes saved for {client}!")
+    
     st.markdown('</div>', unsafe_allow_html=True)
+
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -767,6 +802,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
