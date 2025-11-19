@@ -120,7 +120,9 @@ selected_page = st.sidebar.radio("Go to", pages)
 st.markdown("""
     <style>
     .stSelectbox div[data-baseweb="select"] * {
-        color: #FFFFFF !important;
+        color: ##D3D3D3 !important; /* Force white text */
+        font-size: 16px !important;
+        padding: 0.5rem 1rem !important
     }
     ul[role="listbox"] li {
         color: ##D3D3D3 !important; /* Force white text */
@@ -679,6 +681,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
