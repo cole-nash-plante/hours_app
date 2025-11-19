@@ -535,7 +535,6 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
-
 elif selected_page == "History":
     st.title("History")
 
@@ -543,7 +542,7 @@ elif selected_page == "History":
     df_hours = pd.read_csv(HOURS_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
 
-    # Convert date columns to datetime for compatibility
+    # Convert date columns for compatibility
     df_hours["Date"] = pd.to_datetime(df_hours["Date"], errors="coerce")
     df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
     df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
@@ -573,16 +572,20 @@ elif selected_page == "History":
         if len(filtered_hours) == 0:
             st.info("No hours logged for selected client(s).")
         else:
+            sort_hours_by = st.selectbox("Sort Hours By", ["Date (Newest)", "Date (Oldest)", "Hours (High to Low)", "Hours (Low to High)"])
+            if sort_hours_by == "Date (Newest)":
+                filtered_hours = filtered_hours.sort_values(by="Date", ascending=False)
+            elif sort_hours_by == "Date (Oldest)":
+                filtered_hours = filtered_hours.sort_values(by="Date", ascending=True)
+            elif sort_hours_by == "Hours (High to Low)":
+                filtered_hours = filtered_hours.sort_values(by="Hours", ascending=False)
+            elif sort_hours_by == "Hours (Low to High)":
+                filtered_hours = filtered_hours.sort_values(by="Hours", ascending=True)
+
             edited_hours = st.data_editor(
                 filtered_hours[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
                 num_rows="dynamic",
                 width="stretch",
-                column_config={
-                    "Date": st.column_config.DateColumn("Date", help="Sort by date"),
-                    "Client": st.column_config.TextColumn("Client"),
-                    "Hours": st.column_config.NumberColumn("Hours", help="Sort by hours"),
-                    "Description": st.column_config.TextColumn("Description")
-                },
                 hide_index=True
             )
             if st.button("Save Hours Changes"):
@@ -597,18 +600,20 @@ elif selected_page == "History":
         if len(filtered_todos) == 0:
             st.info("No tasks recorded for selected client(s).")
         else:
+            sort_todos_by = st.selectbox("Sort To-Dos By", ["Priority (High to Low)", "Priority (Low to High)", "Date Created (Newest)", "Date Created (Oldest)"])
+            if sort_todos_by == "Priority (High to Low)":
+                filtered_todos = filtered_todos.sort_values(by="Priority", ascending=False)
+            elif sort_todos_by == "Priority (Low to High)":
+                filtered_todos = filtered_todos.sort_values(by="Priority", ascending=True)
+            elif sort_todos_by == "Date Created (Newest)":
+                filtered_todos = filtered_todos.sort_values(by="DateCreated", ascending=False)
+            elif sort_todos_by == "Date Created (Oldest)":
+                filtered_todos = filtered_todos.sort_values(by="DateCreated", ascending=True)
+
             edited_todos = st.data_editor(
                 filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
                 num_rows="dynamic",
                 width="stretch",
-                column_config={
-                    "Client": st.column_config.TextColumn("Client"),
-                    "Category": st.column_config.TextColumn("Category"),
-                    "Task": st.column_config.TextColumn("Task"),
-                    "Priority": st.column_config.NumberColumn("Priority", help="Sort by priority"),
-                    "DateCreated": st.column_config.DateColumn("Date Created"),
-                    "DateCompleted": st.column_config.DateColumn("Date Completed")
-                },
                 hide_index=True
             )
             if st.button("Save To-Do Changes"):
@@ -618,6 +623,7 @@ elif selected_page == "History":
                 st.success("To-Do history updated!")
 
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 elif selected_page == "Archive":
     st.title("Archive Clients")
@@ -815,6 +821,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
