@@ -322,4 +322,16 @@ h1 {
 .stSlider label {
     font-size: 16px;
 }
+/* Make the color picker label white and bold */
+.stColorPicker label {
+    color: #FFFFFF !important;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Optional: Add some spacing around the color picker box */
+.stColorPicker {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
 
