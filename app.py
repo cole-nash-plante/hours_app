@@ -436,6 +436,7 @@ elif selected_page == "Reports":
 
     # Current date
     now = datetime.today()
+    today = now.date()
     last_day = date(now.year, now.month, calendar.monthrange(now.year, now.month)[1])
 
     # BAN Calculations
@@ -474,7 +475,9 @@ elif selected_page == "Reports":
     with col2:
         st.metric("Avg Hours Left per Day (Annual)", f"{annual_avg_left:.2f}")
     with col3:
-        st.metric("Total Hours in Period", f"{hours_df[(hours_df['Date'] >= pd.to_datetime(date(now.year, now.month, 1))) & (hours_df['Date'] <= pd.to_datetime(last_day))]['Hours'].sum():.2f}")
+        # Today's hours only
+        todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
+        st.metric("Total Hours Today", f"{todays_hours:.2f}")
     with col4:
         new_end_date = st.date_input("Annual End Date", annual_end_date.date(), label_visibility="collapsed")
         if st.button("Update Year-End Date", use_container_width=True):
@@ -489,15 +492,10 @@ elif selected_page == "Reports":
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col_start, col_end = st.columns([1, 1])
     with col_start:
-        
         now = datetime.now()
-        
-        # Calculate 4 months ago safely
         month_offset = (now.month - 4) % 12 or 12
         year_offset = now.year if now.month > 4 else now.year - 1
-        
         start_date = st.date_input("Start Date", date(year_offset, month_offset, 1))
-
     with col_end:
         end_date = st.date_input("End Date", last_day)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -511,7 +509,7 @@ elif selected_page == "Reports":
     # Charts
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    col1, col2 = st.columns([2, 1])  # Line chart 2/3, Pie chart 1/3
+    col1, col2 = st.columns([2, 1])
 
     chart_bg = "#0f0f23"
     text_color = "#FFFFFF"
@@ -526,11 +524,11 @@ elif selected_page == "Reports":
                                       mode="lines+markers", name="Actual Hours",
                                       line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f")))
         fig_line.update_layout(
-            showlegend=False,  # Remove plot title and legend
+            showlegend=False,
             plot_bgcolor=chart_bg,
             paper_bgcolor=chart_bg,
             font=dict(color=text_color, size=14),
-            xaxis=dict(color=text_color),
+            xaxis=dict(color=text_color, title="Month"),
             yaxis=dict(color=text_color)
         )
         st.plotly_chart(fig_line, use_container_width=True)
@@ -539,7 +537,6 @@ elif selected_page == "Reports":
         st.subheader("Hours by Client")
         if len(filtered_hours) > 0:
             client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
-
             pie_fig = px.pie(filtered_hours, names="Client", values="Hours",
                              color="Client", color_discrete_map=client_colors)
             pie_fig.update_layout(
@@ -553,6 +550,10 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
 elif selected_page == "History":
     st.title("History")
 
@@ -847,6 +848,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
