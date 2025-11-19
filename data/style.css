@@ -3,7 +3,7 @@
   --bg-primary: #0f0f23;
   --bg-secondary: #1a1a2e;
   --bg-tertiary: #16213e;
-  --text-primary: #e4e4e7;
+  --text-primary: #FFFFFF;
   --text-secondary: #a1a1aa;
   --accent: #9333ea;
   --accent-hover: #a855f7;
@@ -22,7 +22,15 @@
   --client-5: #8b5cf6;
   --client-6: #06b6d4;
 }
-
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stTextArea textarea,
+.stSelectbox > div > div,
+.stDateInput > div > div > input {
+    color: #FFFFFF !important; /* Force white text */
+    font-size: 16px !important;
+    padding: 0.75rem !important;
+}
 /* Main Background */
 .stApp {
   background-color: var(--bg-primary) !important;
