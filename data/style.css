@@ -301,3 +301,25 @@ h1 {
 .stSpinner > div {
   border-color: var(--accent) !important;
 }
+
+/* Make all form labels white */
+.stTextInput label,
+.stDateInput label,
+.stNumberInput label,
+.stTextArea label,
+.stSelectbox label,
+.stSlider label {
+    color: #FFFFFF !important;
+    font-weight: 600; /* Optional: make them bold */
+}
+
+/* Optional: Adjust font size for better visibility */
+.stTextInput label,
+.stDateInput label,
+.stNumberInput label,
+.stTextArea label,
+.stSelectbox label,
+.stSlider label {
+    font-size: 16px;
+}
+
