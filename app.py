@@ -183,15 +183,13 @@ if selected_page == "Data Entry":
         if new_client.strip():
             df_clients = pd.read_csv(CLIENTS_FILE)
     
-            # Ensure DataFrame has correct columns
-            expected_cols = ["Client", "Color"]
-            if list(df_clients.columns) != expected_cols:
-                # Fix columns if needed
-                df_clients = pd.DataFrame(df_clients.values, columns=expected_cols)
+            # Ensure both columns exist
+            if "Color" not in df_clients.columns:
+                df_clients["Color"] = ""  # Add empty Color column if missing
     
             if new_client not in df_clients["Client"].values:
-                # Use concat for safer row addition
-                new_row = pd.DataFrame([[new_client, client_color]], columns=expected_cols)
+                # Append new row safely
+                new_row = pd.DataFrame([[new_client, client_color]], columns=["Client", "Color"])
                 df_clients = pd.concat([df_clients, new_row], ignore_index=True)
     
                 # Save and push
@@ -203,6 +201,7 @@ if selected_page == "Data Entry":
         else:
             st.error("Please enter a valid client name.")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
     # -------------------------
@@ -706,6 +705,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
