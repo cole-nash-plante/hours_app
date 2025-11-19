@@ -26,17 +26,7 @@ CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
 os.makedirs(DATA_DIR, exist_ok=True)
 st.set_page_config(layout="wide")
-st.markdown("""
-    <style>
-    .stSelectbox div[data-baseweb="select"] * {
-        color: #FFFFFF !important;
-    }
-    ul[role="listbox"] li {
-        color: #FFFFFF !important;
-        background-color: #16213e !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+
 # -------------------------------------------------
 # Custom CSS for Dark Theme and Boxed Forms
 # -------------------------------------------------
@@ -127,7 +117,17 @@ for file, cols in init_files:
 st.sidebar.title("Navigation")
 pages = ["Data Entry", "To-Do", "Reports", "History", "Days Off", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
-
+st.markdown("""
+    <style>
+    .stSelectbox div[data-baseweb="select"] * {
+        color: #FFFFFF !important;
+    }
+    ul[role="listbox"] li {
+        color: #FFFFFF !important;
+        background-color: #16213e !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
@@ -677,6 +677,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
