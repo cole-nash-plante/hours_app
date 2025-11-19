@@ -498,7 +498,7 @@ elif selected_page == "Reports":
     # Weekly Snapshot Chart
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Weekly Snapshot: Billed Hours by Client")
+    st.subheader("Weekly Snapshot")
 
     if "week_offset" not in st.session_state:
         st.session_state.week_offset = 0
@@ -908,6 +908,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
