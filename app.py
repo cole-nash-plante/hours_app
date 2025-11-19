@@ -491,7 +491,7 @@ elif selected_page == "Reports":
     with col4: st.metric("Today's Hours", f"{todays_hours:.2f}")
 
     # -------------------------
-    # Weekly Snapshot Chart
+    # Weekly Snapshot Chart (Top)
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Weekly Snapshot: Billed Hours by Client")
@@ -535,11 +535,11 @@ elif selected_page == "Reports":
         margin=dict(l=40, r=40, t=40, b=80)
     )
     st.plotly_chart(fig_weekly, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------
     # Monthly & Pie Charts
     # -------------------------
-    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2 = st.columns([2, 1])
     chart_bg = "#0f0f23"
@@ -588,6 +588,19 @@ elif selected_page == "Reports":
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
 
+    # -------------------------
+    # Date Filters at Bottom
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Chart Date Filters")
+    col_start, col_end = st.columns([1, 1])
+    with col_start:
+        month_offset = (now.month - 4) % 12 or 12
+        year_offset = now.year if now.month > 4 else now.year - 1
+        chart_start = st.date_input("Chart Start Date", date(year_offset, month_offset, 1))
+    with col_end:
+        chart_end = st.date_input("Chart End Date", date(now.year, now.month, calendar.monthrange(now.year, now.month)[1]))
+    st.markdown('</div>', unsafe_allow_html=True)
 
 elif selected_page == "History":
     st.title("History")
@@ -888,6 +901,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
