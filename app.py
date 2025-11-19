@@ -521,7 +521,8 @@ elif selected_page == "Reports":
         fig_weekly.add_trace(go.Scatter(
             x=days.strftime("%a"), y=client_df.values,
             mode="lines+markers", name=client,
-            line=dict(color=client_colors.get(client, "#FFFFFF"), width=3)
+            line=dict(color=client_colors.get(client, "#FFFFFF"), width=4),
+            marker=dict(size=10)
         ))
 
     fig_weekly.update_layout(
@@ -530,7 +531,7 @@ elif selected_page == "Reports":
         font=dict(color="#FFFFFF", size=14),
         xaxis=dict(title="Day of Week", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
         yaxis=dict(title="Hours", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
-        legend=dict(font=dict(color="#FFFFFF", size=16, family="Arial"), orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
+        legend=dict(font=dict(color="#FFFFFF", size=18, family="Arial Bold"), orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
         margin=dict(l=40, r=40, t=40, b=80)
     )
     st.plotly_chart(fig_weekly, use_container_width=True)
@@ -550,12 +551,12 @@ elif selected_page == "Reports":
         fig_line.add_trace(go.Scatter(
             x=merged_period["Month"], y=merged_period["GoalHours"],
             mode="lines+markers", name="Planned Hours",
-            line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000")
+            line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000", size=8)
         ))
         fig_line.add_trace(go.Scatter(
             x=merged_period["Month"], y=merged_period["ActualHours"],
             mode="lines+markers", name="Actual Hours",
-            line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f")
+            line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f", size=8)
         ))
         fig_line.update_layout(
             showlegend=False,
@@ -586,6 +587,7 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 elif selected_page == "History":
     st.title("History")
@@ -886,6 +888,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
