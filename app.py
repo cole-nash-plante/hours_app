@@ -542,10 +542,26 @@ elif selected_page == "Reports":
     st.plotly_chart(fig_weekly, use_container_width=True)
 
     # -------------------------
+    # Date Range Filter for Bottom Charts
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Filter for Monthly & Client Charts")
+    col_start, col_end = st.columns([1, 1])
+    with col_start:
+        chart_start = st.date_input("Chart Start Date", date(now.year, max(now.month - 4, 1), 1))
+    with col_end:
+        chart_end = st.date_input("Chart End Date", date(now.year, now.month, calendar.monthrange(now.year, now.month)[1]))
+
+    filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(chart_start)) & (hours_df["Date"] <= pd.to_datetime(chart_end))]
+    filtered_merged = merged_period[(pd.to_datetime(merged_period["Month"] + "-01") >= pd.to_datetime(chart_start)) &
+                                    (pd.to_datetime(merged_period["Month"] + "-01") <= pd.to_datetime(chart_end))]
+    filtered_merged["MonthDate"] = pd.to_datetime(filtered_merged["Month"] + "-01")
+    filtered_merged = filtered_merged.sort_values("MonthDate")
+    filtered_merged["MonthLabel"] = filtered_merged["MonthDate"].dt.strftime("%b %Y")
+
+    # -------------------------
     # Monthly & Pie Charts
     # -------------------------
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2 = st.columns([2, 1])
     chart_bg = "#0f0f23"
     text_color = "#FFFFFF"
@@ -554,12 +570,12 @@ elif selected_page == "Reports":
         st.subheader("Monthly Actual vs Planned Hours")
         fig_line = go.Figure()
         fig_line.add_trace(go.Scatter(
-            x=merged_period["Month"], y=merged_period["GoalHours"],
+            x=filtered_merged["MonthLabel"], y=filtered_merged["GoalHours"],
             mode="lines+markers", name="Planned Hours",
             line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000", size=8)
         ))
         fig_line.add_trace(go.Scatter(
-            x=merged_period["Month"], y=merged_period["ActualHours"],
+            x=filtered_merged["MonthLabel"], y=filtered_merged["ActualHours"],
             mode="lines+markers", name="Actual Hours",
             line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f", size=8)
         ))
@@ -577,7 +593,6 @@ elif selected_page == "Reports":
 
     with col2:
         st.subheader("Hours by Client")
-        filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(period_start)) & (hours_df["Date"] <= pd.to_datetime(period_end))]
         if len(filtered_hours) > 0:
             pie_fig = px.pie(filtered_hours, names="Client", values="Hours",
                              color="Client", color_discrete_map=client_colors)
@@ -893,6 +908,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
