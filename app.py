@@ -119,21 +119,22 @@ pages = ["Data Entry", "To-Do", "Reports", "History", "Days Off", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
 st.markdown("""
 <style>
-/* Style the selected value in the select box */
-.stSelectbox div[data-baseweb="select"] {
-    color: #D3D3D3 !important; /* Light gray text */
+/* Selected value text */
+.stSelectbox div[data-baseweb="select"] > div {
+    color: #D3D3D3 !important;
     font-size: 16px !important;
-    padding: 0.5rem 1rem !important;
+    line-height: 1.5 !important;
 }
 
-/* Style the dropdown options */
+/* Dropdown options */
 ul[role="listbox"] li {
-    color: #D3D3D3 !important; /* Light gray text */
+    color: #D3D3D3 !important;
     font-size: 16px !important;
-    padding: 0.5rem 1rem !important;
+    line-height: 1.5 !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 # -------------------------------------------------
 # Page: Data Entry
@@ -684,6 +685,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
