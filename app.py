@@ -417,6 +417,7 @@ elif selected_page == "Reports":
     GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
     DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
     CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")
+    PERIOD_FILE = os.path.join(DATA_DIR, "period_settings.csv")
 
     # Load data
     hours_df = pd.read_csv(HOURS_FILE)
@@ -428,22 +429,40 @@ elif selected_page == "Reports":
     hours_df["Date"] = pd.to_datetime(hours_df["Date"])
     days_off_df["Date"] = pd.to_datetime(days_off_df["Date"])
 
-    # Current date
     now = datetime.today()
     today = now.date()
 
     # -------------------------
-    # Select Period
+    # Load or Initialize BAN Period
+    # -------------------------
+    if not os.path.exists(PERIOD_FILE):
+        default_start = date(now.year, 1, 1)
+        default_end = date(now.year, 12, 31)
+        pd.DataFrame({"StartDate": [str(default_start)], "EndDate": [str(default_end)]}).to_csv(PERIOD_FILE, index=False)
+
+    period_settings = pd.read_csv(PERIOD_FILE)
+    saved_start = pd.to_datetime(period_settings["StartDate"].iloc[0]).date()
+    saved_end = pd.to_datetime(period_settings["EndDate"].iloc[0]).date()
+
+    # -------------------------
+    # BAN Period Selection
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col_start, col_end = st.columns([1, 1])
     with col_start:
-        period_start = st.date_input("Period Start", date(now.year, 1, 1))
+        period_start = st.date_input("BAN Period Start", saved_start)
     with col_end:
-        period_end = st.date_input("Period End", date(now.year, 12, 31))
+        period_end = st.date_input("BAN Period End", saved_end)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Filter data for selected period
+    if st.button("Update BAN Period", use_container_width=True):
+        pd.DataFrame({"StartDate": [str(period_start)], "EndDate": [str(period_end)]}).to_csv(PERIOD_FILE, index=False)
+        push_to_github("data/period_settings.csv", "Updated BAN period")
+        st.success("BAN period updated!")
+
+    # -------------------------
+    # BAN Calculations
+    # -------------------------
     period_hours_df = hours_df[(hours_df["Date"].dt.date >= period_start) & (hours_df["Date"].dt.date <= period_end)]
     period_goals_df = goals_df.copy()
 
@@ -455,10 +474,8 @@ elif selected_page == "Reports":
     monthly_actual_period = period_hours_df.groupby("Month")["Hours"].sum().reset_index()
     monthly_actual_period.rename(columns={"Hours": "ActualHours"}, inplace=True)
 
-    # Create full month list for the period
-    all_months_period = pd.DataFrame({"Month": sorted(set(period_hours_df["Month"]).union(set(period_goals_df["Month"])))})
-
     # Merge goals and actuals
+    all_months_period = pd.DataFrame({"Month": sorted(set(period_hours_df["Month"]).union(set(period_goals_df["Month"])))})
     merged_period = (
         all_months_period
         .merge(period_goals_df, on="Month", how="left")
@@ -466,12 +483,10 @@ elif selected_page == "Reports":
         .fillna(0)
     )
 
-    # Calculate BAN metrics for selected period
     total_goal_hours = merged_period["GoalHours"].sum()
     total_actual_hours = merged_period["ActualHours"].sum()
     remaining_hours_period = max(total_goal_hours - total_actual_hours, 0)
 
-    # Remaining weekdays in the selected period
     remaining_days_period = pd.date_range(start=max(now, pd.to_datetime(period_start)), end=pd.to_datetime(period_end), freq="B")
     days_off_period = days_off_df[(days_off_df["Date"].dt.date >= period_start) & (days_off_df["Date"].dt.date <= period_end)]
     remaining_weekdays_period = len(remaining_days_period) - len(days_off_period)
@@ -495,13 +510,32 @@ elif selected_page == "Reports":
     st.metric("Total Hours Today", f"{todays_hours:.2f}")
 
     # -------------------------
-    # Charts for Selected Period
+    # Chart Date Filter (Separate Logic)
     # -------------------------
-    # Sort months chronologically
-    merged_period["MonthDate"] = pd.to_datetime(merged_period["Month"] + "-01")
-    merged_period = merged_period.sort_values("MonthDate")
-    merged_period["MonthLabel"] = merged_period["MonthDate"].dt.strftime("%b %Y")
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    col_start, col_end = st.columns([1, 1])
+    with col_start:
+        # Default start date = 4 months ago
+        month_offset = (now.month - 4) % 12 or 12
+        year_offset = now.year if now.month > 4 else now.year - 1
+        chart_start = st.date_input("Chart Start Date", date(year_offset, month_offset, 1))
+    with col_end:
+        chart_end = st.date_input("Chart End Date", date(now.year, now.month, calendar.monthrange(now.year, now.month)[1]))
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    # Filter data for charts
+    filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(chart_start)) & (hours_df["Date"] <= pd.to_datetime(chart_end))]
+    filtered_merged = merged_period[(pd.to_datetime(merged_period["Month"] + "-01") >= pd.to_datetime(chart_start)) &
+                                    (pd.to_datetime(merged_period["Month"] + "-01") <= pd.to_datetime(chart_end))]
+
+    # Sort months chronologically
+    filtered_merged["MonthDate"] = pd.to_datetime(filtered_merged["Month"] + "-01")
+    filtered_merged = filtered_merged.sort_values("MonthDate")
+    filtered_merged["MonthLabel"] = filtered_merged["MonthDate"].dt.strftime("%b %Y")
+
+    # -------------------------
+    # Charts
+    # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2 = st.columns([2, 1])  # Line chart 2/3, Pie chart 1/3
 
@@ -512,12 +546,12 @@ elif selected_page == "Reports":
         st.subheader("Monthly Actual vs Planned Hours")
         fig_line = go.Figure()
         fig_line.add_trace(go.Scatter(
-            x=merged_period["MonthLabel"], y=merged_period["GoalHours"],
+            x=filtered_merged["MonthLabel"], y=filtered_merged["GoalHours"],
             mode="lines+markers", name="Planned Hours",
             line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000")
         ))
         fig_line.add_trace(go.Scatter(
-            x=merged_period["MonthLabel"], y=merged_period["ActualHours"],
+            x=filtered_merged["MonthLabel"], y=filtered_merged["ActualHours"],
             mode="lines+markers", name="Actual Hours",
             line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f")
         ))
@@ -535,9 +569,9 @@ elif selected_page == "Reports":
 
     with col2:
         st.subheader("Hours by Client")
-        if len(period_hours_df) > 0:
+        if len(filtered_hours) > 0:
             client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
-            pie_fig = px.pie(period_hours_df, names="Client", values="Hours",
+            pie_fig = px.pie(filtered_hours, names="Client", values="Hours",
                              color="Client", color_discrete_map=client_colors)
             pie_fig.update_layout(
                 showlegend=True,
@@ -848,6 +882,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
