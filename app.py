@@ -432,7 +432,7 @@ elif selected_page == "Reports":
     today = now.date()
 
     # -------------------------
-    # Performance Period Setup
+    # Load or Initialize Performance Period
     # -------------------------
     if not os.path.exists(PERIOD_FILE):
         default_start = date(now.year, 1, 1)
@@ -444,6 +444,7 @@ elif selected_page == "Reports":
     saved_end = pd.to_datetime(period_settings["EndDate"].iloc[0]).date()
 
     # Performance Period Selection
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col_start, col_end, col_btn = st.columns([1, 1, 1])
     with col_start:
         period_start = st.date_input("Performance Period Start", saved_start)
@@ -454,6 +455,7 @@ elif selected_page == "Reports":
             pd.DataFrame({"StartDate": [str(period_start)], "EndDate": [str(period_end)]}).to_csv(PERIOD_FILE, index=False)
             push_to_github("data/period_settings.csv", "Updated performance period")
             st.success("Performance period updated!")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------
     # BAN Calculations
@@ -484,14 +486,16 @@ elif selected_page == "Reports":
     todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
 
     # Display BAN Metrics
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     with col1: st.metric("Avg Hours Left/Day", f"{avg_hours_left_period:.2f}")
     with col2: st.metric("Goal Hours", f"{total_goal_hours:.2f}")
     with col3: st.metric("Actual Hours", f"{total_actual_hours:.2f}")
     with col4: st.metric("Today's Hours", f"{todays_hours:.2f}")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------
-    # Weekly Snapshot Chart (Top)
+    # Weekly Snapshot Chart
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Weekly Snapshot: Billed Hours by Client")
@@ -522,7 +526,8 @@ elif selected_page == "Reports":
             x=days.strftime("%a"), y=client_df.values,
             mode="lines+markers", name=client,
             line=dict(color=client_colors.get(client, "#FFFFFF"), width=4),
-            marker=dict(size=10)
+            marker=dict(size=10),
+            hovertemplate=f"Client: {client}<br>Day: %{x}<br>Hours: %{y}<extra></extra>"
         ))
 
     fig_weekly.update_layout(
@@ -535,11 +540,11 @@ elif selected_page == "Reports":
         margin=dict(l=40, r=40, t=40, b=80)
     )
     st.plotly_chart(fig_weekly, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------
     # Monthly & Pie Charts
     # -------------------------
+    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2 = st.columns([2, 1])
     chart_bg = "#0f0f23"
@@ -586,20 +591,6 @@ elif selected_page == "Reports":
             st.plotly_chart(pie_fig, use_container_width=True)
         else:
             st.info("No hours logged in this range.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # -------------------------
-    # Date Filters at Bottom
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Chart Date Filters")
-    col_start, col_end = st.columns([1, 1])
-    with col_start:
-        month_offset = (now.month - 4) % 12 or 12
-        year_offset = now.year if now.month > 4 else now.year - 1
-        chart_start = st.date_input("Chart Start Date", date(year_offset, month_offset, 1))
-    with col_end:
-        chart_end = st.date_input("Chart End Date", date(now.year, now.month, calendar.monthrange(now.year, now.month)[1]))
     st.markdown('</div>', unsafe_allow_html=True)
 
 elif selected_page == "History":
@@ -901,6 +892,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
