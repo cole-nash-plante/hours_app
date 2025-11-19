@@ -121,16 +121,16 @@ st.markdown("""
 <style>
 /* Selected value text */
 .stSelectbox div[data-baseweb="select"] > div {
-    color: #D3D3D3 !important;
+    color: #FF0000 !important;
     font-size: 16px !important;
-    line-height: 1.5 !important;
+    line-height: 1.4 !important;
 }
 
 /* Dropdown options */
 ul[role="listbox"] li {
-    color: #D3D3D3 !important;
+    color: #FF0000 !important;
     font-size: 16px !important;
-    line-height: 1.5 !important;
+    line-height: 1.4 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -685,6 +685,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
