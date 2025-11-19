@@ -120,6 +120,80 @@ selected_page = st.sidebar.radio("Go to", pages)
 
 
 
+st.markdown("""
+<style>
+/* Override the problematic padding */
+.stSelectbox > div > div {
+    padding: 0 !important; /* Remove extra padding */
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Style the actual text inside the select box */
+.stSelectbox div[data-baseweb="select"] span {
+    color: #D3D3D3 !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+}
+
+/* Dropdown options */
+ul[role="listbox"] li {
+    color: #D3D3D3 !important;
+    font-size: 16px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+
+# Inject custom CSS for styling
+st.markdown("""
+<style>
+/* Dark background for the entire app */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+/* Table styling */
+[data-testid="stDataFrame"] table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #1e1e1e;
+    color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Remove unnecessary borders */
+[data-testid="stDataFrame"] table th, 
+[data-testid="stDataFrame"] table td {
+    border: none !important;
+    padding: 8px 12px;
+}
+
+/* Header styling */
+[data-testid="stDataFrame"] table th {
+    font-size: 14px; /* Smaller headers */
+    font-weight: 600;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+/* Row hover effect */
+[data-testid="stDataFrame"] table tr:hover {
+    background-color: #333333;
+}
+
+/* Rounded corners for the table container */
+[data-testid="stDataFrame"] {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+</style>
+""", unsafe_allow_html=True)
+
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
@@ -267,56 +341,6 @@ elif selected_page == "To-Do":
     # Active To-Dos
     # -------------------------------
     # Active To-Dos Section
-    # Custom CSS for styling
-    st.markdown("""
-    <style>
-    /* Dark background for the app */
-    body {
-        background-color: #121212;
-        color: #e0e0e0;
-    }
-    
-    /* Editable table styling */
-    [data-testid="stDataFrame"] table {
-        border-collapse: collapse;
-        width: 100%;
-        background-color: #1e1e1e;
-        color: #f5f5f5;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    /* Light gray divider lines */
-    [data-testid="stDataFrame"] table th, 
-    [data-testid="stDataFrame"] table td {
-        border-bottom: 1px solid #444 !important;
-        padding: 8px 12px;
-    }
-    
-    /* Header styling */
-    [data-testid="stDataFrame"] table th {
-        font-size: 14px; /* Smaller headers */
-        font-weight: 600;
-        background-color: #2c2c2c;
-        color: #ffffff;
-        text-transform: uppercase;
-        text-align: center; /* Center align headers */
-    }
-    
-    /* Row hover effect */
-    [data-testid="stDataFrame"] table tr:hover {
-        background-color: #333333;
-    }
-    
-    /* Rounded corners and shadow for table container */
-    [data-testid="stDataFrame"] {
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    # Begin section
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Active To-Dos")
     
@@ -334,7 +358,7 @@ elif selected_page == "To-Do":
                 # Get client color
                 color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
     
-                # Styled header with client color
+                # Style the header with client color
                 header_html = f"""
                 <div style="background-color:{color}; padding:10px; border-radius:5px; text-align:center;">
                     <h3 style="color:#fff; margin:0;">{client}</h3>
@@ -343,7 +367,7 @@ elif selected_page == "To-Do":
                 with cols[i]:
                     st.markdown(header_html, unsafe_allow_html=True)
     
-                    # Editable table
+                    # Show editable table
                     client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
                     edited_table = st.data_editor(
                         client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
@@ -359,9 +383,7 @@ elif selected_page == "To-Do":
                         df_todos.to_csv(TODOS_FILE, index=False)
                         push_to_github("data/todos.csv", "Updated To-Do list")
                         st.success(f"Changes saved for {client}!")
-    
     st.markdown('</div>', unsafe_allow_html=True)
-
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -745,9 +767,6 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
-
-
-
 
 
 
