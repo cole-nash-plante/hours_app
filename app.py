@@ -446,7 +446,11 @@ elif selected_page == "Reports":
     monthly_actual = hours_df.groupby("Month")["Hours"].sum().reset_index()
     monthly_actual.rename(columns={"Hours": "ActualHours"}, inplace=True)
     goals_df["Month"] = goals_df["Month"].apply(lambda m: f"{now.year}-{m}")
-    merged = pd.merge(goals_df, monthly_actual, on="Month", how="left").fillna(0)
+    # Create a complete list of months from hours_df and goals_df
+    all_months = pd.DataFrame({"Month": sorted(set(hours_df["Month"]).union(set(goals_df["Month"])))})
+    
+    # Merge goals and actuals into full month list
+    merged = all_months.merge(goals_df, on="Month", how="left").merge(monthly_actual, on="Month", how="left").fillna(0)
 
     goal_hours = merged.loc[merged["Month"] == current_month, "GoalHours"].sum()
     actual_hours = merged.loc[merged["Month"] == current_month, "ActualHours"].sum()
@@ -859,6 +863,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
