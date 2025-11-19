@@ -495,7 +495,7 @@ elif selected_page == "Reports":
     st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------
-    # Weekly Snapshot Chart
+    # Weekly Snapshot Chart (Weekdays Only)
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
 
@@ -521,12 +521,15 @@ elif selected_page == "Reports":
     weekly_data = hours_df[(hours_df["Date"] >= start_of_week) & (hours_df["Date"] <= end_of_week)]
     client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
 
+    # Only Monday-Friday
+    weekdays = pd.date_range(start_of_week, end_of_week, freq="D")
+    weekdays = [d for d in weekdays if d.weekday() < 5]  # 0=Mon, 4=Fri
+
     fig_weekly = go.Figure()
-    days = pd.date_range(start_of_week, end_of_week)
     for client in weekly_data["Client"].unique():
-        client_df = weekly_data[weekly_data["Client"] == client].groupby("Date")["Hours"].sum().reindex(days, fill_value=0)
+        client_df = weekly_data[weekly_data["Client"] == client].groupby("Date")["Hours"].sum().reindex(weekdays, fill_value=0)
         fig_weekly.add_trace(go.Scatter(
-            x=days.strftime("%a"), y=client_df.values,
+            x=[d.strftime("%a") for d in weekdays], y=client_df.values,
             mode="lines+markers", name=client,
             line=dict(color=client_colors.get(client, "#FFFFFF"), width=4),
             marker=dict(size=10),
@@ -610,7 +613,6 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
-
 
 elif selected_page == "History":
     st.title("History")
