@@ -498,10 +498,17 @@ elif selected_page == "Reports":
     # Weekly Snapshot Chart
     # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Weekly Snapshot")
 
     if "week_offset" not in st.session_state:
         st.session_state.week_offset = 0
+
+    today = pd.Timestamp.today()
+    start_of_week = (today + pd.Timedelta(weeks=st.session_state.week_offset)).normalize() - pd.Timedelta(days=today.weekday())
+    end_of_week = start_of_week + pd.Timedelta(days=6)
+
+    # Dynamic title with date range
+    week_label = f"{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d')}"
+    st.subheader(f"Weekly Snapshot: Billed Hours by Client ({week_label})")
 
     nav_col1, nav_col2 = st.columns([1, 1])
     with nav_col1:
@@ -510,10 +517,6 @@ elif selected_page == "Reports":
     with nav_col2:
         if st.button("Next Week ➡"):
             st.session_state.week_offset += 1
-
-    today = pd.Timestamp.today()
-    start_of_week = (today + pd.Timedelta(weeks=st.session_state.week_offset)).normalize() - pd.Timedelta(days=today.weekday())
-    end_of_week = start_of_week + pd.Timedelta(days=6)
 
     weekly_data = hours_df[(hours_df["Date"] >= start_of_week) & (hours_df["Date"] <= end_of_week)]
     client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
@@ -908,6 +911,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
