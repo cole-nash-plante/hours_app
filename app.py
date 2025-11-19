@@ -589,7 +589,6 @@ elif selected_page == "Reports":
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-
 elif selected_page == "History":
     st.title("History")
 
@@ -641,13 +640,24 @@ elif selected_page == "History":
                 filtered_hours[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
                 num_rows="dynamic",
                 width="stretch",
-                hide_index=True
+                hide_index=True,
+                selection_mode="multi-row"
             )
+
+            # Save changes
             if st.button("Save Hours Changes"):
                 df_hours = edited_hours
                 df_hours.to_csv(HOURS_FILE, index=False)
                 push_to_github("data/hours.csv", "Updated hours history")
                 st.success("Hours history updated!")
+
+            # Delete selected rows
+            selected_rows = edited_hours.get("selected_rows", [])
+            if len(selected_rows) > 0 and st.button("Delete Selected Hours"):
+                df_hours = df_hours.drop(df_hours.index[selected_rows])
+                df_hours.to_csv(HOURS_FILE, index=False)
+                push_to_github("data/hours.csv", "Deleted selected hours")
+                st.success(f"Deleted {len(selected_rows)} hour(s).")
 
     # Editable To-Do History
     with col2:
@@ -669,13 +679,24 @@ elif selected_page == "History":
                 filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
                 num_rows="dynamic",
                 width="stretch",
-                hide_index=True
+                hide_index=True,
+                selection_mode="multi-row"
             )
+
+            # Save changes
             if st.button("Save To-Do Changes"):
                 df_todos = edited_todos
                 df_todos.to_csv(TODOS_FILE, index=False)
                 push_to_github("data/todos.csv", "Updated To-Do history")
                 st.success("To-Do history updated!")
+
+            # Delete selected rows
+            selected_todo_rows = edited_todos.get("selected_rows", [])
+            if len(selected_todo_rows) > 0 and st.button("Delete Selected To-Dos"):
+                df_todos = df_todos.drop(df_todos.index[selected_todo_rows])
+                df_todos.to_csv(TODOS_FILE, index=False)
+                push_to_github("data/todos.csv", "Deleted selected To-Dos")
+                st.success(f"Deleted {len(selected_todo_rows)} to-do(s).")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -884,6 +905,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
