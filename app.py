@@ -514,24 +514,28 @@ elif selected_page == "Reports":
     chart_bg = "#0f0f23"
     text_color = "#FFFFFF"
 
-    with col1:
-        st.subheader("Monthly Actual vs Planned Hours")
-        fig_line = go.Figure()
-        fig_line.add_trace(go.Scatter(x=filtered_merged["Month"], y=filtered_merged["GoalHours"],
-                                      mode="lines+markers", name="Planned Hours",
-                                      line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000")))
-        fig_line.add_trace(go.Scatter(x=filtered_merged["Month"], y=filtered_merged["ActualHours"],
-                                      mode="lines+markers", name="Actual Hours",
-                                      line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f")))
-        fig_line.update_layout(
-            showlegend=False,
-            plot_bgcolor=chart_bg,
-            paper_bgcolor=chart_bg,
-            font=dict(color=text_color, size=14),
-            xaxis=dict(color=text_color, title="Month"),
-            yaxis=dict(color=text_color)
-        )
-        st.plotly_chart(fig_line, use_container_width=True)
+    # Add MonthLabel for display
+    merged["MonthLabel"] = pd.to_datetime(merged["Month"] + "-01").dt.strftime("%b %Y")
+    filtered_merged["MonthLabel"] = pd.to_datetime(filtered_merged["Month"] + "-01").dt.strftime("%b %Y")
+    
+    # Chart
+    st.subheader("Monthly Actual vs Planned Hours")
+    fig_line = go.Figure()
+    fig_line.add_trace(go.Scatter(x=filtered_merged["MonthLabel"], y=filtered_merged["GoalHours"],
+                                  mode="lines+markers", name="Planned Hours",
+                                  line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000")))
+    fig_line.add_trace(go.Scatter(x=filtered_merged["MonthLabel"], y=filtered_merged["ActualHours"],
+                                  mode="lines+markers", name="Actual Hours",
+                                  line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f")))
+    fig_line.update_layout(
+        showlegend=False,
+        plot_bgcolor=chart_bg,
+        paper_bgcolor=chart_bg,
+        font=dict(color=text_color, size=14),
+        xaxis=dict(color=text_color, title="Month", type="category"),  # Force categorical axis
+        yaxis=dict(color=text_color)
+    )
+    st.plotly_chart(fig_line, use_container_width=True)
 
     with col2:
         st.subheader("Hours by Client")
@@ -848,6 +852,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
