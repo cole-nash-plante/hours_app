@@ -126,6 +126,8 @@ st.markdown("""
         color: #FFFFFF !important;
         background-color: #16213e !important;
         font-size: 8px !important;
+        padding: 0.75rem !important;
+
     }
     </style>
 """, unsafe_allow_html=True)
@@ -678,6 +680,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
