@@ -382,3 +382,15 @@ ul[role="listbox"] li {
     background-color: var(--bg-tertiary) !important;
 }
 
+
+/* Force selectbox text to pure white */
+.stSelectbox div[data-baseweb="select"] * {
+    color: #FFFFFF !important;
+}
+
+/* Dropdown menu options */
+ul[role="listbox"] li {
+    color: #FFFFFF !important;
+    background-color: var(--bg-tertiary) !important;
+}
+
