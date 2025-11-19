@@ -406,8 +406,6 @@ elif selected_page == "To-Do":
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
-
-
 elif selected_page == "Reports":
     st.title("Reports")
 
@@ -530,9 +528,10 @@ elif selected_page == "Reports":
         plot_bgcolor="#0f0f23",
         paper_bgcolor="#0f0f23",
         font=dict(color="#FFFFFF", size=14),
-        xaxis=dict(title="Day of Week"),
-        yaxis=dict(title="Hours"),
-        margin=dict(l=40, r=40, t=40, b=40)
+        xaxis=dict(title="Day of Week", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
+        yaxis=dict(title="Hours", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
+        legend=dict(font=dict(color="#FFFFFF", size=16, family="Arial"), orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
+        margin=dict(l=40, r=40, t=40, b=80)
     )
     st.plotly_chart(fig_weekly, use_container_width=True)
 
@@ -563,8 +562,8 @@ elif selected_page == "Reports":
             plot_bgcolor=chart_bg,
             paper_bgcolor=chart_bg,
             font=dict(color=text_color, size=14),
-            xaxis=dict(type="category", title="Month"),
-            yaxis=dict(color=text_color),
+            xaxis=dict(type="category", title="Month", color=text_color, tickfont=dict(color=text_color), showgrid=True, gridcolor=text_color),
+            yaxis=dict(color=text_color, tickfont=dict(color=text_color), showgrid=True, gridcolor=text_color),
             autosize=True,
             margin=dict(l=40, r=40, t=40, b=40)
         )
@@ -587,9 +586,6 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
-
-
-
 
 elif selected_page == "History":
     st.title("History")
@@ -890,6 +886,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
