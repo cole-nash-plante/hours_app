@@ -369,3 +369,16 @@ h1 {
     font-size: 16px !important;      /* Bigger text */
     padding: 0.75rem !important;     /* Taller input */
 }
+
+/* Force selectbox text to white */
+.stSelectbox div[data-baseweb="select"] * {
+    color: #FFFFFF !important;
+    font-size: 16px !important;
+}
+
+/* Dropdown menu options */
+ul[role="listbox"] li {
+    color: #FFFFFF !important;
+    background-color: var(--bg-tertiary) !important;
+}
+
