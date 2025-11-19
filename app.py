@@ -527,7 +527,7 @@ elif selected_page == "Reports":
             mode="lines+markers", name=client,
             line=dict(color=client_colors.get(client, "#FFFFFF"), width=4),
             marker=dict(size=10),
-            hovertemplate=f"Client: {client}<br>Day: %{x}<br>Hours: %{y}<extra></extra>"
+            hovertemplate="Client: " + client + "<br>Day: %{x}<br>Hours: %{y}<extra></extra>"
         ))
 
     fig_weekly.update_layout(
@@ -592,6 +592,7 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 elif selected_page == "History":
     st.title("History")
@@ -892,6 +893,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
