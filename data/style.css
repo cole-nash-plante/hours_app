@@ -382,6 +382,11 @@ ul[role="listbox"] li {
     background-color: var(--bg-tertiary) !important;
 }
 
+/* Fix selected value background in selectbox */
+.stSelectbox div[data-baseweb="select"] {
+    background-color: var(--bg-tertiary) !important;
+    color: #FFFFFF !important;
+}
 
 
 /* Dropdown menu options */
