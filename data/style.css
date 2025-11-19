@@ -4,7 +4,7 @@
   --bg-secondary: #1a1a2e;
   --bg-tertiary: #16213e;
   --text-primary: #FFFFFF;
-  --text-secondary: #a1a1aa;
+  --text-secondary: #FFFFFF;
   --accent: #9333ea;
   --accent-hover: #a855f7;
   --border: #27272a;
@@ -22,6 +22,7 @@
   --client-5: #8b5cf6;
   --client-6: #06b6d4;
 }
+
 /* Force dropdown text to white */
 
 /* Also make dropdown background match dark theme */
