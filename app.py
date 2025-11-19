@@ -398,7 +398,7 @@ elif selected_page == "Reports":
     GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
     DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
     ANNUAL_TARGET_FILE = os.path.join(DATA_DIR, "annual_target.csv")
-    CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")  # <-- Added for colors
+    CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")  # For colors
 
     # Ensure annual target file exists
     if not os.path.exists(ANNUAL_TARGET_FILE):
@@ -409,7 +409,7 @@ elif selected_page == "Reports":
     goals_df = pd.read_csv(GOALS_FILE)
     days_off_df = pd.read_csv(DAYS_OFF_FILE)
     annual_target_df = pd.read_csv(ANNUAL_TARGET_FILE)
-    df_clients = pd.read_csv(CLIENTS_FILE)  # <-- Load client colors
+    df_clients = pd.read_csv(CLIENTS_FILE)
 
     # Convert dates
     hours_df["Date"] = pd.to_datetime(hours_df["Date"])
@@ -484,8 +484,7 @@ elif selected_page == "Reports":
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
 
-    # Dark theme for charts
-    chart_bg = "#121212"
+    chart_bg = "#0f0f23"
     text_color = "#FFFFFF"
 
     with col1:
@@ -493,18 +492,18 @@ elif selected_page == "Reports":
         fig_line = go.Figure()
         fig_line.add_trace(go.Scatter(x=filtered_merged["Month"], y=filtered_merged["GoalHours"],
                                       mode="lines+markers", name="Planned Hours",
-                                      line=dict(color="white"), marker=dict(color="white")))
+                                      line=dict(color="#ff0000", width=3), marker=dict(color="#ff0000")))
         fig_line.add_trace(go.Scatter(x=filtered_merged["Month"], y=filtered_merged["ActualHours"],
                                       mode="lines+markers", name="Actual Hours",
-                                      line=dict(color="white"), marker=dict(color="white")))
+                                      line=dict(color="#00ff2f", width=3), marker=dict(color="#00ff2f")))
         fig_line.update_layout(
             title="Monthly Actual vs Planned Hours",
             xaxis_title="Month",
             yaxis_title="Hours",
             plot_bgcolor=chart_bg,
             paper_bgcolor=chart_bg,
-            font=dict(color=text_color),
-            legend=dict(font=dict(color=text_color)),
+            font=dict(color=text_color, size=14),
+            legend=dict(font=dict(color=text_color, size=14), orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
             xaxis=dict(color=text_color),
             yaxis=dict(color=text_color)
         )
@@ -513,7 +512,6 @@ elif selected_page == "Reports":
     with col2:
         st.subheader("Hours by Client")
         if len(filtered_hours) > 0:
-            # Build color map from df_clients
             client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
 
             pie_fig = px.pie(filtered_hours, names="Client", values="Hours",
@@ -523,8 +521,8 @@ elif selected_page == "Reports":
             pie_fig.update_layout(
                 plot_bgcolor=chart_bg,
                 paper_bgcolor=chart_bg,
-                font=dict(color=text_color),
-                legend=dict(font=dict(color=text_color))
+                font=dict(color=text_color, size=14),
+                legend=dict(font=dict(color=text_color, size=16), orientation="v", x=1.05, y=0.5, bgcolor="rgba(0,0,0,0)")
             )
             st.plotly_chart(pie_fig, use_container_width=True)
         else:
@@ -797,6 +795,7 @@ elif selected_page == "Days Off":
         push_to_github("data/days_off.csv", "Updated days off list")
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
