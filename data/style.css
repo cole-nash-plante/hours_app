@@ -335,3 +335,20 @@ h1 {
     margin-bottom: 12px;
 }
 
+/* Increase input text size and height */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stTextArea textarea,
+.stSelectbox > div > div,
+.stDateInput > div > div > input {
+    font-size: 16px !important; /* Bigger text */
+    padding: 0.75rem !important; /* More height */
+}
+
+/* Optional: Make slider label and number bigger */
+.stSlider label {
+    font-size: 16px !important;
+}
+.stSlider [role="slider"] {
+    height: 8px !important; /* Thicker slider track */
+}
