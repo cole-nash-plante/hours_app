@@ -328,21 +328,10 @@ if selected_page == "Home":
     df_left = df_today_with_blank.iloc[:half+1]
     df_right = df_today_with_blank.iloc[half+1:]
 
-    st.subheader("Today's Hours")
-    col1, col2 = st.columns(2)
-    with col1:
-        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
-    with col2:
-        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
-
-    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
-
-    st.markdown('\n', unsafe_allow_html=True)
-
     # -----------------------
     # Log Hours (Quick Entry)
     # -----------------------
-    st.subheader("Log Hours")
+    st.subheader("Log Today's Hours")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
     else:
@@ -364,7 +353,16 @@ if selected_page == "Home":
                 push_to_github("data/hours.csv", "Updated hours log")
 
     st.markdown('\n', unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
+    with col2:
+        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
 
+    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
+
+    st.markdown('\n', unsafe_allow_html=True)
+    
     # -----------------------
     # Unified Save Button
     # -----------------------
@@ -389,6 +387,9 @@ if selected_page == "Home":
         push_to_github("data/hours.csv", "Updated hours log")
 
         st.success("All changes saved successfully!")
+
+
+
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -951,6 +952,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
