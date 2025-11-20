@@ -200,6 +200,15 @@ body {
 if selected_page == "Home":
     st.title("Home")
 
+    # Apply custom CSS for larger fonts and better readability
+    st.markdown("""
+        <style>
+        .big-font {font-size:18px !important;}
+        .stTextArea textarea {font-size:16px !important;}
+        .stSlider {font-size:16px !important;}
+        </style>
+    """, unsafe_allow_html=True)
+
     # Load data
     df_clients = pd.read_csv(CLIENTS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
@@ -286,7 +295,7 @@ if selected_page == "Home":
     st.markdown('\n', unsafe_allow_html=True)
 
     # -----------------------
-    # Active To-Dos with Expanders
+    # Active To-Dos with Custom Containers
     # -----------------------
     st.subheader("Active To-Dos")
     active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
@@ -299,28 +308,30 @@ if selected_page == "Home":
 
         updated_tasks = []
 
-        for client in selected_clients:
-            color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
-            header_html = f"""
-            <div style="background-color:{color}; padding:10px; border-radius:5px; margin-bottom:10px;">
-                <h4 style="color:white; margin:0;">{client}</h4>
-            </div>
-            """
-            st.markdown(header_html, unsafe_allow_html=True)
+        cols = st.columns(len(selected_clients))
+        for i, client in enumerate(selected_clients):
+            with cols[i]:
+                color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
+                st.markdown(f"<div style='background-color:{color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>{client}</h4></div>", unsafe_allow_html=True)
 
-            client_tasks = active_todos[active_todos["Client"] == client]
-            for idx, row in client_tasks.iterrows():
-                with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
+                client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+                for idx, row in client_tasks.iterrows():
+                    st.markdown(f"<div class='big-font' style='border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:5px;'>", unsafe_allow_html=True)
+                    st.write(f"**Task:** {row['Task']}")
                     st.write(f"Category: {row['Category']}")
                     st.write(f"Created: {row['DateCreated'].date() if pd.notna(row['DateCreated']) else ''}")
                     new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
                     new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
-                    updated_tasks.append({"index": idx, "Priority": new_priority, "Notes": new_notes})
+                    mark_complete = st.button("Mark as Complete", key=f"complete_{client}_{idx}")
+                    updated_tasks.append({"index": idx, "Priority": new_priority, "Notes": new_notes, "Complete": mark_complete})
+                    st.markdown("</div>", unsafe_allow_html=True)
 
         if st.button("Save All Changes", key="save_all_changes"):
             for update in updated_tasks:
                 df_todos.at[update["index"], "Priority"] = update["Priority"]
                 df_todos.at[update["index"], "Notes"] = update["Notes"]
+                if update["Complete"]:
+                    df_todos.at[update["index"], "DateCompleted"] = str(datetime.today().date())
             df_todos.to_csv(TODOS_FILE, index=False)
             st.success("All changes saved successfully!")
 
@@ -909,6 +920,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
