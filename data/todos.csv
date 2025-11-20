@@ -6,7 +6,7 @@ create rules for PKs "
 DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1,1.0,,,
 DHCS,TMSIS,wf_TMSIS_Claims_RX_DD3_V1,1.0,,,
 DHCS,TMSIS,wf_TMSIS_PROVIDER_DD3_V1,1.0,,,
-University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20 00:00:00,,"select 
+University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,,"select 
 STVAPDC_CODE APPLICATION_DECISION_CODE, 
 STVAPDC_DESC APPLICATION_DECISION_DESC, 
 STVAPDC_SIGNF_IND, --This field indicates whether the decision affects the acceptance of the         application.  Y - Application acceptance is effected by decision.
@@ -26,4 +26,13 @@ STVAPST_DESC APPLICATION_STATUS_DESC
 
 FROM test_raw.banner_student.stvapst;
  "
-University of Alaska,Unit Testing,Fix AO_CODES,3.0,2025-11-20,,
+University of Alaska,Unit Testing,Fix AO_CODES,4.0,,,"Need to fix ao codes so fallback happens at the end.: 
+------------------------------------------------------------
+-- AO Counts in Snowflake by student enrollment
+------------------------------------------------------------
+select dc.campus_code, ao_code, count(distinct student_pidm) from test_refined.ods.ods_course_enrollment fce
+join test_curated.edw.dim_course dc on dc.term_code = fce.term_code and dc.crn = fce.crn
+where fce.term_code = '202403' and dc.campus_code = '6'
+group by dc.campus_code, ao_code
+order by count(distinct student_pidm) desc
+;"
