@@ -197,7 +197,6 @@ body {
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
-
 if selected_page == "Home":
     st.title("Home")
 
@@ -208,6 +207,10 @@ if selected_page == "Home":
     df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
     df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
 
+    # Ensure Notes column exists
+    if "Notes" not in df_todos.columns:
+        df_todos["Notes"] = ""
+
     # -----------------------
     # Log Hours
     # -----------------------
@@ -217,15 +220,15 @@ if selected_page == "Home":
     else:
         col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
         with col1:
-            client = st.selectbox("Client", df_clients["Client"].tolist())
+            client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
         with col2:
-            date_val = st.date_input("Date", datetime.today())
+            date_val = st.date_input("Date", datetime.today(), key="log_date")
         with col3:
-            hours = st.number_input("Hours", min_value=0.0, step=0.25)
+            hours = st.number_input("Hours", min_value=0.0, step=0.25, key="log_hours")
         with col4:
-            description = st.text_input("Description")
+            description = st.text_input("Description", key="log_description")
         with col5:
-            if st.button("Save Hours"):
+            if st.button("Save Hours", key="save_hours"):
                 df_hours = pd.read_csv(HOURS_FILE)
                 df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
                 df_hours.to_csv(HOURS_FILE, index=False)
@@ -247,13 +250,10 @@ if selected_page == "Home":
         with col3:
             todo_task = st.text_input("Task", key="todo_task")
         with col4:
-            priority = st.slider("Priority", 1, 5, 3, key="priority")
+            priority = st.slider("Priority", 1, 5, 3, key="todo_priority")
         with col5:
-            if st.button("Add Task"):
+            if st.button("Add Task", key="add_task"):
                 if todo_task.strip() and todo_category != "No categories":
-                    # Add Notes column if not exists
-                    if "Notes" not in df_todos.columns:
-                        df_todos["Notes"] = ""
                     df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(datetime.today().date()), "", ""]
                     df_todos.to_csv(TODOS_FILE, index=False)
                     st.success("Task added successfully!")
@@ -275,7 +275,7 @@ if selected_page == "Home":
         with col2:
             new_category = st.text_input("New Category", key="new_category")
         with col3:
-            if st.button("Add Category"):
+            if st.button("Add Category", key="add_category"):
                 if new_category.strip():
                     df_categories.loc[len(df_categories)] = [cat_client, new_category]
                     df_categories.to_csv(CATEGORIES_FILE, index=False)
@@ -295,7 +295,7 @@ if selected_page == "Home":
         st.info("No active tasks.")
     else:
         clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
-        selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
+        selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks, key="filter_clients")
 
         updated_tasks = []
 
@@ -310,18 +310,14 @@ if selected_page == "Home":
 
             client_tasks = active_todos[active_todos["Client"] == client]
             for idx, row in client_tasks.iterrows():
-                with st.expander(f"{row['Task']} (Priority: {row['Priority']})"):
+                with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
                     st.write(f"Category: {row['Category']}")
                     st.write(f"Created: {row['DateCreated'].date() if pd.notna(row['DateCreated']) else ''}")
-                    new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{idx}")
-                    new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{idx}")
-                    updated_tasks.append({
-                        "index": idx,
-                        "Priority": new_priority,
-                        "Notes": new_notes
-                    })
+                    new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
+                    new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
+                    updated_tasks.append({"index": idx, "Priority": new_priority, "Notes": new_notes})
 
-        if st.button("Save All Changes"):
+        if st.button("Save All Changes", key="save_all_changes"):
             for update in updated_tasks:
                 df_todos.at[update["index"], "Priority"] = update["Priority"]
                 df_todos.at[update["index"], "Notes"] = update["Notes"]
@@ -344,14 +340,13 @@ if selected_page == "Home":
         edited_right = st.data_editor(df_today_with_blank.iloc[half+1:], num_rows="dynamic", key="editor_right")
     edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
 
-    if st.button("Save Hours"):
+    if st.button("Save Hours", key="save_hours_today"):
         edited_hours = edited_hours.dropna(subset=["Client"])
         edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
         df_hours = df_hours[df_hours["Date"] != today_str]
         df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
         df_hours.to_csv(HOURS_FILE, index=False)
         st.success("Hours saved successfully!")
-
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -914,6 +909,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
