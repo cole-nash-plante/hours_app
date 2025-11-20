@@ -740,6 +740,54 @@ elif selected_page == "Data Entry":
         st.success("Changes saved!")
     st.markdown('</div>', unsafe_allow_html=True)
 
+ # Today's Hours
+    # -----------------------
+    HOURS_FILE = "data/hours.csv"
+    df_hours = pd.read_csv(HOURS_FILE)
+    today_str = datetime.today().strftime("%Y-%m-%d")
+    df_today = df_hours[df_hours["Date"] == today_str]
+    new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
+    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
+    half = len(df_today_with_blank) // 2
+    df_left = df_today_with_blank.iloc[:half+1]
+    df_right = df_today_with_blank.iloc[half+1:]
+    col1, col2 = st.columns(2)
+    with col1:
+        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
+    with col2:
+        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
+
+    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
+
+    st.markdown('\n', unsafe_allow_html=True)
+
+    # -----------------------
+    # Unified Save Button
+    # -----------------------
+    if st.button("Save All Hours Changes"):
+
+       
+        # Save Hours edits
+        edited_hours = edited_hours.dropna(subset=["Client"])
+        edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
+        df_hours = pd.read_csv(HOURS_FILE)
+        df_hours = df_hours[df_hours["Date"] != today_str]
+        df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
+
+        # Remove rows with empty Client
+        df_hours = df_hours[df_hours["Client"].notna() & (df_hours["Client"].str.strip() != "")]
+
+        df_hours.to_csv(HOURS_FILE, index=False)
+
+        # Push updates
+        push_to_github("data/todos.csv", "Updated To-Do list")
+        push_to_github("data/hours.csv", "Updated hours log")
+
+        st.success("All changes saved successfully!")
+
+
+    st.markdown('\n', unsafe_allow_html=True)
+
 
 
 
@@ -901,6 +949,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
