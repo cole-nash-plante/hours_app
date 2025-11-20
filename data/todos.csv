@@ -1,5 +1,8 @@
 Client,Category,Task,Priority,DateCreated,DateCompleted,Notes
-University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0,,,Test
+University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0,,,"ON HOLD FOR NOW
+Profiling rules for dashboard:
+- find a way to check for GOBINLT duplicates
+create rules for PKs "
 DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1,1.0,,,
 DHCS,TMSIS,wf_TMSIS_Claims_RX_DD3_V1,1.0,,,
 DHCS,TMSIS,wf_TMSIS_PROVIDER_DD3_V1,1.0,,,
