@@ -366,28 +366,48 @@ if selected_page == "Home":
                         st.success(f"Changes saved for {client}!")
 
     st.markdown('</div>', unsafe_allow_html=True)
-
-
-    # Load hours data
+    st.subheader("Today Log Hours")
+    
+    # Load data
     df_hours = pd.read_csv(HOURS_FILE)
-    df_hours["Date"] = pd.to_datetime(df_hours["Date"], errors="coerce").dt.date
+    df_clients = pd.read_csv(CLIENTS_FILE)
     
-    # Filter for today's date
-    today = datetime.today().date()
-    today_hours = df_hours[df_hours["Date"] == today]
+    # Example: Split hours into two groups (you can define logic here)
+    group1 = df_hours[df_hours["Client"].isin(df_clients["Client"].tolist()[:len(df_clients)//2])]
+    group2 = df_hours[df_hours["Client"].isin(df_clients["Client"].tolist()[len(df_clients)//2:])]
     
-    # Apply client filter
-    if len(selected_clients) > 0:
-        today_hours = today_hours[today_hours["Client"].isin(selected_clients)]
+    # Create two columns for two tables
+    col1, col2 = st.columns(2)
     
-    # Show hours under each client's To-Do table
-    for i, client in enumerate(selected_clients):
-        client_hours = today_hours[today_hours["Client"] == client]
-        if len(client_hours) > 0:
-            st.markdown(f"**Today's Logged Hours for {client}:**")
-            st.table(client_hours[["Hours", "Description"]])
-        else:
-            st.markdown(f"*No hours logged today for {client}.*")
+    with col1:
+        st.markdown("#### Hours Table 1")
+        edited_group1 = st.data_editor(
+            group1[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
+            num_rows="dynamic",
+            width="stretch",
+            hide_index=True
+        )
+        if st.button("Save Changes Table 1"):
+            df_hours = df_hours[~df_hours["Client"].isin(group1["Client"])]
+            df_hours = pd.concat([df_hours, edited_group1], ignore_index=True)
+            df_hours.to_csv(HOURS_FILE, index=False)
+            st.success("Changes saved for Table 1!")
+            push_to_github("data/hours.csv", "Updated hours log")
+    
+    with col2:
+        st.markdown("#### Hours Table 2")
+        edited_group2 = st.data_editor(
+            group2[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
+            num_rows="dynamic",
+            width="stretch",
+            hide_index=True
+        )
+        if st.button("Save Changes Table 2"):
+            df_hours = df_hours[~df_hours["Client"].isin(group2["Client"])]
+            df_hours = pd.concat([df_hours, edited_group2], ignore_index=True)
+            df_hours.to_csv(HOURS_FILE, index=False)
+            st.success("Changes saved for Table 2!")
+
 
 
 # -------------------------------------------------
@@ -951,6 +971,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
