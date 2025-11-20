@@ -323,9 +323,10 @@ if selected_page == "Home":
 
                         # Buttons
                         if st.button("Save Changes", key=f"save_{client}_{idx}"):
-                            df_todos.at[idx, "Priority"] = new_priority
-                            df_todos.at[idx, "Notes"] = new_notes
+                            df_todos.at[row.name, "Priority"] = new_priority
+                            df_todos.at[row.name, "Notes"] = new_notes
                             df_todos.to_csv(TODOS_FILE, index=False)
+                            push_to_github("data/todos.csv", "Updated task notes and priority")
                             st.success("Changes saved!")
 
                         if st.button("Mark as Complete", key=f"complete_{client}_{idx}"):
@@ -900,6 +901,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
