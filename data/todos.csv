@@ -15,24 +15,7 @@ STVAPDC_STDN_ACC_IND, --This field specifies whether student acceptance is indic
 STVAPDC_APPL_INACT --This field indicates whether decision causes application to become inactive.    Y - Application is inactive.
 from test_raw.banner_student.stvapdc;
  "
-University of Alaska,Unit Testing,Create DIM Application status,3.0,,,"--DIM_APPLICATION_DESCISION
-
-select 
-
-STVAPDC_CODE APPLICATION_DECISION_CODE, 
-
-STVAPDC_DESC APPLICATION_DECISION_DESC, 
-
-STVAPDC_SIGNF_IND, --This field indicates whether the decision affects the acceptance of the         application.  Y - Application acceptance is effected by decision.
-
-STVAPDC_INST_ACC_IND, --This field specifies whether institutional acceptance of application is         effected by the decision.  Y - Institution accepts application.
-
-STVAPDC_STDN_ACC_IND, --This field specifies whether student acceptance is indicated by the             decision.  Y - Student accepts offer of admission.
-
-STVAPDC_APPL_INACT --This field indicates whether decision causes application to become inactive.    Y - Application is inactive.
-
-from test_raw.banner_student.stvapdc;
- 
+University of Alaska,Unit Testing,Create DIM Application status,3.0,,,"
 --DIM_APPLICATION_STATUS
 
 SELECT
