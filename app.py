@@ -197,6 +197,7 @@ body {
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
+
 if selected_page == "Home":
     st.title("Home")
 
@@ -206,8 +207,9 @@ if selected_page == "Home":
     df_todos = pd.read_csv(TODOS_FILE)
     df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
     df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
+
     # -----------------------
-    # Log Hours (Quick Entry)
+    # Log Hours
     # -----------------------
     st.subheader("Log Hours")
     if len(df_clients) == 0:
@@ -228,8 +230,7 @@ if selected_page == "Home":
                 df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
                 df_hours.to_csv(HOURS_FILE, index=False)
                 st.success("Hours logged successfully!")
-                push_to_github("data/hours.csv", "Updated hours log")
-    # -----------------------
+
     # -----------------------
     # Add To-Do Item
     # -----------------------
@@ -250,13 +251,12 @@ if selected_page == "Home":
         with col5:
             if st.button("Add Task"):
                 if todo_task.strip() and todo_category != "No categories":
-                    df_todos.loc[len(df_todos)] = [
-                        todo_client, todo_category, todo_task, priority, str(datetime.today().date()), ""
-                    ]
+                    # Add Notes column if not exists
+                    if "Notes" not in df_todos.columns:
+                        df_todos["Notes"] = ""
+                    df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(datetime.today().date()), "", ""]
                     df_todos.to_csv(TODOS_FILE, index=False)
                     st.success("Task added successfully!")
-                    push_to_github("data/todos.csv", "Updated To-Do list")
-                    df_todos = pd.read_csv(TODOS_FILE)
                 else:
                     st.error("Please enter a valid task and category.")
 
@@ -280,19 +280,16 @@ if selected_page == "Home":
                     df_categories.loc[len(df_categories)] = [cat_client, new_category]
                     df_categories.to_csv(CATEGORIES_FILE, index=False)
                     st.success(f"Category '{new_category}' added for '{cat_client}'!")
-                    push_to_github("data/categories.csv", "Updated categories list")
-                    df_categories = pd.read_csv(CATEGORIES_FILE)
                 else:
                     st.error("Please enter a valid category name.")
 
     st.markdown('\n', unsafe_allow_html=True)
 
     # -----------------------
-    # Active To-Dos
+    # Active To-Dos with Expanders
     # -----------------------
     st.subheader("Active To-Dos")
     active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
-    edited_tables = {}
 
     if len(active_todos) == 0:
         st.info("No active tasks.")
@@ -300,100 +297,61 @@ if selected_page == "Home":
         clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
 
-        if len(selected_clients) > 0:
-            cols = st.columns(len(selected_clients))
-            for i, client in enumerate(selected_clients):
-                with cols[i]:
-                    color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
-                    header_html = f"""
-                    <div style="background-color:{color}; padding:10px; border-radius:5px; margin-bottom:10px;">
-                        <h4 style="color:white; margin:0;">{client}</h4>
-                    </div>
-                    """
-                    st.markdown(header_html, unsafe_allow_html=True)
+        updated_tasks = []
 
-                    sort_option = st.selectbox(
-                        f"Sort {client}'s Tasks By",
-                        ["Priority (High to Low)", "Priority (Low to High)", "Date Created (Newest)", "Date Created (Oldest)"],
-                        key=f"sort_{client}"
-                    )
-                    client_tasks = active_todos[active_todos["Client"] == client]
-                    if sort_option == "Priority (High to Low)":
-                        client_tasks = client_tasks.sort_values(by="Priority", ascending=False)
-                    elif sort_option == "Priority (Low to High)":
-                        client_tasks = client_tasks.sort_values(by="Priority", ascending=True)
-                    elif sort_option == "Date Created (Newest)":
-                        client_tasks = client_tasks.sort_values(by="DateCreated", ascending=False)
-                    elif sort_option == "Date Created (Oldest)":
-                        client_tasks = client_tasks.sort_values(by="DateCreated", ascending=True)
+        for client in selected_clients:
+            color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
+            header_html = f"""
+            <div style="background-color:{color}; padding:10px; border-radius:5px; margin-bottom:10px;">
+                <h4 style="color:white; margin:0;">{client}</h4>
+            </div>
+            """
+            st.markdown(header_html, unsafe_allow_html=True)
 
-                    edited_table = st.data_editor(
-                        client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
-                        num_rows="dynamic",
-                        width="stretch",
-                        hide_index=True,
-                        key=f"editor_{client}"
-                    )
-                    edited_tables[client] = edited_table
+            client_tasks = active_todos[active_todos["Client"] == client]
+            for idx, row in client_tasks.iterrows():
+                with st.expander(f"{row['Task']} (Priority: {row['Priority']})"):
+                    st.write(f"Category: {row['Category']}")
+                    st.write(f"Created: {row['DateCreated'].date() if pd.notna(row['DateCreated']) else ''}")
+                    new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{idx}")
+                    new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{idx}")
+                    updated_tasks.append({
+                        "index": idx,
+                        "Priority": new_priority,
+                        "Notes": new_notes
+                    })
 
-    st.markdown('\n', unsafe_allow_html=True)
+        if st.button("Save All Changes"):
+            for update in updated_tasks:
+                df_todos.at[update["index"], "Priority"] = update["Priority"]
+                df_todos.at[update["index"], "Notes"] = update["Notes"]
+            df_todos.to_csv(TODOS_FILE, index=False)
+            st.success("All changes saved successfully!")
 
+    # -----------------------
     # Today's Hours
     # -----------------------
-    HOURS_FILE = "data/hours.csv"
     df_hours = pd.read_csv(HOURS_FILE)
     today_str = datetime.today().strftime("%Y-%m-%d")
     df_today = df_hours[df_hours["Date"] == today_str]
     new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
-    half = len(df_today_with_blank) // 2
-    df_left = df_today_with_blank.iloc[:half+1]
-    df_right = df_today_with_blank.iloc[half+1:]
     col1, col2 = st.columns(2)
+    half = len(df_today_with_blank) // 2
     with col1:
-        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
+        edited_left = st.data_editor(df_today_with_blank.iloc[:half+1], num_rows="dynamic", key="editor_left")
     with col2:
-        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
-
+        edited_right = st.data_editor(df_today_with_blank.iloc[half+1:], num_rows="dynamic", key="editor_right")
     edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
 
-    st.markdown('\n', unsafe_allow_html=True)
-
-    # -----------------------
-    # Unified Save Button
-    # -----------------------
-    if st.button("Save All Changes"):
-        # Save To-Do edits
-        for client, edited_table in edited_tables.items():
-            df_todos = df_todos[df_todos["Client"] != client]
-            edited_table["Client"] = client
-            df_todos = pd.concat([df_todos, edited_table], ignore_index=True)
-
-        # Remove rows with empty Category
-        df_todos = df_todos[df_todos["Category"].notna() & (df_todos["Category"].str.strip() != "")]
-
-        df_todos.to_csv(TODOS_FILE, index=False)
-
-        # Save Hours edits
+    if st.button("Save Hours"):
         edited_hours = edited_hours.dropna(subset=["Client"])
         edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
-        df_hours = pd.read_csv(HOURS_FILE)
         df_hours = df_hours[df_hours["Date"] != today_str]
         df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
-
-        # Remove rows with empty Client
-        df_hours = df_hours[df_hours["Client"].notna() & (df_hours["Client"].str.strip() != "")]
-
         df_hours.to_csv(HOURS_FILE, index=False)
+        st.success("Hours saved successfully!")
 
-        # Push updates
-        push_to_github("data/todos.csv", "Updated To-Do list")
-        push_to_github("data/hours.csv", "Updated hours log")
-
-        st.success("All changes saved successfully!")
-
-
-    st.markdown('\n', unsafe_allow_html=True)
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -956,6 +914,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
