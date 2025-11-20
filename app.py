@@ -278,34 +278,38 @@ if selected_page == "Home":
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
 
         if len(selected_clients) > 0:
-            cols = st.columns(len(selected_clients))
-            for i, client in enumerate(selected_clients):
-                header_html = f"#### {client}"
-                with cols[i]:
-                    st.markdown(header_html, unsafe_allow_html=True)
-                    sort_option = st.selectbox(
-                        f"Sort {client}'s Tasks By",
-                        ["Priority (High to Low)", "Priority (Low to High)", "Date Created (Newest)", "Date Created (Oldest)"],
-                        key=f"sort_{client}"
-                    )
-                    client_tasks = active_todos[active_todos["Client"] == client]
-                    if sort_option == "Priority (High to Low)":
-                        client_tasks = client_tasks.sort_values(by="Priority", ascending=False)
-                    elif sort_option == "Priority (Low to High)":
-                        client_tasks = client_tasks.sort_values(by="Priority", ascending=True)
-                    elif sort_option == "Date Created (Newest)":
-                        client_tasks = client_tasks.sort_values(by="DateCreated", ascending=False)
-                    elif sort_option == "Date Created (Oldest)":
-                        client_tasks = client_tasks.sort_values(by="DateCreated", ascending=True)
+            for client in selected_clients:
+                color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
+                header_html = f"""
+                <div style="background-color:{color}; padding:10px; border-radius:5px; margin-bottom:10px;">
+                    <h4 style="color:white; margin:0;">{client}</h4>
+                </div>
+                """
+                st.markdown(header_html, unsafe_allow_html=True)
 
-                    edited_table = st.data_editor(
-                        client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
-                        num_rows="dynamic",
-                        width="stretch",
-                        hide_index=True,
-                        key=f"editor_{client}"
-                    )
-                    edited_tables[client] = edited_table
+                sort_option = st.selectbox(
+                    f"Sort {client}'s Tasks By",
+                    ["Priority (High to Low)", "Priority (Low to High)", "Date Created (Newest)", "Date Created (Oldest)"],
+                    key=f"sort_{client}"
+                )
+                client_tasks = active_todos[active_todos["Client"] == client]
+                if sort_option == "Priority (High to Low)":
+                    client_tasks = client_tasks.sort_values(by="Priority", ascending=False)
+                elif sort_option == "Priority (Low to High)":
+                    client_tasks = client_tasks.sort_values(by="Priority", ascending=True)
+                elif sort_option == "Date Created (Newest)":
+                    client_tasks = client_tasks.sort_values(by="DateCreated", ascending=False)
+                elif sort_option == "Date Created (Oldest)":
+                    client_tasks = client_tasks.sort_values(by="DateCreated", ascending=True)
+
+                edited_table = st.data_editor(
+                    client_tasks[["Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
+                    num_rows="dynamic",
+                    width="stretch",
+                    hide_index=True,
+                    key=f"editor_{client}"
+                )
+                edited_tables[client] = edited_table
 
     st.markdown('\n', unsafe_allow_html=True)
 
@@ -382,7 +386,7 @@ if selected_page == "Home":
         push_to_github("data/todos.csv", "Updated To-Do list")
         push_to_github("data/hours.csv", "Updated hours log")
 
-        st.success("All changes saved successfully!")
+
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -945,6 +949,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
