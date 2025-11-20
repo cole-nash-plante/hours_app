@@ -199,42 +199,7 @@ body {
 # -------------------------------------------------
 if selected_page == "Home":
     st.title("Home")
-
-    # -------------------------
-    # Log Hours (Top)
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Log Hours")
-    df_clients = pd.read_csv(CLIENTS_FILE)
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        
-        # Create 5 columns for the inputs and button
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
-        
-        # Inputs in columns
-        with col1:
-            client = st.selectbox("Client", df_clients["Client"].tolist())
-        
-        with col2:
-            date_val = st.date_input("Date", datetime.today())
-        
-        with col3:
-            hours = st.number_input("Hours", min_value=0.0, step=0.25)
-        
-        with col4:
-            description = st.text_input("Description")  # Use text_input for compactness
-        
-        with col5:
-            if st.button("Save Hours"):
-                df_hours = pd.read_csv(HOURS_FILE)
-                df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
-                df_hours.to_csv(HOURS_FILE, index=False)
-                st.success("Hours logged successfully!")
-                push_to_github("data/hours.csv", "Updated hours log")
-
-
+    
     st.title("To-Do List")
 
     # Load data
@@ -384,11 +349,11 @@ if selected_page == "Home":
     half = len(df_today_with_blank) // 2
     df_left = df_today_with_blank.iloc[:half+1]
     df_right = df_today_with_blank.iloc[half+1:]
-    
+    st.subheader("Today's Hours")
     # Layout: two columns side by side
     col1, col2 = st.columns(2)
     
-    st.subheader("Today's Hours")
+
     with col1:
         edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
     
@@ -405,6 +370,41 @@ if selected_page == "Home":
         final_df.to_csv(HOURS_FILE, index=False)
         st.success("Hours logged successfully!")
         push_to_github("data/hours.csv", "Updated hours log")
+
+    
+     # -------------------------
+    # Log Hours (Top)
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Log Hours")
+    df_clients = pd.read_csv(CLIENTS_FILE)
+    if len(df_clients) == 0:
+        st.warning("Add clients first!")
+    else:
+        
+        # Create 5 columns for the inputs and button
+        col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
+        
+        # Inputs in columns
+        with col1:
+            client = st.selectbox("Client", df_clients["Client"].tolist())
+        
+        with col2:
+            date_val = st.date_input("Date", datetime.today())
+        
+        with col3:
+            hours = st.number_input("Hours", min_value=0.0, step=0.25)
+        
+        with col4:
+            description = st.text_input("Description")  # Use text_input for compactness
+        
+        with col5:
+            if st.button("Save Hours"):
+                df_hours = pd.read_csv(HOURS_FILE)
+                df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
+                df_hours.to_csv(HOURS_FILE, index=False)
+                st.success("Hours logged successfully!")
+                push_to_github("data/hours.csv", "Updated hours log")
 
 
 
@@ -969,6 +969,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
