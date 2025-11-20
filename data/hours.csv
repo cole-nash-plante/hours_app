@@ -1,4 +1,4 @@
-Date,Client,Hours,Description,Hours Worked
+Date,Client,Hours,Description
 2025-11-18,DHCS,0.5,Internal Meeting,
 2025-11-18,University of Alaska,1.0,FCT_COURSE_ENROLLMENT final testing,
 2025-11-17,University of Alaska,2.75,FCT_COURSE_ENROLLMENT troubleshoot,
@@ -111,5 +111,5 @@ Date,Client,Hours,Description,Hours Worked
 2025-09-15,DHCS,14.25,Pre-tracking Hours,
 2025-08-15,University of Alaska,11.75,Pre-tracking Hours,
 2025-11-19,University of Alaska,0.5,"Internal meeting, informatica ticket submission",
-2025-11-20,University of Alaska,0.5,Morning check on jobs and informatica ticket HAR files,0.5
-2025-11-20,University of Alaska,,Meeting about develupment,0.5
+2025-11-20,University of Alaska,0.5,Morning check on jobs and informatica ticket HAR files
+2025-11-20,University of Alaska,,Meeting about develupment
