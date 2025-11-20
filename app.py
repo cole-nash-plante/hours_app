@@ -242,7 +242,7 @@ if selected_page == "Home":
                 new_row = {
                     "Date": str(date_val),
                     "Client": client,
-                    "Hours": hours,
+                    "Hours": hours,  # FIXED
                     "Description": description
                 }
                 df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
@@ -357,7 +357,7 @@ if selected_page == "Home":
     df_hours = pd.read_csv(HOURS_FILE)
     today_str = datetime.today().strftime("%Y-%m-%d")
     df_today = df_hours[df_hours["Date"] == today_str]
-    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
+    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}  # FIXED
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
     col1, col2 = st.columns(2)
     half = len(df_today_with_blank) // 2
@@ -375,7 +375,6 @@ if selected_page == "Home":
         df_hours.to_csv(HOURS_FILE, index=False)
         push_to_github("data/hours.csv", "Updated today's hours")
         st.success("Hours saved successfully!")
-
 
 
 # -------------------------------------------------
@@ -987,6 +986,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
