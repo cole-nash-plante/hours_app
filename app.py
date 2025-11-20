@@ -327,7 +327,8 @@ if selected_page == "Home":
                         st.markdown(f"### Task: {row['Task']}")
                         st.write(f"Category: {row['Category']}")
                         created_date = row["DateCreated"]
-                        st.write(f"Created: {created_date.strftime('%Y-%m-%d') if pd.notna(created_date) else ''}")
+                        created_display = created_date.strftime("%Y-%m-%d") if isinstance(created_date, pd.Timestamp) and pd.notna(created_date) else ""
+                        st.write(f"Created: {created_display}")
                         new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
                         new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
 
@@ -986,6 +987,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
