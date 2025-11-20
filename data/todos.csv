@@ -1,39 +1,8 @@
-Client,Category,Task,Priority,DateCreated,DateCompleted,Notes
-University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0,,,"ON HOLD FOR NOW
-Profiling rules for dashboard:
-- find a way to check for GOBINLT duplicates
-create rules for PKs "
-DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1,1.0,,,
-DHCS,TMSIS,wf_TMSIS_Claims_RX_DD3_V1,1.0,,,
-DHCS,TMSIS,wf_TMSIS_PROVIDER_DD3_V1,1.0,,,
-University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,,"select 
-STVAPDC_CODE APPLICATION_DECISION_CODE, 
-STVAPDC_DESC APPLICATION_DECISION_DESC, 
-STVAPDC_SIGNF_IND, --This field indicates whether the decision affects the acceptance of the         application.  Y - Application acceptance is effected by decision.
-STVAPDC_INST_ACC_IND, --This field specifies whether institutional acceptance of application is         effected by the decision.  Y - Institution accepts application.
-STVAPDC_STDN_ACC_IND, --This field specifies whether student acceptance is indicated by the             decision.  Y - Student accepts offer of admission.
-STVAPDC_APPL_INACT --This field indicates whether decision causes application to become inactive.    Y - Application is inactive.
-from test_raw.banner_student.stvapdc;
- "
-University of Alaska,Unit Testing,Create DIM Application status,3.0,,,"
---DIM_APPLICATION_STATUS
-
-SELECT
-
-STVAPST_CODE APPLICATION_STATUS_CODE,
-
-STVAPST_DESC APPLICATION_STATUS_DESC
-
-FROM test_raw.banner_student.stvapst;
- "
-University of Alaska,Unit Testing,Fix AO_CODES,4.0,,,"Need to fix ao codes so fallback happens at the end.: 
-------------------------------------------------------------
--- AO Counts in Snowflake by student enrollment
-------------------------------------------------------------
-select dc.campus_code, ao_code, count(distinct student_pidm) from test_refined.ods.ods_course_enrollment fce
-join test_curated.edw.dim_course dc on dc.term_code = fce.term_code and dc.crn = fce.crn
-where fce.term_code = '202403' and dc.campus_code = '6'
-group by dc.campus_code, ao_code
-order by count(distinct student_pidm) desc
-;"
-University of Alaska,Unit Testing,test,3.0,,2025-11-20,
+Client,Category,Task,Priority,DateCreated,DateCompleted
+University of Alaska,Unit Testing,Fix AO_CODES,4.0,,
+University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,
+University of Alaska,Unit Testing,Create DIM Application status,3.0,,
+DHCS,TMSIS,wf_TMSIS_PROVIDER_DD3_V1,1.0,,
+DHCS,TMSIS,wf_TMSIS_Claims_RX_DD3_V1,1.0,,
+DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1,1.0,,
+University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0,,
