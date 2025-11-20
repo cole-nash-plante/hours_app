@@ -1,115 +1,116 @@
 Date,Client,Hours,Description
-2025-11-18,DHCS,0.5,Internal Meeting,
-2025-11-18,University of Alaska,1.0,FCT_COURSE_ENROLLMENT final testing,
-2025-11-17,University of Alaska,2.75,FCT_COURSE_ENROLLMENT troubleshoot,
-2025-11-14,University of Alaska,2.5,Adding details to fct_enrollment and fct_course_enrollment,
-2025-11-14,DHCS,0.5,Meeting,
-2025-11-13,DHCS,0.5,Meeting,
-2025-11-13,University of Alaska,1.5,Documentation FCT_COURSE_ENROLLMENT,
-2025-11-13,University of Alaska,1.25,m_ua_hr_active_job_emp_current,
-2025-11-12,University of Alaska,0.25,Meeting with Amy,
-2025-11-12,University of Alaska,1.5,MartDesign documentation,
-2025-11-11,DHCS,1.5,mt troubleshooting,
-2025-11-11,DHCS,0.5,Meeting,
-2025-11-11,DHCS,2.0,SQL Documentation,
-2025-11-10,University of Alaska,0.5,Meeting,
-2025-11-10,DHCS,1.0,CCLAIM_IP updates,
-2025-11-10,University of Alaska,3.25,Unit testing,
-2025-11-10,DHCS,1.0,SQL documentation,
-2025-11-07,DHCS,0.5,Attempting tf runs,
-2025-11-07,University of Alaska,2.5,Unit testing,
-2025-11-06,DHCS,0.5,Meeting,
-2025-11-06,DHCS,3.0,Mapping conversions,
-2025-11-06,University of Alaska,1.25,Documenting insert statements for dev work,
-2025-11-05,DHCS,3.75,Mercer updates and documentation,
-2025-11-05,University of Alaska,0.25,Morning checks on tables,
-2025-11-04,DHCS,4.75,Lost workbook progress,
-2025-11-04,University of Alaska,0.5,Demo record finding,
-2025-11-03,University of Alaska,0.5,Ingestion troubleshooting,
-2025-11-03,University of Alaska,1.75,Meeting with Ben working on TRX,
-2025-11-03,DHCS,0.75,wf_TMSIS_Claims_OT_DD3_V1,
-2025-11-03,DHCS,1.5,wf_TMSIS_Claims_RX_DD3_V1,
-2025-10-31,University of Alaska,0.5,UA Raw Ingestion,
-2025-10-31,OFM,0.5,OFM Standup,
-2025-10-31,OFM,1.75,Formatting,
-2025-10-31,DHCS,1.5,Mappings,
-2025-10-31,DHCS,0.5,Meeting,
-2025-10-30,DHCS,1.25,TMIS Mappings,
-2025-10-30,DHCS,0.5,Meeting,
-2025-10-30,University of Alaska,0.75,UA Raw Ingestion,
-2025-10-30,DHCS,0.5,HCAI Mappings,
-2025-10-29,DHCS,0.25,HCAI Updates,
-2025-10-29,OFM,1.0,OFM Standup and Ben Meeting,
-2025-10-29,University of Alaska,0.5,UA Meeting,
-2025-10-29,University of Alaska,3.5,Final Updated Iteration 1,
-2025-10-29,University of Alaska,0.75,UA Raw Ingestion,
-2025-10-28,University of Alaska,2.5,UA Raw Ingestion,
-2025-10-28,OFM,0.5,Ben Meeting and script tuning,
-2025-10-28,University of Alaska,0.5,Meeting,
-2025-10-28,University of Alaska,0.75,UA Dev Faculty SK,
-2025-10-28,DHCS,1.0,Meeting and mapping adjustment,
-2025-10-28,University of Alaska,1.25,DIM Academic Org,
-2025-10-27,OFM,1.0,Meeting with Ben on Python script,
-2025-10-27,OFM,1.5,Python file movement,
-2025-10-27,University of Alaska,0.75,Rename Rules and try to delete rule occurrences,
-2025-10-27,University of Alaska,0.5,Meeting on Faculty SK,
-2025-10-27,University of Alaska,1.25,Faculty SK dev,
-2025-10-27,University of Alaska,1.0,UA Meeting,
-2025-10-24,University of Alaska,1.0,Rerun ODS_STUDENT with filter on PIDM,
-2025-10-24,University of Alaska,0.5,DIM COURSE Updates,
-2025-10-24,DHCS,1.5,TMIS Mappings,
-2025-10-24,DHCS,1.0,Meeting and notes taking,
-2025-10-24,University of Alaska,2.75,Rules Creation,
-2025-10-24,University of Alaska,0.75,Testing AO_CODE,
-2025-10-24,University of Alaska,0.25,Meeting,
-2025-10-23,DHCS,1.0,External Meeting,
-2025-10-23,DHCS,0.5,Internal Meeting,
-2025-10-23,DHCS,0.5,Mappings updates,
-2025-10-23,University of Alaska,3.75,Dev mappings for DIM_COURSE,
-2025-10-22,University of Alaska,1.75,Alaska Meeting,
-2025-10-22,University of Alaska,2.0,Data Profiling and Rules,
-2025-10-22,DHCS,1.0,TMIS Mappings,
-2025-10-22,DHCS,0.5,HCAI Mappings,
-2025-10-22,DHCS,0.5,Assigning conversions and checking updates for previous,
-2025-10-20,University of Alaska,0.25,Rules Call,
-2025-10-20,University of Alaska,0.75,Rules Meeting,
-2025-10-20,University of Alaska,0.5,Freeze Call,
-2025-10-17,DHCS,0.75,Working Session,
-2025-10-17,University of Alaska,1.25,Rules Dashboard,
-2025-10-16,University of Alaska,0.5,Internal Meeting,
-2025-10-16,University of Alaska,0.5,Rules Dashboard,
-2025-10-16,DHCS,1.25,Internal Meeting,
-2025-10-16,DHCS,3.0,TMIS Mappings,
-2025-10-15,DHCS,1.5,HCAI Mappings,
-2025-10-14,DHCS,0.5,Check in Meeting,
-2025-10-14,DHCS,2.25,Mappings,
-2025-10-13,DHCS,0.5,HCAI Mappings,
-2025-10-13,University of Alaska,0.5,Partial-UA meeting,
-2025-10-13,University of Alaska,0.25,Data Profiling and Rules,
-2025-10-10,DHCS,1.25,TMIS Mappings,
-2025-10-10,DHCS,0.25,HCAI Mappings,
-2025-10-09,University of Alaska,0.25,Data Profiling and Rules,
-2025-10-09,University of Alaska,0.5,Data Profiling Meeting,
-2025-10-09,University of Alaska,0.25,Freeze Meeting,
-2025-10-09,DHCS,0.5,DHCS Meeting,
-2025-10-09,DHCS,0.5,HCAI Mappings,
-2025-10-08,University of Alaska,0.75,Dev Meeting,
-2025-10-08,University of Alaska,2.25,Dev Mappings,
-2025-10-08,University of Alaska,0.25,Data Profiling and Rules,
-2025-10-08,DHCS,0.5,DHCS Meeting,
-2025-10-08,DHCS,2.75,HCAI Mappings,
-2025-10-07,University of Alaska,1.0,Data Profiling and Rules,
-2025-10-07,University of Alaska,0.75,fct_enrollment meeting,
-2025-10-07,University of Alaska,3.75,fct_enrollment,
-2025-10-07,DHCS,1.0,HCAI Internal meeting,
-2025-10-06,University of Alaska,5.0,Dev Mappings,
-2025-10-06,DHCS,1.25,HCAI Mappings,
-2025-10-06,University of Alaska,0.25,Client Meeting Development,
-2025-10-16,University of Alaska,2.5,Pre-tracking Hours,
-2025-10-16,DHCS,2.25,Pre-tracking Hours,
-2025-09-15,University of Alaska,27.25,Pre-tracking Hours,
-2025-09-15,DHCS,14.25,Pre-tracking Hours,
-2025-08-15,University of Alaska,11.75,Pre-tracking Hours,
-2025-11-19,University of Alaska,0.5,"Internal meeting, informatica ticket submission",
+Date,Client,0.0,Description
+2025-11-18,DHCS,0.5,Internal Meeting
+2025-11-18,University of Alaska,1.0,FCT_COURSE_ENROLLMENT final testing
+2025-11-17,University of Alaska,2.75,FCT_COURSE_ENROLLMENT troubleshoot
+2025-11-14,University of Alaska,2.5,Adding details to fct_enrollment and fct_course_enrollment
+2025-11-14,DHCS,0.5,Meeting
+2025-11-13,DHCS,0.5,Meeting
+2025-11-13,University of Alaska,1.5,Documentation FCT_COURSE_ENROLLMENT
+2025-11-13,University of Alaska,1.25,m_ua_hr_active_job_emp_current
+2025-11-12,University of Alaska,0.25,Meeting with Amy
+2025-11-12,University of Alaska,1.5,MartDesign documentation
+2025-11-11,DHCS,1.5,mt troubleshooting
+2025-11-11,DHCS,0.5,Meeting
+2025-11-11,DHCS,2.0,SQL Documentation
+2025-11-10,University of Alaska,0.5,Meeting
+2025-11-10,DHCS,1.0,CCLAIM_IP updates
+2025-11-10,University of Alaska,3.25,Unit testing
+2025-11-10,DHCS,1.0,SQL documentation
+2025-11-07,DHCS,0.5,Attempting tf runs
+2025-11-07,University of Alaska,2.5,Unit testing
+2025-11-06,DHCS,0.5,Meeting
+2025-11-06,DHCS,3.0,Mapping conversions
+2025-11-06,University of Alaska,1.25,Documenting insert statements for dev work
+2025-11-05,DHCS,3.75,Mercer updates and documentation
+2025-11-05,University of Alaska,0.25,Morning checks on tables
+2025-11-04,DHCS,4.75,Lost workbook progress
+2025-11-04,University of Alaska,0.5,Demo record finding
+2025-11-03,University of Alaska,0.5,Ingestion troubleshooting
+2025-11-03,University of Alaska,1.75,Meeting with Ben working on TRX
+2025-11-03,DHCS,0.75,wf_TMSIS_Claims_OT_DD3_V1
+2025-11-03,DHCS,1.5,wf_TMSIS_Claims_RX_DD3_V1
+2025-10-31,University of Alaska,0.5,UA Raw Ingestion
+2025-10-31,OFM,0.5,OFM Standup
+2025-10-31,OFM,1.75,Formatting
+2025-10-31,DHCS,1.5,Mappings
+2025-10-31,DHCS,0.5,Meeting
+2025-10-30,DHCS,1.25,TMIS Mappings
+2025-10-30,DHCS,0.5,Meeting
+2025-10-30,University of Alaska,0.75,UA Raw Ingestion
+2025-10-30,DHCS,0.5,HCAI Mappings
+2025-10-29,DHCS,0.25,HCAI Updates
+2025-10-29,OFM,1.0,OFM Standup and Ben Meeting
+2025-10-29,University of Alaska,0.5,UA Meeting
+2025-10-29,University of Alaska,3.5,Final Updated Iteration 1
+2025-10-29,University of Alaska,0.75,UA Raw Ingestion
+2025-10-28,University of Alaska,2.5,UA Raw Ingestion
+2025-10-28,OFM,0.5,Ben Meeting and script tuning
+2025-10-28,University of Alaska,0.5,Meeting
+2025-10-28,University of Alaska,0.75,UA Dev Faculty SK
+2025-10-28,DHCS,1.0,Meeting and mapping adjustment
+2025-10-28,University of Alaska,1.25,DIM Academic Org
+2025-10-27,OFM,1.0,Meeting with Ben on Python script
+2025-10-27,OFM,1.5,Python file movement
+2025-10-27,University of Alaska,0.75,Rename Rules and try to delete rule occurrences
+2025-10-27,University of Alaska,0.5,Meeting on Faculty SK
+2025-10-27,University of Alaska,1.25,Faculty SK dev
+2025-10-27,University of Alaska,1.0,UA Meeting
+2025-10-24,University of Alaska,1.0,Rerun ODS_STUDENT with filter on PIDM
+2025-10-24,University of Alaska,0.5,DIM COURSE Updates
+2025-10-24,DHCS,1.5,TMIS Mappings
+2025-10-24,DHCS,1.0,Meeting and notes taking
+2025-10-24,University of Alaska,2.75,Rules Creation
+2025-10-24,University of Alaska,0.75,Testing AO_CODE
+2025-10-24,University of Alaska,0.25,Meeting
+2025-10-23,DHCS,1.0,External Meeting
+2025-10-23,DHCS,0.5,Internal Meeting
+2025-10-23,DHCS,0.5,Mappings updates
+2025-10-23,University of Alaska,3.75,Dev mappings for DIM_COURSE
+2025-10-22,University of Alaska,1.75,Alaska Meeting
+2025-10-22,University of Alaska,2.0,Data Profiling and Rules
+2025-10-22,DHCS,1.0,TMIS Mappings
+2025-10-22,DHCS,0.5,HCAI Mappings
+2025-10-22,DHCS,0.5,Assigning conversions and checking updates for previous
+2025-10-20,University of Alaska,0.25,Rules Call
+2025-10-20,University of Alaska,0.75,Rules Meeting
+2025-10-20,University of Alaska,0.5,Freeze Call
+2025-10-17,DHCS,0.75,Working Session
+2025-10-17,University of Alaska,1.25,Rules Dashboard
+2025-10-16,University of Alaska,0.5,Internal Meeting
+2025-10-16,University of Alaska,0.5,Rules Dashboard
+2025-10-16,DHCS,1.25,Internal Meeting
+2025-10-16,DHCS,3.0,TMIS Mappings
+2025-10-15,DHCS,1.5,HCAI Mappings
+2025-10-14,DHCS,0.5,Check in Meeting
+2025-10-14,DHCS,2.25,Mappings
+2025-10-13,DHCS,0.5,HCAI Mappings
+2025-10-13,University of Alaska,0.5,Partial-UA meeting
+2025-10-13,University of Alaska,0.25,Data Profiling and Rules
+2025-10-10,DHCS,1.25,TMIS Mappings
+2025-10-10,DHCS,0.25,HCAI Mappings
+2025-10-09,University of Alaska,0.25,Data Profiling and Rules
+2025-10-09,University of Alaska,0.5,Data Profiling Meeting
+2025-10-09,University of Alaska,0.25,Freeze Meeting
+2025-10-09,DHCS,0.5,DHCS Meeting
+2025-10-09,DHCS,0.5,HCAI Mappings
+2025-10-08,University of Alaska,0.75,Dev Meeting
+2025-10-08,University of Alaska,2.25,Dev Mappings
+2025-10-08,University of Alaska,0.25,Data Profiling and Rules
+2025-10-08,DHCS,0.5,DHCS Meeting
+2025-10-08,DHCS,2.75,HCAI Mappings
+2025-10-07,University of Alaska,1.0,Data Profiling and Rules
+2025-10-07,University of Alaska,0.75,fct_enrollment meeting
+2025-10-07,University of Alaska,3.75,fct_enrollment
+2025-10-07,DHCS,1.0,HCAI Internal meeting
+2025-10-06,University of Alaska,5.0,Dev Mappings
+2025-10-06,DHCS,1.25,HCAI Mappings
+2025-10-06,University of Alaska,0.25,Client Meeting Development
+2025-10-16,University of Alaska,2.5,Pre-tracking Hours
+2025-10-16,DHCS,2.25,Pre-tracking Hours
+2025-09-15,University of Alaska,27.25,Pre-tracking Hours
+2025-09-15,DHCS,14.25,Pre-tracking Hours
+2025-08-15,University of Alaska,11.75,Pre-tracking Hours
+2025-11-19,University of Alaska,0.5,"""Internal meeting"
 2025-11-20,University of Alaska,0.5,Morning check on jobs and informatica ticket HAR files
-2025-11-20,University of Alaska,,Meeting about develupment
+2025-11-20,University of Alaska,0.0,Meeting on dev
