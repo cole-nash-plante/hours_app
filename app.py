@@ -367,6 +367,9 @@ if selected_page == "Home":
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+    
+    HOURS_FILE = "data/hours.csv"
+    
     # Load data
     df_hours = pd.read_csv(HOURS_FILE)
     
@@ -404,7 +407,6 @@ if selected_page == "Home":
         final_df.to_csv(HOURS_FILE, index=False)
         st.success("Hours logged successfully!")
         push_to_github("data/hours.csv", "Updated hours log")
-
 
 
 # -------------------------------------------------
@@ -968,6 +970,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
