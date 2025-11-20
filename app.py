@@ -115,7 +115,7 @@ for file, cols in init_files:
 # Sidebar Navigation
 # -------------------------------------------------
 st.sidebar.title("Navigation")
-pages = ["Data Entry", "To-Do", "Reports", "History", "Days Off", "Archive"]
+pages = ["Home", "Reports", "Data Entry", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
 
 
@@ -197,7 +197,7 @@ body {
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
-if selected_page == "Data Entry":
+if selected_page == "Home":
     st.title("Data Entry")
 
     # -------------------------
@@ -221,57 +221,6 @@ if selected_page == "Data Entry":
             push_to_github("data/hours.csv", "Updated hours log")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # -------------------------
-    # Add New Client (Middle)
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Add New Client")
-    new_client = st.text_input("Client Name")
-    client_color = st.color_picker("Pick Client Color", "#FFFFFF")
-    if st.button("Add Client"):
-        if new_client.strip():
-            df_clients = pd.read_csv(CLIENTS_FILE)
-    
-            # Ensure both columns exist
-            if "Color" not in df_clients.columns:
-                df_clients["Color"] = ""  # Add empty Color column if missing
-    
-            if new_client not in df_clients["Client"].values:
-                # Append new row safely
-                new_row = pd.DataFrame([[new_client, client_color]], columns=["Client", "Color"])
-                df_clients = pd.concat([df_clients, new_row], ignore_index=True)
-    
-                # Save and push
-                df_clients.to_csv(CLIENTS_FILE, index=False)
-                st.success(f"Client '{new_client}' added with color {client_color}!")
-                push_to_github("data/clients.csv", "Updated clients list")
-            else:
-                st.warning("Client already exists.")
-        else:
-            st.error("Please enter a valid client name.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-    # -------------------------
-    # Set Hour Goals (Bottom)
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Set Hour Goals")
-    month = st.selectbox("Month", [f"{m:02d}" for m in range(1, 13)])
-    goal_hours = st.number_input("Goal Hours", min_value=0.0, step=1.0)
-    if st.button("Save Goal"):
-        df_goals = pd.read_csv(GOALS_FILE)
-        df_goals.loc[len(df_goals)] = [month, goal_hours]
-        df_goals.to_csv(GOALS_FILE, index=False)
-        st.success("Goal saved successfully!")
-        push_to_github("data/goals.csv", "Updated goals list")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# -------------------------------------------------
-# Page: To-Do
-# -------------------------------------------------
-elif selected_page == "To-Do":
     st.title("To-Do List")
 
     # Load data
@@ -614,7 +563,7 @@ elif selected_page == "Reports":
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-elif selected_page == "History":
+elif selected_page == "Data Entry":
     st.title("History")
 
     # Load data
@@ -708,6 +657,106 @@ elif selected_page == "History":
                 st.success("To-Do history updated! Empty rows deleted.")
 
     st.markdown('</div>', unsafe_allow_html=True)
+    # -------------------------
+    # Add New Client (Middle)
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Add New Client")
+    new_client = st.text_input("Client Name")
+    client_color = st.color_picker("Pick Client Color", "#FFFFFF")
+    if st.button("Add Client"):
+        if new_client.strip():
+            df_clients = pd.read_csv(CLIENTS_FILE)
+    
+            # Ensure both columns exist
+            if "Color" not in df_clients.columns:
+                df_clients["Color"] = ""  # Add empty Color column if missing
+    
+            if new_client not in df_clients["Client"].values:
+                # Append new row safely
+                new_row = pd.DataFrame([[new_client, client_color]], columns=["Client", "Color"])
+                df_clients = pd.concat([df_clients, new_row], ignore_index=True)
+    
+                # Save and push
+                df_clients.to_csv(CLIENTS_FILE, index=False)
+                st.success(f"Client '{new_client}' added with color {client_color}!")
+                push_to_github("data/clients.csv", "Updated clients list")
+            else:
+                st.warning("Client already exists.")
+        else:
+            st.error("Please enter a valid client name.")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+    # -------------------------
+    # Set Hour Goals (Bottom)
+    # -------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Set Hour Goals")
+    month = st.selectbox("Month", [f"{m:02d}" for m in range(1, 13)])
+    goal_hours = st.number_input("Goal Hours", min_value=0.0, step=1.0)
+    if st.button("Save Goal"):
+        df_goals = pd.read_csv(GOALS_FILE)
+        df_goals.loc[len(df_goals)] = [month, goal_hours]
+        df_goals.to_csv(GOALS_FILE, index=False)
+        st.success("Goal saved successfully!")
+        push_to_github("data/goals.csv", "Updated goals list")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    #----------------------------------
+    #Days Off
+    #-----------------------------------
+    # File path
+    DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
+
+    # Ensure file exists
+    if not os.path.exists(DAYS_OFF_FILE):
+        pd.DataFrame(columns=["Date", "Reason"]).to_csv(DAYS_OFF_FILE, index=False)
+
+    # Load data
+    df_days_off = pd.read_csv(DAYS_OFF_FILE)
+
+    # -------------------------------
+    # Add New Day Off
+    # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Add a Day Off")
+    new_date = st.date_input("Select Date")
+    new_reason = st.text_input("Reason for Day Off")
+    if st.button("Add Day Off"):
+        if new_reason.strip():
+            df_days_off.loc[len(df_days_off)] = [str(new_date), new_reason]
+            df_days_off.to_csv(DAYS_OFF_FILE, index=False)
+            push_to_github("data/days_off.csv", "Added new day off")
+            st.success("Day off added successfully!")
+        else:
+            st.error("Please enter a reason.")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # -------------------------------
+    # Editable Days Off Table
+    # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Manage Days Off")
+    edited_days_off = st.data_editor(
+        df_days_off.reset_index(drop=True),
+        num_rows="dynamic",
+        width="stretch"
+    )
+
+    if st.button("Save Changes"):
+        df_days_off = edited_days_off
+        df_days_off.to_csv(DAYS_OFF_FILE, index=False)
+        push_to_github("data/days_off.csv", "Updated days off list")
+        st.success("Changes saved!")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
+
+    
 
 elif selected_page == "Archive":
     st.title("Archive Clients")
@@ -866,53 +915,6 @@ elif selected_page == "Archive":
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-elif selected_page == "Days Off":
-    st.title("Days Off")
-
-    # File path
-    DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
-
-    # Ensure file exists
-    if not os.path.exists(DAYS_OFF_FILE):
-        pd.DataFrame(columns=["Date", "Reason"]).to_csv(DAYS_OFF_FILE, index=False)
-
-    # Load data
-    df_days_off = pd.read_csv(DAYS_OFF_FILE)
-
-    # -------------------------------
-    # Add New Day Off
-    # -------------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Add a Day Off")
-    new_date = st.date_input("Select Date")
-    new_reason = st.text_input("Reason for Day Off")
-    if st.button("Add Day Off"):
-        if new_reason.strip():
-            df_days_off.loc[len(df_days_off)] = [str(new_date), new_reason]
-            df_days_off.to_csv(DAYS_OFF_FILE, index=False)
-            push_to_github("data/days_off.csv", "Added new day off")
-            st.success("Day off added successfully!")
-        else:
-            st.error("Please enter a reason.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # -------------------------------
-    # Editable Days Off Table
-    # -------------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Manage Days Off")
-    edited_days_off = st.data_editor(
-        df_days_off.reset_index(drop=True),
-        num_rows="dynamic",
-        width="stretch"
-    )
-
-    if st.button("Save Changes"):
-        df_days_off = edited_days_off
-        df_days_off.to_csv(DAYS_OFF_FILE, index=False)
-        push_to_github("data/days_off.csv", "Updated days off list")
-        st.success("Changes saved!")
-    st.markdown('</div>', unsafe_allow_html=True)
 
 
 
