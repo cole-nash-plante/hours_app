@@ -368,35 +368,27 @@ if selected_page == "Home":
     st.markdown('</div>', unsafe_allow_html=True)
 
 
+    # Load hours data
+    df_hours = pd.read_csv(HOURS_FILE)
+    df_hours["Date"] = pd.to_datetime(df_hours["Date"], errors="coerce").dt.date
+    
+    # Filter for today's date
+    today = datetime.today().date()
+    today_hours = df_hours[df_hours["Date"] == today]
+    
+    # Apply client filter
+    if len(selected_clients) > 0:
+        today_hours = today_hours[today_hours["Client"].isin(selected_clients)]
+    
+    # Show hours under each client's To-Do table
+    for i, client in enumerate(selected_clients):
+        client_hours = today_hours[today_hours["Client"] == client]
+        if len(client_hours) > 0:
+            st.markdown(f"**Today's Logged Hours for {client}:**")
+            st.table(client_hours[["Hours", "Description"]])
+        else:
+            st.markdown(f"*No hours logged today for {client}.*")
 
-    st.subheader("Logged Hours History")
-    if len(filtered_hours) == 0:
-        st.info("No hours logged for selected client(s).")
-    else:
-        sort_hours_by = st.selectbox("Sort Hours By", ["Date (Newest)", "Date (Oldest)", "Hours (High to Low)", "Hours (Low to High)"])
-        if sort_hours_by == "Date (Newest)":
-            filtered_hours = filtered_hours.sort_values(by="Date", ascending=False)
-        elif sort_hours_by == "Date (Oldest)":
-            filtered_hours = filtered_hours.sort_values(by="Date", ascending=True)
-        elif sort_hours_by == "Hours (High to Low)":
-            filtered_hours = filtered_hours.sort_values(by="Hours", ascending=False)
-        elif sort_hours_by == "Hours (Low to High)":
-            filtered_hours = filtered_hours.sort_values(by="Hours", ascending=True)
-
-        edited_hours = st.data_editor(
-            filtered_hours[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
-            num_rows="dynamic",
-            width="stretch",
-            hide_index=True
-        )
-
-        if st.button("Save Hours Changes"):
-            # Remove rows where all columns are empty
-            cleaned_hours = edited_hours.dropna(how="all")
-            cleaned_hours = cleaned_hours[(cleaned_hours != "").any(axis=1)]
-            cleaned_hours.to_csv(HOURS_FILE, index=False)
-            push_to_github("data/hours.csv", "Updated hours history (removed empty rows)")
-            st.success("Hours history updated! Empty rows deleted.")
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -959,6 +951,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
