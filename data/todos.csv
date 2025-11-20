@@ -1,6 +1,6 @@
 Client,Category,Task,Priority,DateCreated,DateCompleted
-University of Alaska,Data Profiling and Rules,GOBINTL Duplicates check in CDGCtest,1,2025-11-19,
+University of Alaska,Data Profiling and Rules,GOBINTL Duplicates check in CDGC,1,2025-11-19,
 University of Alaska,Data Profiling and Rules,Create Seperate Rules for 0 and 1 PKs-new dashboard,1,,
-DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1test,1,,
+DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1,1,,
 DHCS,TMSIS,wf_TMSIS_Claims_RX_DD3_V1,1,,
 DHCS,TMSIS,wf_TMSIS_PROVIDER_DD3_V1,1,,
