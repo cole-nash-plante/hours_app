@@ -388,12 +388,11 @@ if selected_page == "Home":
     # Layout: two columns side by side
     col1, col2 = st.columns(2)
     
+    st.subheader("Today's Hours")
     with col1:
-        st.subheader("Today's Hours (Part 1)")
         edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
     
     with col2:
-        st.subheader("Today's Hours (Part 2)")
         edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
     
     # Combine edited tables
@@ -970,6 +969,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
