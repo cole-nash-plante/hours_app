@@ -315,34 +315,11 @@ if selected_page == "Home":
 
     st.markdown('\n', unsafe_allow_html=True)
 
-    # -----------------------
-    # Today's Hours
-    # -----------------------
-    HOURS_FILE = "data/hours.csv"
-    df_hours = pd.read_csv(HOURS_FILE)
-    today_str = datetime.today().strftime("%Y-%m-%d")
-    df_today = df_hours[df_hours["Date"] == today_str]
-    new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
-    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
-    half = len(df_today_with_blank) // 2
-    df_left = df_today_with_blank.iloc[:half+1]
-    df_right = df_today_with_blank.iloc[half+1:]
 
-    st.subheader("Today's Hours")
-    col1, col2 = st.columns(2)
-    with col1:
-        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
-    with col2:
-        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
-
-    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
-
-    st.markdown('\n', unsafe_allow_html=True)
-
-    # -----------------------
+        # -----------------------
     # Log Hours (Quick Entry)
     # -----------------------
-    st.subheader("Log Hours")
+    st.subheader("Log Today's Hours")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
     else:
@@ -362,6 +339,25 @@ if selected_page == "Home":
                 df_hours.to_csv(HOURS_FILE, index=False)
                 st.success("Hours logged successfully!")
                 push_to_github("data/hours.csv", "Updated hours log")
+    # -----------------------
+    # Today's Hours
+    # -----------------------
+    HOURS_FILE = "data/hours.csv"
+    df_hours = pd.read_csv(HOURS_FILE)
+    today_str = datetime.today().strftime("%Y-%m-%d")
+    df_today = df_hours[df_hours["Date"] == today_str]
+    new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
+    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
+    half = len(df_today_with_blank) // 2
+    df_left = df_today_with_blank.iloc[:half+1]
+    df_right = df_today_with_blank.iloc[half+1:]
+    col1, col2 = st.columns(2)
+    with col1:
+        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
+    with col2:
+        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
+
+    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
 
     st.markdown('\n', unsafe_allow_html=True)
 
@@ -399,7 +395,7 @@ if selected_page == "Home":
         st.success("All changes saved successfully!")
 
 
-
+    st.markdown('\n', unsafe_allow_html=True)
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -962,6 +958,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
