@@ -241,6 +241,7 @@ if selected_page == "Home":
                 df_hours = pd.read_csv(HOURS_FILE)
                 df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
                 df_hours.to_csv(HOURS_FILE, index=False)
+                push_to_github("data/hours.csv", "Updated hours log")
                 st.success("Hours logged successfully!")
 
     # -----------------------
@@ -265,6 +266,7 @@ if selected_page == "Home":
                 if todo_task.strip() and todo_category != "No categories":
                     df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(datetime.today().date()), "", ""]
                     df_todos.to_csv(TODOS_FILE, index=False)
+                    push_to_github("data/todos.csv", "Added new task")
                     st.success("Task added successfully!")
                 else:
                     st.error("Please enter a valid task and category.")
@@ -288,6 +290,7 @@ if selected_page == "Home":
                 if new_category.strip():
                     df_categories.loc[len(df_categories)] = [cat_client, new_category]
                     df_categories.to_csv(CATEGORIES_FILE, index=False)
+                    push_to_github("data/categories.csv", "Added new category")
                     st.success(f"Category '{new_category}' added for '{cat_client}'!")
                 else:
                     st.error("Please enter a valid category name.")
@@ -330,16 +333,42 @@ if selected_page == "Home":
                             st.success("Changes saved!")
 
                         if st.button("Mark as Complete", key=f"complete_{client}_{idx}"):
-                            df_todos.at[idx, "DateCompleted"] = str(datetime.today().date())
+                            df_todos.at[row.name, "DateCompleted"] = str(datetime.today().date())
                             df_todos.to_csv(TODOS_FILE, index=False)
+                            push_to_github("data/todos.csv", "Marked task as complete")
                             st.success("Task marked as complete!")
 
                         if st.button("Delete Task", key=f"delete_{client}_{idx}"):
-                            df_todos = df_todos.drop(index=idx)
+                            df_todos = df_todos.drop(index=row.name)
                             df_todos.to_csv(TODOS_FILE, index=False)
-                            push_to_github("data/todos.csv", "Deleted a task from To-Do list")
+                            push_to_github("data/todos.csv", "Deleted a task")
                             st.success("Task deleted!")
 
+    # -----------------------
+    # Today's Hours
+    # -----------------------
+    st.subheader("Today's Hours")
+    df_hours = pd.read_csv(HOURS_FILE)
+    today_str = datetime.today().strftime("%Y-%m-%d")
+    df_today = df_hours[df_hours["Date"] == today_str]
+    new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
+    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
+    col1, col2 = st.columns(2)
+    half = len(df_today_with_blank) // 2
+    with col1:
+        edited_left = st.data_editor(df_today_with_blank.iloc[:half+1], num_rows="dynamic", key="editor_left")
+    with col2:
+        edited_right = st.data_editor(df_today_with_blank.iloc[half+1:], num_rows="dynamic", key="editor_right")
+    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
+
+    if st.button("Save Hours", key="save_hours_today"):
+        edited_hours = edited_hours.dropna(subset=["Client"])
+        edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
+        df_hours = df_hours[df_hours["Date"] != today_str]
+        df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
+        df_hours.to_csv(HOURS_FILE, index=False)
+        push_to_github("data/hours.csv", "Updated today's hours")
+        st.success("Hours saved successfully!")
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -949,6 +978,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
