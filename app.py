@@ -366,7 +366,6 @@ if selected_page == "Home":
                         st.success(f"Changes saved for {client}!")
 
     st.markdown('</div>', unsafe_allow_html=True)
-
     
     HOURS_FILE = "data/hours.csv"
     
@@ -381,7 +380,7 @@ if selected_page == "Home":
     new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
     
-    # Split into two tables (example: first half and second half)
+    # Split into two tables
     half = len(df_today_with_blank) // 2
     df_left = df_today_with_blank.iloc[:half+1]
     df_right = df_today_with_blank.iloc[half+1:]
@@ -391,22 +390,23 @@ if selected_page == "Home":
     
     with col1:
         st.subheader("Today's Hours (Part 1)")
-        edited_left = st.data_editor(df_left, num_rows="dynamic", key="left_editor")
+        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
     
     with col2:
         st.subheader("Today's Hours (Part 2)")
-        edited_right = st.data_editor(df_right, num_rows="dynamic", key="right_editor")
+        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
     
     # Combine edited tables
     final_df = pd.concat([edited_left, edited_right], ignore_index=True)
     
-    # Save button
-    if st.button("Save Hours"):
+    # Save button with unique key
+    if st.button("Save Hours", key="save_hours_btn"):
         # Drop empty rows (no client)
         final_df = final_df.dropna(subset=["Client"])
         final_df.to_csv(HOURS_FILE, index=False)
         st.success("Hours logged successfully!")
         push_to_github("data/hours.csv", "Updated hours log")
+
 
 
 # -------------------------------------------------
@@ -970,6 +970,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
