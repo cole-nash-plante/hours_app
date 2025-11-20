@@ -336,6 +336,7 @@ if selected_page == "Home":
                         if st.button("Delete Task", key=f"delete_{client}_{idx}"):
                             df_todos = df_todos.drop(index=idx)
                             df_todos.to_csv(TODOS_FILE, index=False)
+                            push_to_github("data/todos.csv", "Deleted a task from To-Do list")
                             st.success("Task deleted!")
 
 # -------------------------------------------------
@@ -899,6 +900,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
