@@ -239,7 +239,13 @@ if selected_page == "Home":
         with col5:
             if st.button("Save Hours", key="save_hours"):
                 df_hours = pd.read_csv(HOURS_FILE)
-                df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
+                new_row = {
+                    "Date": str(date_val),
+                    "Client": client,
+                    "Hours Worked": hours,
+                    "Description": description
+                }
+                df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
                 df_hours.to_csv(HOURS_FILE, index=False)
                 push_to_github("data/hours.csv", "Updated hours log")
                 st.success("Hours logged successfully!")
@@ -369,6 +375,9 @@ if selected_page == "Home":
         df_hours.to_csv(HOURS_FILE, index=False)
         push_to_github("data/hours.csv", "Updated today's hours")
         st.success("Hours saved successfully!")
+
+
+
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -978,6 +987,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
