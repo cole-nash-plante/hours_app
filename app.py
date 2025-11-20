@@ -242,7 +242,7 @@ if selected_page == "Home":
                 new_row = {
                     "Date": str(date_val),
                     "Client": client,
-                    "Hours": hours,  # FIXED
+                    "Hours": hours,
                     "Description": description
                 }
                 df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
@@ -326,7 +326,8 @@ if selected_page == "Home":
                     with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
                         st.markdown(f"### Task: {row['Task']}")
                         st.write(f"Category: {row['Category']}")
-                        st.write(f"Created: {row['DateCreated'].date() if pd.notna(row['DateCreated']) else ''}")
+                        created_date = row["DateCreated"]
+                        st.write(f"Created: {created_date.strftime('%Y-%m-%d') if pd.notna(created_date) else ''}")
                         new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
                         new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
 
@@ -357,7 +358,7 @@ if selected_page == "Home":
     df_hours = pd.read_csv(HOURS_FILE)
     today_str = datetime.today().strftime("%Y-%m-%d")
     df_today = df_hours[df_hours["Date"] == today_str]
-    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}  # FIXED
+    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
     col1, col2 = st.columns(2)
     half = len(df_today_with_blank) // 2
@@ -375,7 +376,6 @@ if selected_page == "Home":
         df_hours.to_csv(HOURS_FILE, index=False)
         push_to_github("data/hours.csv", "Updated today's hours")
         st.success("Hours saved successfully!")
-
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -986,6 +986,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
