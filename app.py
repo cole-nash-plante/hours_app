@@ -278,7 +278,7 @@ if selected_page == "Home":
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks)
 
         if len(selected_clients) > 0:
-            cols = st.columns(len(selected_clients))  # ✅ Restore columns layout
+            cols = st.columns(len(selected_clients))
             for i, client in enumerate(selected_clients):
                 with cols[i]:
                     color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
@@ -328,10 +328,21 @@ if selected_page == "Home":
     df_left = df_today_with_blank.iloc[:half+1]
     df_right = df_today_with_blank.iloc[half+1:]
 
+    st.subheader("Today's Hours")
+    col1, col2 = st.columns(2)
+    with col1:
+        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
+    with col2:
+        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
+
+    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
+
+    st.markdown('\n', unsafe_allow_html=True)
+
     # -----------------------
     # Log Hours (Quick Entry)
     # -----------------------
-    st.subheader("Log Today's Hours")
+    st.subheader("Log Hours")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
     else:
@@ -353,16 +364,7 @@ if selected_page == "Home":
                 push_to_github("data/hours.csv", "Updated hours log")
 
     st.markdown('\n', unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
-    with col2:
-        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
 
-    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
-
-    st.markdown('\n', unsafe_allow_html=True)
-    
     # -----------------------
     # Unified Save Button
     # -----------------------
@@ -373,13 +375,21 @@ if selected_page == "Home":
             edited_table["Client"] = client
             df_todos = pd.concat([df_todos, edited_table], ignore_index=True)
 
+        # Remove rows with empty Category
+        df_todos = df_todos[df_todos["Category"].notna() & (df_todos["Category"].str.strip() != "")]
+
         df_todos.to_csv(TODOS_FILE, index=False)
 
         # Save Hours edits
         edited_hours = edited_hours.dropna(subset=["Client"])
+        edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
         df_hours = pd.read_csv(HOURS_FILE)
         df_hours = df_hours[df_hours["Date"] != today_str]
         df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
+
+        # Remove rows with empty Client
+        df_hours = df_hours[df_hours["Client"].notna() & (df_hours["Client"].str.strip() != "")]
+
         df_hours.to_csv(HOURS_FILE, index=False)
 
         # Push updates
@@ -952,6 +962,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
