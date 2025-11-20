@@ -210,7 +210,6 @@ if selected_page == "Home":
     # -----------------------
     # Add To-Do Item
     # -----------------------
-    st.markdown('\n', unsafe_allow_html=True)
     st.subheader("Add To-Do Item")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -281,7 +280,6 @@ if selected_page == "Home":
         if len(selected_clients) > 0:
             cols = st.columns(len(selected_clients))
             for i, client in enumerate(selected_clients):
-                color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
                 header_html = f"#### {client}"
                 with cols[i]:
                     st.markdown(header_html, unsafe_allow_html=True)
@@ -331,8 +329,33 @@ if selected_page == "Home":
     with col2:
         edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
 
-    # Combine edited hours
     edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
+
+    st.markdown('\n', unsafe_allow_html=True)
+
+    # -----------------------
+    # Log Hours (Quick Entry)
+    # -----------------------
+    st.subheader("Log Hours")
+    if len(df_clients) == 0:
+        st.warning("Add clients first!")
+    else:
+        col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
+        with col1:
+            client = st.selectbox("Client", df_clients["Client"].tolist())
+        with col2:
+            date_val = st.date_input("Date", datetime.today())
+        with col3:
+            hours = st.number_input("Hours", min_value=0.0, step=0.25)
+        with col4:
+            description = st.text_input("Description")
+        with col5:
+            if st.button("Save Hours"):
+                df_hours = pd.read_csv(HOURS_FILE)
+                df_hours.loc[len(df_hours)] = [str(date_val), client, hours, description]
+                df_hours.to_csv(HOURS_FILE, index=False)
+                st.success("Hours logged successfully!")
+                push_to_github("data/hours.csv", "Updated hours log")
 
     st.markdown('\n', unsafe_allow_html=True)
 
@@ -360,7 +383,6 @@ if selected_page == "Home":
         push_to_github("data/hours.csv", "Updated hours log")
 
         st.success("All changes saved successfully!")
-
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -923,6 +945,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
