@@ -242,7 +242,7 @@ if selected_page == "Home":
                 new_row = {
                     "Date": str(date_val),
                     "Client": client,
-                    "Hours Worked": hours,
+                    "Hours": hours,
                     "Description": description
                 }
                 df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
@@ -357,7 +357,7 @@ if selected_page == "Home":
     df_hours = pd.read_csv(HOURS_FILE)
     today_str = datetime.today().strftime("%Y-%m-%d")
     df_today = df_hours[df_hours["Date"] == today_str]
-    new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
+    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
     col1, col2 = st.columns(2)
     half = len(df_today_with_blank) // 2
@@ -784,7 +784,7 @@ elif selected_page == "Data Entry":
     df_hours = pd.read_csv(HOURS_FILE)
     today_str = datetime.today().strftime("%Y-%m-%d")
     df_today = df_hours[df_hours["Date"] == today_str]
-    new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
+    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
     half = len(df_today_with_blank) // 2
     df_left = df_today_with_blank.iloc[:half+1]
@@ -987,6 +987,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
