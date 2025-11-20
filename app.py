@@ -198,7 +198,7 @@ body {
 # Page: Data Entry
 # -------------------------------------------------
 if selected_page == "Home":
-    st.title("Data Entry")
+    st.title("Home")
 
     # -------------------------
     # Log Hours (Top)
@@ -247,31 +247,6 @@ if selected_page == "Home":
     df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
 
     # -------------------------------
-    # Add Category
-    # -------------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Add Category")
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        col1, col2, col3 = st.columns([2, 2, 1])
-        with col1:
-            cat_client = st.selectbox("Client", df_clients["Client"].tolist(), key="cat_client")
-        with col2:
-            new_category = st.text_input("New Category", key="new_category")
-        with col3:
-            if st.button("Add Category"):
-                if new_category.strip():
-                    df_categories.loc[len(df_categories)] = [cat_client, new_category]
-                    df_categories.to_csv(CATEGORIES_FILE, index=False)
-                    st.success(f"Category '{new_category}' added for '{cat_client}'!")
-                    push_to_github("data/categories.csv", "Updated categories list")
-                    df_categories = pd.read_csv(CATEGORIES_FILE)
-                else:
-                    st.error("Please enter a valid category name.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # -------------------------------
     # Add To-Do Item
     # -------------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
@@ -302,6 +277,31 @@ if selected_page == "Home":
                     df_todos = pd.read_csv(TODOS_FILE)
                 else:
                     st.error("Please enter a valid task and category.")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+     # -------------------------------
+    # Add Category
+    # -------------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    st.subheader("Add To-Do Category")
+    if len(df_clients) == 0:
+        st.warning("Add clients first!")
+    else:
+        col1, col2, col3 = st.columns([2, 2, 1])
+        with col1:
+            cat_client = st.selectbox("Client", df_clients["Client"].tolist(), key="cat_client")
+        with col2:
+            new_category = st.text_input("New Category", key="new_category")
+        with col3:
+            if st.button("Add Category"):
+                if new_category.strip():
+                    df_categories.loc[len(df_categories)] = [cat_client, new_category]
+                    df_categories.to_csv(CATEGORIES_FILE, index=False)
+                    st.success(f"Category '{new_category}' added for '{cat_client}'!")
+                    push_to_github("data/categories.csv", "Updated categories list")
+                    df_categories = pd.read_csv(CATEGORIES_FILE)
+                else:
+                    st.error("Please enter a valid category name.")
     st.markdown('</div>', unsafe_allow_html=True)
 
     # -------------------------------
@@ -366,6 +366,38 @@ if selected_page == "Home":
                         st.success(f"Changes saved for {client}!")
 
     st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+    st.subheader("Logged Hours History")
+    if len(filtered_hours) == 0:
+        st.info("No hours logged for selected client(s).")
+    else:
+        sort_hours_by = st.selectbox("Sort Hours By", ["Date (Newest)", "Date (Oldest)", "Hours (High to Low)", "Hours (Low to High)"])
+        if sort_hours_by == "Date (Newest)":
+            filtered_hours = filtered_hours.sort_values(by="Date", ascending=False)
+        elif sort_hours_by == "Date (Oldest)":
+            filtered_hours = filtered_hours.sort_values(by="Date", ascending=True)
+        elif sort_hours_by == "Hours (High to Low)":
+            filtered_hours = filtered_hours.sort_values(by="Hours", ascending=False)
+        elif sort_hours_by == "Hours (Low to High)":
+            filtered_hours = filtered_hours.sort_values(by="Hours", ascending=True)
+
+        edited_hours = st.data_editor(
+            filtered_hours[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
+            num_rows="dynamic",
+            width="stretch",
+            hide_index=True
+        )
+
+        if st.button("Save Hours Changes"):
+            # Remove rows where all columns are empty
+            cleaned_hours = edited_hours.dropna(how="all")
+            cleaned_hours = cleaned_hours[(cleaned_hours != "").any(axis=1)]
+            cleaned_hours.to_csv(HOURS_FILE, index=False)
+            push_to_github("data/hours.csv", "Updated hours history (removed empty rows)")
+            st.success("Hours history updated! Empty rows deleted.")
+
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -927,6 +959,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
