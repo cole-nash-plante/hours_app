@@ -366,47 +366,44 @@ if selected_page == "Home":
                         st.success(f"Changes saved for {client}!")
 
     st.markdown('</div>', unsafe_allow_html=True)
-    st.subheader("Today Log Hours")
-    
+
     # Load data
     df_hours = pd.read_csv(HOURS_FILE)
-    df_clients = pd.read_csv(CLIENTS_FILE)
     
-    # Example: Split hours into two groups (you can define logic here)
-    group1 = df_hours[df_hours["Client"].isin(df_clients["Client"].tolist()[:len(df_clients)//2])]
-    group2 = df_hours[df_hours["Client"].isin(df_clients["Client"].tolist()[len(df_clients)//2:])]
+    # Filter for today's date
+    today_str = datetime.today().strftime("%Y-%m-%d")
+    df_today = df_hours[df_hours["Date"] == today_str]
     
-    # Create two columns for two tables
+    # Add blank row for new entry
+    new_row = {"Date": today_str, "Client": "", "Hours Worked": 0.0, "Description": ""}
+    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
+    
+    # Split into two tables (example: first half and second half)
+    half = len(df_today_with_blank) // 2
+    df_left = df_today_with_blank.iloc[:half+1]
+    df_right = df_today_with_blank.iloc[half+1:]
+    
+    # Layout: two columns side by side
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("#### Hours Table 1")
-        edited_group1 = st.data_editor(
-            group1[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
-            num_rows="dynamic",
-            width="stretch",
-            hide_index=True
-        )
-        if st.button("Save Changes Table 1"):
-            df_hours = df_hours[~df_hours["Client"].isin(group1["Client"])]
-            df_hours = pd.concat([df_hours, edited_group1], ignore_index=True)
-            df_hours.to_csv(HOURS_FILE, index=False)
-            st.success("Changes saved for Table 1!")
-            push_to_github("data/hours.csv", "Updated hours log")
+        st.subheader("Today's Hours (Part 1)")
+        edited_left = st.data_editor(df_left, num_rows="dynamic", key="left_editor")
     
     with col2:
-        st.markdown("#### Hours Table 2")
-        edited_group2 = st.data_editor(
-            group2[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
-            num_rows="dynamic",
-            width="stretch",
-            hide_index=True
-        )
-        if st.button("Save Changes Table 2"):
-            df_hours = df_hours[~df_hours["Client"].isin(group2["Client"])]
-            df_hours = pd.concat([df_hours, edited_group2], ignore_index=True)
-            df_hours.to_csv(HOURS_FILE, index=False)
-            st.success("Changes saved for Table 2!")
+        st.subheader("Today's Hours (Part 2)")
+        edited_right = st.data_editor(df_right, num_rows="dynamic", key="right_editor")
+    
+    # Combine edited tables
+    final_df = pd.concat([edited_left, edited_right], ignore_index=True)
+    
+    # Save button
+    if st.button("Save Hours"):
+        # Drop empty rows (no client)
+        final_df = final_df.dropna(subset=["Client"])
+        final_df.to_csv(HOURS_FILE, index=False)
+        st.success("Hours logged successfully!")
+        push_to_github("data/hours.csv", "Updated hours log")
 
 
 
@@ -971,6 +968,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
