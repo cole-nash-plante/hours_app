@@ -200,7 +200,7 @@ body {
 if selected_page == "Home":
     st.title("Home")
 
-    # Apply custom CSS for larger fonts and better readability
+    # Apply custom CSS for larger fonts
     st.markdown("""
         <style>
         .big-font {font-size:18px !important;}
@@ -295,7 +295,7 @@ if selected_page == "Home":
     st.markdown('\n', unsafe_allow_html=True)
 
     # -----------------------
-    # Active To-Dos with Custom Containers
+    # Active To-Dos with Expanders
     # -----------------------
     st.subheader("Active To-Dos")
     active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
@@ -307,6 +307,7 @@ if selected_page == "Home":
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks, key="filter_clients")
 
         updated_tasks = []
+        deleted_tasks = []
 
         cols = st.columns(len(selected_clients))
         for i, client in enumerate(selected_clients):
@@ -316,22 +317,26 @@ if selected_page == "Home":
 
                 client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
                 for idx, row in client_tasks.iterrows():
-                    st.markdown(f"<div class='big-font' style='border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:5px;'>", unsafe_allow_html=True)
-                    st.write(f"**Task:** {row['Task']}")
-                    st.write(f"Category: {row['Category']}")
-                    st.write(f"Created: {row['DateCreated'].date() if pd.notna(row['DateCreated']) else ''}")
-                    new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
-                    new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
-                    mark_complete = st.button("Mark as Complete", key=f"complete_{client}_{idx}")
-                    updated_tasks.append({"index": idx, "Priority": new_priority, "Notes": new_notes, "Complete": mark_complete})
-                    st.markdown("</div>", unsafe_allow_html=True)
+                    with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
+                        st.write(f"Category: {row['Category']}")
+                        st.write(f"Created: {row['DateCreated'].date() if pd.notna(row['DateCreated']) else ''}")
+                        new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
+                        new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
+                        mark_complete = st.button("Mark as Complete", key=f"complete_{client}_{idx}")
+                        delete_task = st.button("Delete Task", key=f"delete_{client}_{idx}")
+                        updated_tasks.append({"index": idx, "Priority": new_priority, "Notes": new_notes, "Complete": mark_complete})
+                        if delete_task:
+                            deleted_tasks.append(idx)
 
         if st.button("Save All Changes", key="save_all_changes"):
             for update in updated_tasks:
-                df_todos.at[update["index"], "Priority"] = update["Priority"]
-                df_todos.at[update["index"], "Notes"] = update["Notes"]
-                if update["Complete"]:
-                    df_todos.at[update["index"], "DateCompleted"] = str(datetime.today().date())
+                if update["index"] not in deleted_tasks:
+                    df_todos.at[update["index"], "Priority"] = update["Priority"]
+                    df_todos.at[update["index"], "Notes"] = update["Notes"]
+                    if update["Complete"]:
+                        df_todos.at[update["index"], "DateCompleted"] = str(datetime.today().date())
+            # Remove deleted tasks
+            df_todos = df_todos.drop(index=deleted_tasks)
             df_todos.to_csv(TODOS_FILE, index=False)
             st.success("All changes saved successfully!")
 
@@ -920,6 +925,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
