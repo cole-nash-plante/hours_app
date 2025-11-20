@@ -306,9 +306,6 @@ if selected_page == "Home":
         clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks, key="filter_clients")
 
-        updated_tasks = []
-        deleted_tasks = []
-
         cols = st.columns(len(selected_clients))
         for i, client in enumerate(selected_clients):
             with cols[i]:
@@ -318,27 +315,25 @@ if selected_page == "Home":
                 client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
                 for idx, row in client_tasks.iterrows():
                     with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
+                        st.markdown(f"### Task: {row['Task']}")
                         st.write(f"Category: {row['Category']}")
                         st.write(f"Created: {row['DateCreated'].date() if pd.notna(row['DateCreated']) else ''}")
                         new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
                         new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
                         mark_complete = st.button("Mark as Complete", key=f"complete_{client}_{idx}")
                         delete_task = st.button("Delete Task", key=f"delete_{client}_{idx}")
-                        updated_tasks.append({"index": idx, "Priority": new_priority, "Notes": new_notes, "Complete": mark_complete})
-                        if delete_task:
-                            deleted_tasks.append(idx)
+                        save_changes = st.button("Save Changes", key=f"save_{client}_{idx}")
 
-        if st.button("Save All Changes", key="save_all_changes"):
-            for update in updated_tasks:
-                if update["index"] not in deleted_tasks:
-                    df_todos.at[update["index"], "Priority"] = update["Priority"]
-                    df_todos.at[update["index"], "Notes"] = update["Notes"]
-                    if update["Complete"]:
-                        df_todos.at[update["index"], "DateCompleted"] = str(datetime.today().date())
-            # Remove deleted tasks
-            df_todos = df_todos.drop(index=deleted_tasks)
-            df_todos.to_csv(TODOS_FILE, index=False)
-            st.success("All changes saved successfully!")
+                        if save_changes:
+                            if delete_task:
+                                df_todos = df_todos.drop(index=idx)
+                            else:
+                                df_todos.at[idx, "Priority"] = new_priority
+                                df_todos.at[idx, "Notes"] = new_notes
+                                if mark_complete:
+                                    df_todos.at[idx, "DateCompleted"] = str(datetime.today().date())
+                            df_todos.to_csv(TODOS_FILE, index=False)
+                            st.success("Changes saved!")
 
     # -----------------------
     # Today's Hours
@@ -363,6 +358,7 @@ if selected_page == "Home":
         df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
         df_hours.to_csv(HOURS_FILE, index=False)
         st.success("Hours saved successfully!")
+
 
 # -------------------------------------------------
 # Placeholder Pages
@@ -925,6 +921,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
