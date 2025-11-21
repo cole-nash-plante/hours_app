@@ -452,15 +452,18 @@ elif selected_page == "Reports":
     days_off_df = pd.read_csv(DAYS_OFF_FILE)
     df_clients = pd.read_csv(CLIENTS_FILE)
 
-    # Convert dates
-    hours_df["Date"] = pd.to_datetime(hours_df["Date"])
-    days_off_df["Date"] = pd.to_datetime(days_off_df["Date"])
+    # ✅ Safe date conversion
+    hours_df["Date"] = pd.to_datetime(hours_df["Date"], errors="coerce")
+    days_off_df["Date"] = pd.to_datetime(days_off_df["Date"], errors="coerce")
+
+    # Drop invalid dates
+    hours_df = hours_df.dropna(subset=["Date"])
+    days_off_df = days_off_df.dropna(subset=["Date"])
+
     now = datetime.today()
     today = now.date()
 
-    # -------------------------
     # Load or Initialize Performance Period
-    # -------------------------
     if not os.path.exists(PERIOD_FILE):
         default_start = date(now.year, 1, 1)
         default_end = date(now.year, 12, 31)
@@ -484,9 +487,7 @@ elif selected_page == "Reports":
             st.success("Performance period updated!")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # -------------------------
     # BAN Calculations
-    # -------------------------
     period_hours_df = hours_df[(hours_df["Date"].dt.date >= period_start) & (hours_df["Date"].dt.date <= period_end)]
     period_goals_df = goals_df.copy()
     period_hours_df["Month"] = period_hours_df["Date"].dt.strftime("%Y-%m")
@@ -496,6 +497,7 @@ elif selected_page == "Reports":
     monthly_actual_period.rename(columns={"Hours": "ActualHours"}, inplace=True)
 
     all_months_period = pd.DataFrame({"Month": sorted(set(period_hours_df["Month"]).union(set(period_goals_df["Month"])))})
+
     merged_period = (
         all_months_period
         .merge(period_goals_df, on="Month", how="left")
@@ -506,6 +508,7 @@ elif selected_page == "Reports":
     total_goal_hours = merged_period["GoalHours"].sum()
     total_actual_hours = merged_period["ActualHours"].sum()
     remaining_hours_period = max(total_goal_hours - total_actual_hours, 0)
+
     remaining_days_period = pd.date_range(start=max(now, pd.to_datetime(period_start)), end=pd.to_datetime(period_end), freq="B")
     days_off_period = days_off_df[(days_off_df["Date"].dt.date >= period_start) & (days_off_df["Date"].dt.date <= period_end)]
     remaining_weekdays_period = len(remaining_days_period) - len(days_off_period)
@@ -521,22 +524,15 @@ elif selected_page == "Reports":
     with col4: st.metric("Today's Hours", f"{todays_hours:.2f}")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # -------------------------
-    # Weekly Snapshot Chart (Weekdays Only)
-    # -------------------------
+    # Weekly Snapshot Chart
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-
     if "week_offset" not in st.session_state:
         st.session_state.week_offset = 0
-
-    today = pd.Timestamp.today()
-    start_of_week = (today + pd.Timedelta(weeks=st.session_state.week_offset)).normalize() - pd.Timedelta(days=today.weekday())
+    today_ts = pd.Timestamp.today()
+    start_of_week = (today_ts + pd.Timedelta(weeks=st.session_state.week_offset)).normalize() - pd.Timedelta(days=today_ts.weekday())
     end_of_week = start_of_week + pd.Timedelta(days=6)
-
-    # Dynamic title with date range
     week_label = f"{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d')}"
     st.subheader(f"Weekly Snapshot: Billed Hours by Client ({week_label})")
-
     nav_col1, nav_col2 = st.columns([1, 1])
     with nav_col1:
         if st.button("⬅ Previous Week"):
@@ -548,9 +544,8 @@ elif selected_page == "Reports":
     weekly_data = hours_df[(hours_df["Date"] >= start_of_week) & (hours_df["Date"] <= end_of_week)]
     client_colors = {row["Client"]: row["Color"] for _, row in df_clients.iterrows()}
 
-    # Only Monday-Friday
     weekdays = pd.date_range(start_of_week, end_of_week, freq="D")
-    weekdays = [d for d in weekdays if d.weekday() < 5]  # 0=Mon, 4=Fri
+    weekdays = [d for d in weekdays if d.weekday() < 5]
 
     fig_weekly = go.Figure()
     for client in weekly_data["Client"].unique():
@@ -574,9 +569,7 @@ elif selected_page == "Reports":
     )
     st.plotly_chart(fig_weekly, use_container_width=True)
 
-    # -------------------------
     # Date Range Filter for Bottom Charts
-    # -------------------------
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Filter for Monthly & Client Charts")
     col_start, col_end = st.columns([1, 1])
@@ -586,19 +579,18 @@ elif selected_page == "Reports":
         chart_end = st.date_input("Chart End Date", date(now.year, now.month, calendar.monthrange(now.year, now.month)[1]))
 
     filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(chart_start)) & (hours_df["Date"] <= pd.to_datetime(chart_end))]
-    filtered_merged = merged_period[(pd.to_datetime(merged_period["Month"] + "-01") >= pd.to_datetime(chart_start)) &
-                                    (pd.to_datetime(merged_period["Month"] + "-01") <= pd.to_datetime(chart_end))]
+    filtered_merged = merged_period[
+        (pd.to_datetime(merged_period["Month"] + "-01") >= pd.to_datetime(chart_start)) &
+        (pd.to_datetime(merged_period["Month"] + "-01") <= pd.to_datetime(chart_end))
+    ]
     filtered_merged["MonthDate"] = pd.to_datetime(filtered_merged["Month"] + "-01")
     filtered_merged = filtered_merged.sort_values("MonthDate")
     filtered_merged["MonthLabel"] = filtered_merged["MonthDate"].dt.strftime("%b %Y")
 
-    # -------------------------
     # Monthly & Pie Charts
-    # -------------------------
     col1, col2 = st.columns([2, 1])
     chart_bg = "#0f0f23"
     text_color = "#FFFFFF"
-
     with col1:
         st.subheader("Monthly Actual vs Planned Hours")
         fig_line = go.Figure()
@@ -623,12 +615,10 @@ elif selected_page == "Reports":
             margin=dict(l=40, r=40, t=40, b=40)
         )
         st.plotly_chart(fig_line, use_container_width=True)
-
     with col2:
         st.subheader("Hours by Client")
         if len(filtered_hours) > 0:
-            pie_fig = px.pie(filtered_hours, names="Client", values="Hours",
-                             color="Client", color_discrete_map=client_colors)
+            pie_fig = px.pie(filtered_hours, names="Client", values="Hours", color="Client", color_discrete_map=client_colors)
             pie_fig.update_layout(
                 showlegend=True,
                 plot_bgcolor=chart_bg,
@@ -640,6 +630,26 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 elif selected_page == "Data Entry":
     st.title("History")
@@ -1039,6 +1049,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
