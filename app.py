@@ -115,7 +115,7 @@ for file, cols in init_files:
 # Sidebar Navigation
 # -------------------------------------------------
 st.sidebar.title("Navigation")
-pages = ["Home", "Reports", "Data Entry", "Archive"]
+pages = ["Home", "Meeting Notes", "Reports", "Data Entry", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
 
 
@@ -321,6 +321,89 @@ if st.button("Save Hours", key="save_hours_today"):
     df_hours.to_csv(HOURS_FILE, index=False)
     push_to_github("data/hours.csv", "Updated today's hours")
     st.success("Hours saved successfully!")
+
+
+
+
+#----------------------------------------------------
+# Meeting Notes
+#----------------------------------------------------
+
+
+elif selected_page == "Meeting Notes":
+    st.title("Meeting Notes")
+
+    # Client selection
+    if len(df_clients) == 0:
+        st.warning("Add clients first!")
+    else:
+        selected_client = st.selectbox("Select Client", df_clients["Client"].tolist(), key="meeting_client")
+        client_color = df_clients.loc[df_clients["Client"] == selected_client, "Color"].values[0]
+        st.markdown(f"<div style='background-color:{client_color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>Meeting Notes for {selected_client}</h4></div>", unsafe_allow_html=True)
+
+        # New Meeting Form
+        st.subheader("New Meeting")
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            meeting_date = st.date_input("Date", datetime.today(), key="meeting_date")
+        with col2:
+            meeting_title = st.text_input("Meeting Title", key="meeting_title")
+
+        if st.button("Add Meeting", key="add_meeting"):
+            if meeting_title.strip():
+                new_meeting = {"Date": str(meeting_date), "Client": selected_client, "Meeting": meeting_title, "Notes": ""}
+                meetings_df = pd.read_csv(MEETINGS_FILE)
+                meetings_df = pd.concat([meetings_df, pd.DataFrame([new_meeting])], ignore_index=True)
+                meetings_df.to_csv(MEETINGS_FILE, index=False)
+                push_to_github("data/meetings.csv", "Added new meeting")
+                st.success("Meeting added successfully!")
+            else:
+                st.error("Please enter a meeting title.")
+
+        # Meeting Navigation
+        client_meetings = meetings_df[meetings_df["Client"] == selected_client]
+        if len(client_meetings) == 0:
+            st.info("No meetings for this client yet.")
+        else:
+            meeting_list = client_meetings.sort_values(by="Date")
+            selected_meeting = st.selectbox("Select Meeting", [f"{row['Date']} - {row['Meeting']}" for _, row in meeting_list.iterrows()], key="selected_meeting")
+            selected_row = meeting_list.iloc[[i for i, row in enumerate(meeting_list.iterrows()) if f"{row[1]['Date']} - {row[1]['Meeting']}" == selected_meeting][0]][1]
+
+            # Notes Editor with Auto-Save
+            st.subheader("Meeting Notes")
+            notes_key = f"notes_{selected_meeting}"
+            new_notes = st.text_area("Notes", value=selected_row["Notes"], height=300, key=notes_key)
+            meetings_df.loc[selected_row.name, "Notes"] = new_notes
+            meetings_df.to_csv(MEETINGS_FILE, index=False)
+            push_to_github("data/meetings.csv", "Updated meeting notes")
+
+        # Add To-Do Item (Modified)
+        st.subheader("Add To-Do Item")
+        col1, col2, col3, col4 = st.columns([2, 2, 3, 1])
+        with col1:
+            todo_category = st.selectbox("Category", df_categories[df_categories["Client"] == selected_client]["Category"].tolist() or ["No categories"], key="todo_category_meeting")
+        with col2:
+            todo_task = st.text_input("Task", key="todo_task_meeting")
+        with col3:
+            todo_notes = st.text_area("Notes", key="todo_notes_meeting")
+        with col4:
+            priority = st.slider("Priority", 1, 5, 3, key="todo_priority_meeting")
+
+        if st.button("Add Task", key="add_task_meeting"):
+            if todo_task.strip() and todo_category != "No categories":
+                todos_df = pd.read_csv(TODOS_FILE)
+                new_todo = {"Client": selected_client, "Category": todo_category, "Task": todo_task, "Priority": priority, "DateCreated": str(datetime.today().date()), "DateCompleted": "", "Notes": todo_notes}
+                todos_df = pd.concat([todos_df, pd.DataFrame([new_todo])], ignore_index=True)
+                todos_df.to_csv(TODOS_FILE, index=False)
+                push_to_github("data/todos.csv", "Added new task from meeting notes")
+                st.success("Task added successfully!")
+            else:
+                st.error("Please enter a valid task and category.")
+
+
+
+
+
 
 
 
@@ -936,6 +1019,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
