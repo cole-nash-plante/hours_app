@@ -30,7 +30,11 @@ STVAPDC_STDN_ACC_IND, --This field specifies whether student acceptance is indic
 STVAPDC_APPL_INACT --This field indicates whether decision causes application to become inactive.    Y - Application is inactive.
 from test_raw.banner_student.stvapdc;"
 General Non-client,Streamlit App,Make the hours one big table on the bottom,3.0,,2025-11-21,
-University of Alaska,Unit Testing,Create DIM Application status,3.0,,,
+University of Alaska,Unit Testing,Create DIM Application status,3.0,,,"--DIM_APPLICATION_STATUS
+SELECT
+STVAPST_CODE APPLICATION_STATUS_CODE,
+STVAPST_DESC APPLICATION_STATUS_DESC
+FROM test_raw.banner_student.stvapst;"
 DHCS,TMSIS,wf_TMSIS_PROVIDER_DD3_V1,1.0,,,
 DHCS,TMSIS,wf_TMSIS_Claims_RX_DD3_V1,1.0,,,
 General Non-client,Streamlit App,Fix reports page,1.0,,2025-11-21,
