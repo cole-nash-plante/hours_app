@@ -3,7 +3,23 @@ DHCS,HCAI,Test FIPS errors,5.0,,,"Check to make sure if FIPS errors arent happen
 m_HCAI_APCD_CDL_PC_1
 mt_HCAI_APCD_CDL_PC_1"
 General Non-client,Streamlit App,Fix the notes make them  save,5.0,,2025-11-21,
-University of Alaska,Unit Testing,Fix AO_CODES,4.0,,,
+University of Alaska,Unit Testing,Fix AO_CODES,4.0,,,"------------------------------------------------------------
+-- AO Counts in Snowflake by student enrollment
+------------------------------------------------------------
+select dc.campus_code, ao_code, count(distinct student_pidm) from test_refined.ods.ods_course_enrollment fce
+join test_curated.edw.dim_course dc on dc.term_code = fce.term_code and dc.crn = fce.crn
+where fce.term_code = '202403' and dc.campus_code = '6'
+group by dc.campus_code, ao_code
+order by count(distinct student_pidm) desc
+;
+ 
+------------------------------------------------------------
+-- AO Counts in dsdmgr registration table
+------------------------------------------------------------
+select campus_code, academic_organization, count(distinct student_pidm)  from test_raw.dsdmgr.dsd_registration
+where term_code = '202403' and campus_code = '6'
+group by campus_code, academic_organization
+order by count(distinct student_pidm) desc"
 University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,,
 General Non-client,Streamlit App,Make the hours one big table on the bottom,3.0,,2025-11-21,
 University of Alaska,Unit Testing,Create DIM Application status,3.0,,,
