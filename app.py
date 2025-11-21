@@ -197,17 +197,23 @@ body {
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
+
 if selected_page == "Home":
     st.title("Home")
 
     # Apply custom CSS for larger fonts
-    st.markdown(""" """, unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+        .big-font {font-size:18px !important;}
+        .stTextArea textarea {font-size:16px !important;}
+        .stSlider {font-size:16px !important;}
+        </style>
+    """, unsafe_allow_html=True)
 
     # Load data
     df_clients = pd.read_csv(CLIENTS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
-
     df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
     df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
 
@@ -215,9 +221,9 @@ if selected_page == "Home":
     if "Notes" not in df_todos.columns:
         df_todos["Notes"] = ""
 
-    # -------------------------
+    # -----------------------
     # Log Hours
-    # -------------------------
+    # -----------------------
     st.subheader("Log Hours")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -245,9 +251,9 @@ if selected_page == "Home":
                 push_to_github("data/hours.csv", "Updated hours log")
                 st.success("Hours logged successfully!")
 
-    # -------------------------
+    # -----------------------
     # Add To-Do Item
-    # -------------------------
+    # -----------------------
     st.subheader("Add To-Do Item")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -274,9 +280,9 @@ if selected_page == "Home":
 
     st.markdown('\n', unsafe_allow_html=True)
 
-    # -------------------------
+    # -----------------------
     # Add Category
-    # -------------------------
+    # -----------------------
     st.subheader("Add To-Do Category")
     if len(df_clients) == 0:
         st.warning("Add clients first!")
@@ -298,21 +304,24 @@ if selected_page == "Home":
 
     st.markdown('\n', unsafe_allow_html=True)
 
-    # -------------------------
+    # -----------------------
     # Active To-Dos with Expanders
-    # -------------------------
+    # -----------------------
     st.subheader("Active To-Dos")
     active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
+
     if len(active_todos) == 0:
         st.info("No active tasks.")
     else:
         clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
         selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks, key="filter_clients")
+
         cols = st.columns(len(selected_clients))
         for i, client in enumerate(selected_clients):
             with cols[i]:
                 color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
-                st.markdown(f"##### {client}\n", unsafe_allow_html=True)
+                st.markdown(f"<div style='background-color:{color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>{client}</h4></div>", unsafe_allow_html=True)
+
                 client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
                 for idx, row in client_tasks.iterrows():
                     with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
@@ -344,24 +353,17 @@ if selected_page == "Home":
                             push_to_github("data/todos.csv", "Deleted a task")
                             st.success("Task deleted!")
 
-    # -------------------------
+    # -----------------------
     # Today's Hours
-    # -------------------------
+    # -----------------------
     st.subheader("Today's Hours")
     df_hours = pd.read_csv(HOURS_FILE)
     today_str = datetime.today().strftime("%Y-%m-%d")
     df_today = df_hours[df_hours["Date"] == today_str]
     new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
+    edited_hours = st.data_editor(df_today_with_blank, num_rows="dynamic", key="editor_today")
 
-    col1, col2 = st.columns(2)
-    half = len(df_today_with_blank) // 2
-    with col1:
-        edited_left = st.data_editor(df_today_with_blank.iloc[:half+1], num_rows="dynamic", key="editor_left")
-    with col2:
-        edited_right = st.data_editor(df_today_with_blank.iloc[half+1:], num_rows="dynamic", key="editor_right")
-
-    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
     if st.button("Save Hours", key="save_hours_today"):
         edited_hours = edited_hours.dropna(subset=["Client"])
         edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
@@ -370,6 +372,11 @@ if selected_page == "Home":
         df_hours.to_csv(HOURS_FILE, index=False)
         push_to_github("data/hours.csv", "Updated today's hours")
         st.success("Hours saved successfully!")
+
+
+
+
+
 # -------------------------------------------------
 # Placeholder Pages
 # -------------------------------------------------
@@ -979,6 +986,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
