@@ -401,20 +401,22 @@ elif selected_page == "Meeting Notes":
                     push_to_github("data/meetings.csv", "Deleted meeting")
                     st.success("Meeting deleted successfully!")
 
-        # Add To-Do Item (simplified with dropdown)
+        # Add To-Do Item (with priority slider)
         st.subheader("Add To-Do Item")
         client_categories = df_categories[df_categories["Client"] == selected_client]["Category"].tolist()
-        col_cat, col_task, col_notes, col_btn = st.columns([1.5, 2, 3, 1])
+        col_cat, col_task, col_notes, col_priority, col_btn = st.columns([1.5, 2, 3, 1, 1])
         with col_cat:
             todo_category = st.selectbox("Category", client_categories if client_categories else ["No categories"], key="todo_category_meeting")
         with col_task:
             todo_task = st.text_input("Task", key="todo_task_meeting")
         with col_notes:
             todo_notes = st.text_area("Notes", key="todo_notes_meeting", height=100)
+        with col_priority:
+            priority = st.slider("Priority", 1, 5, 3, key="todo_priority_meeting")
         with col_btn:
             if st.button("Add Task", key="add_task_meeting"):
                 if todo_task.strip() and todo_category != "No categories":
-                    df_todos.loc[len(df_todos)] = [selected_client, todo_category, todo_task, 3, str(datetime.today().date()), "", todo_notes]
+                    df_todos.loc[len(df_todos)] = [selected_client, todo_category, todo_task, priority, str(datetime.today().date()), "", todo_notes]
                     df_todos.to_csv(TODOS_FILE, index=False)
                     push_to_github("data/todos.csv", "Added new task from meeting notes")
                     st.success("Task added successfully!")
@@ -1037,6 +1039,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
