@@ -351,24 +351,23 @@ elif selected_page == "Meeting Notes":
         client_color = df_clients.loc[df_clients["Client"] == selected_client, "Color"].values[0]
         st.markdown(f"<div style='background-color:{client_color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>Meeting Notes for {selected_client}</h4></div>", unsafe_allow_html=True)
 
-        # New Meeting Form
+        # New Meeting Form (all on one line)
         st.subheader("New Meeting")
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            meeting_date = datetime.today().date()
-            st.write(f"Date: {meeting_date}")
-        with col2:
+        col_date, col_title, col_btn = st.columns([1.2, 3, 1])
+        with col_date:
+            meeting_date = st.date_input("Date", datetime.today().date(), key="meeting_date")
+        with col_title:
             meeting_title = st.text_input("Meeting Title", key="meeting_title")
-
-        if st.button("Save Meeting", key="save_meeting"):
-            if meeting_title.strip():
-                new_row = {"Date": str(meeting_date), "Client": selected_client, "Meeting": meeting_title, "Notes": ""}
-                df_meetings = pd.concat([df_meetings, pd.DataFrame([new_row])], ignore_index=True)
-                df_meetings.to_csv(MEETINGS_FILE, index=False)
-                push_to_github("data/meetings.csv", "Added new meeting")
-                st.success("Meeting saved successfully!")
-            else:
-                st.error("Please enter a meeting title.")
+        with col_btn:
+            if st.button("Save Meeting", key="save_meeting"):
+                if meeting_title.strip():
+                    new_row = {"Date": str(meeting_date), "Client": selected_client, "Meeting": meeting_title, "Notes": ""}
+                    df_meetings = pd.concat([df_meetings, pd.DataFrame([new_row])], ignore_index=True)
+                    df_meetings.to_csv(MEETINGS_FILE, index=False)
+                    push_to_github("data/meetings.csv", "Added new meeting")
+                    st.success("Meeting saved successfully!")
+                else:
+                    st.error("Please enter a meeting title.")
 
         # Navigation for meetings
         client_meetings = df_meetings[df_meetings["Client"] == selected_client]
@@ -1039,6 +1038,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
