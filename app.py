@@ -197,189 +197,133 @@ body {
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
+# Load To-Dos
+df_todos = pd.read_csv(TODOS_FILE)
 
-# Ensure required columns exist in df_todos
+# Ensure required columns exist
 required_cols = ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted", "Notes"]
 for col in required_cols:
     if col not in df_todos.columns:
         df_todos[col] = ""
 
-if selected_page == "Home":
-    st.title("Home")
+# -----------------------------
+# Log Hours
+# -----------------------------
+st.subheader("Log Hours")
+if len(df_clients) == 0:
+    st.warning("Add clients first!")
+else:
+    col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
+    with col1:
+        client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
+    with col2:
+        date_val = st.date_input("Date", datetime.today(), key="log_date")
+    with col3:
+        hours = st.number_input("Hours", min_value=0.0, step=0.25, key="log_hours")
+    with col4:
+        description = st.text_input("Description", key="log_description")
+    with col5:
+        if st.button("Save Hours", key="save_hours"):
+            df_hours = pd.read_csv(HOURS_FILE)
+            new_row = {
+                "Date": str(date_val),
+                "Client": client,
+                "Hours": hours,
+                "Description": description
+            }
+            df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
+            df_hours.to_csv(HOURS_FILE, index=False)
+            push_to_github("data/hours.csv", "Updated hours log")
+            st.success("Hours logged successfully!")
 
-    # Apply custom CSS for larger fonts
-    st.markdown("""
-        <style>
-        .big-font {font-size:18px !important;}
-        .stTextArea textarea {font-size:16px !important;}
-        .stSlider {font-size:16px !important;}
-        </style>
-    """, unsafe_allow_html=True)
+# -----------------------------
+# Add To-Do Item
+# -----------------------------
+st.subheader("Add To-Do Item")
+if len(df_clients) == 0:
+    st.warning("Add clients first!")
+else:
+    col1, col2, col3, col4, col5 = st.columns([2, 2, 3, 2, 1])
+    with col1:
+        todo_date = st.date_input("Date Created", datetime.today(), key="todo_date")
+        todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
+    with col2:
+        client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
+        todo_category = st.selectbox("Category", client_categories if client_categories else ["No categories"], key="todo_category")
+    with col3:
+        todo_task = st.text_input("Task", key="todo_task")
+    with col4:
+        priority = st.slider("Priority", 1, 5, 3, key="todo_priority")
+    with col5:
+        if st.button("Add Task", key="add_task"):
+            if todo_task.strip() and todo_category != "No categories":
+                df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(todo_date), "", ""]
+                df_todos.to_csv(TODOS_FILE, index=False)
+                push_to_github("data/todos.csv", "Added new task with DateCreated")
+                st.success("Task added successfully!")
+            else:
+                st.error("Please enter a valid task and category.")
+    st.markdown('\\n', unsafe_allow_html=True)
 
-    # Load data
-    df_clients = pd.read_csv(CLIENTS_FILE)
-    df_categories = pd.read_csv(CATEGORIES_FILE)
-    df_todos = pd.read_csv(TODOS_FILE)
-    df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
-    df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
+# -----------------------------
+# Active To-Dos with Expanders
+# -----------------------------
+st.subheader("Active To-Dos")
+active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
+if len(active_todos) == 0:
+    st.info("No active tasks.")
+else:
+    clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
+    selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks, key="filter_clients")
+    cols = st.columns(len(selected_clients))
+    for i, client in enumerate(selected_clients):
+        with cols[i]:
+            color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
+            st.markdown(f"<div style='background-color:{color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>{client}</h4></div>", unsafe_allow_html=True)
+            client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+            for idx, row in client_tasks.iterrows():
+                with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
+                    st.markdown(f"### Task: {row['Task']}")
+                    st.write(f"Category: {row['Category']}")
+                    created_date = row["DateCreated"]
+                    st.write(f"Created: {created_date}")
+                    new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
+                    new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
+                    if st.button("Save Changes", key=f"save_{client}_{idx}"):
+                        df_todos.at[row.name, "Priority"] = new_priority
+                        df_todos.at[row.name, "Notes"] = new_notes
+                        df_todos.to_csv(TODOS_FILE, index=False)
+                        push_to_github("data/todos.csv", "Updated task notes and priority")
+                        st.success("Changes saved!")
+                    if st.button("Mark as Complete", key=f"complete_{client}_{idx}"):
+                        df_todos.at[row.name, "DateCompleted"] = str(datetime.today().date())
+                        df_todos.to_csv(TODOS_FILE, index=False)
+                        push_to_github("data/todos.csv", "Marked task as complete")
+                        st.success("Task marked as complete!")
+                    if st.button("Delete Task", key=f"delete_{client}_{idx}"):
+                        df_todos = df_todos.drop(index=row.name)
+                        df_todos.to_csv(TODOS_FILE, index=False)
+                        push_to_github("data/todos.csv", "Deleted a task")
+                        st.success("Task deleted!")
 
-    # Ensure Notes column exists
-    if "Notes" not in df_todos.columns:
-        df_todos["Notes"] = ""
-
-    # -----------------------
-    # Log Hours
-    # -----------------------
-    st.subheader("Log Hours")
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
-        with col1:
-            client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
-        with col2:
-            date_val = st.date_input("Date", datetime.today(), key="log_date")
-        with col3:
-            hours = st.number_input("Hours", min_value=0.0, step=0.25, key="log_hours")
-        with col4:
-            description = st.text_input("Description", key="log_description")
-        with col5:
-            if st.button("Save Hours", key="save_hours"):
-                df_hours = pd.read_csv(HOURS_FILE)
-                new_row = {
-                    "Date": str(date_val),
-                    "Client": client,
-                    "Hours": hours,
-                    "Description": description
-                }
-                df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
-                df_hours.to_csv(HOURS_FILE, index=False)
-                push_to_github("data/hours.csv", "Updated hours log")
-                st.success("Hours logged successfully!")
-
-    # -----------------------
-    # Add To-Do Item
-    # -----------------------
-    st.subheader("Add To-Do Item")
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 3, 2, 1])
-        with col1:
-            todo_date = st.date_input("Date Created", datetime.today(), key="todo_date")
-            todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
-        with col2:
-            client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
-            todo_category = st.selectbox("Category", client_categories if client_categories else ["No categories"], key="todo_category")
-        with col3:
-            todo_task = st.text_input("Task", key="todo_task")
-        with col4:
-            priority = st.slider("Priority", 1, 5, 3, key="todo_priority")
-        with col5:
-            if st.button("Add Task", key="add_task"):
-                if todo_task.strip() and todo_category != "No categories":
-                    df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(datetime.today().date()), "", ""]
-                    df_todos.to_csv(TODOS_FILE, index=False)
-                    push_to_github("data/todos.csv", "Added new task")
-                    st.success("Task added successfully!")
-                else:
-                    st.error("Please enter a valid task and category.")
-
-    st.markdown('\n', unsafe_allow_html=True)
-
-    # -----------------------
-    # Add Category
-    # -----------------------
-    st.subheader("Add To-Do Category")
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        col1, col2, col3 = st.columns([2, 2, 1])
-        with col1:
-            cat_client = st.selectbox("Client", df_clients["Client"].tolist(), key="cat_client")
-        with col2:
-            new_category = st.text_input("New Category", key="new_category")
-        with col3:
-            if st.button("Add Category", key="add_category"):
-                if new_category.strip():
-                    df_categories.loc[len(df_categories)] = [cat_client, new_category]
-                    df_categories.to_csv(CATEGORIES_FILE, index=False)
-                    push_to_github("data/categories.csv", "Added new category")
-                    st.success(f"Category '{new_category}' added for '{cat_client}'!")
-                else:
-                    st.error("Please enter a valid category name.")
-
-    st.markdown('\n', unsafe_allow_html=True)
-
-    # -----------------------
-    # Active To-Dos with Expanders
-    # -----------------------
-    st.subheader("Active To-Dos")
-    active_todos = df_todos[(df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")].copy()
-
-    if len(active_todos) == 0:
-        st.info("No active tasks.")
-    else:
-        clients_with_tasks = active_todos["Client"].dropna().unique().tolist()
-        selected_clients = st.multiselect("Filter by Client", clients_with_tasks, default=clients_with_tasks, key="filter_clients")
-
-        cols = st.columns(len(selected_clients))
-        for i, client in enumerate(selected_clients):
-            with cols[i]:
-                color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0]
-                st.markdown(f"<div style='background-color:{color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>{client}</h4></div>", unsafe_allow_html=True)
-
-                client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
-                for idx, row in client_tasks.iterrows():
-                    with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
-                        st.markdown(f"### Task: {row['Task']}")
-                        st.write(f"Category: {row['Category']}")
-                        created_date = row["DateCreated"]
-                        created_display = created_date.strftime("%Y-%m-%d") if isinstance(created_date, pd.Timestamp) and pd.notna(created_date) else ""
-                        st.write(f"Created: {created_display}")
-                        new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
-                        new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
-
-                        # Buttons
-                        if st.button("Save Changes", key=f"save_{client}_{idx}"):
-                            df_todos.at[row.name, "Priority"] = new_priority
-                            df_todos.at[row.name, "Notes"] = new_notes
-                            df_todos.to_csv(TODOS_FILE, index=False)
-                            push_to_github("data/todos.csv", "Updated task notes and priority")
-                            st.success("Changes saved!")
-
-                        if st.button("Mark as Complete", key=f"complete_{client}_{idx}"):
-                            df_todos.at[row.name, "DateCompleted"] = str(datetime.today().date())
-                            df_todos.to_csv(TODOS_FILE, index=False)
-                            push_to_github("data/todos.csv", "Marked task as complete")
-                            st.success("Task marked as complete!")
-
-                        if st.button("Delete Task", key=f"delete_{client}_{idx}"):
-                            df_todos = df_todos.drop(index=row.name)
-                            df_todos.to_csv(TODOS_FILE, index=False)
-                            push_to_github("data/todos.csv", "Deleted a task")
-                            st.success("Task deleted!")
-
-    # -----------------------
-    # Today's Hours
-    # -----------------------
-    st.subheader("Today's Hours")
-    df_hours = pd.read_csv(HOURS_FILE)
-    today_str = datetime.today().strftime("%Y-%m-%d")
-    df_today = df_hours[df_hours["Date"] == today_str]
-    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
-    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
-    edited_hours = st.data_editor(df_today_with_blank, num_rows="dynamic", key="editor_today")
-
-    if st.button("Save Hours", key="save_hours_today"):
-        edited_hours = edited_hours.dropna(subset=["Client"])
-        edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
-        df_hours = df_hours[df_hours["Date"] != today_str]
-        df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
-        df_hours.to_csv(HOURS_FILE, index=False)
-        push_to_github("data/hours.csv", "Updated today's hours")
-        st.success("Hours saved successfully!")
-
+# -----------------------------
+# Today's Hours (Single Table)
+# -----------------------------
+st.subheader("Today's Hours")
+df_hours = pd.read_csv(HOURS_FILE)
+today_str = datetime.today().strftime("%Y-%m-%d")
+df_today = df_hours[df_hours["Date"] == today_str]
+new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
+df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
+edited_hours = st.data_editor(df_today_with_blank, num_rows="dynamic", key="editor_today")
+if st.button("Save Hours", key="save_hours_today"):
+    edited_hours = edited_hours.dropna(subset=["Client"])
+    edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
+    df_hours = df_hours[df_hours["Date"] != today_str]
+    df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
+    df_hours.to_csv(HOURS_FILE, index=False)
+    push_to_github("data/hours.csv", "Updated today's hours")
+    st.success("Hours saved successfully!")
 
 
 
@@ -994,6 +938,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
