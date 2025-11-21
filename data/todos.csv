@@ -1,7 +1,7 @@
 Client,Category,Task,Priority,DateCreated,DateCompleted,Notes
-DHCS,HCAI,Test FIPS errors,5.0,,,"Check to make sure if FIPS errors arent happening with JDBC connection
+DHCS,HCAI,Test FIPS errors,5.0,,,"Check to make sure if FIPS errors arent happening with JDBC connection, change back the following  mappings
 m_HCAI_APCD_CDL_PC_1
-mt_HCAI_APCD_CDL_PC_1"
+m_TMSIS_PROVIDER"
 General Non-client,Streamlit App,Fix the notes make them  save,5.0,,2025-11-21,
 University of Alaska,Unit Testing,Fix AO_CODES,4.0,,,"------------------------------------------------------------
 -- AO Counts in Snowflake by student enrollment
