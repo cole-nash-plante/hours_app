@@ -3,7 +3,7 @@ DHCS,HCAI,Test FIPS errors,5.0,,,"Check to make sure if FIPS errors arent happen
 m_HCAI_APCD_CDL_PC_1
 m_TMSIS_PROVIDER"
 General Non-client,Streamlit App,Fix the notes make them  save,5.0,,2025-11-21,
-University of Alaska,Unit Testing,Fix AO_CODES,4.0,,,"------------------------------------------------------------
+University of Alaska,Unit Testing,Fix AO_CODES,4.0,,2025-11-21,"------------------------------------------------------------
 -- AO Counts in Snowflake by student enrollment
 ------------------------------------------------------------
 select dc.campus_code, ao_code, count(distinct student_pidm) from test_refined.ods.ods_course_enrollment fce
