@@ -271,7 +271,7 @@ if selected_page == "Home":
         with col5:
             if st.button("Add Task", key="add_task"):
                 if todo_task.strip() and todo_category != "No categories":
-                    df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(datetime.today().date()), "", ""]
+                    df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, todo_date, "", ""]
                     df_todos.to_csv(TODOS_FILE, index=False)
                     push_to_github("data/todos.csv", "Added new task")
                     st.success("Task added successfully!")
@@ -987,6 +987,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
