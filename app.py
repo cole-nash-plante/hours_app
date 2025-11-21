@@ -237,26 +237,29 @@ else:
 # Add To-Do Item
 # -----------------------------
 st.subheader("Add To-Do Item")
+# Add To-Do Item
+st.subheader("Add To-Do Item")
 if len(df_clients) == 0:
     st.warning("Add clients first!")
 else:
-    col1, col2, col3, col4, col5 = st.columns([2, 2, 3, 2, 1])
-    with col1:
+    col_date, col_client, col_category, col_task, col_priority, col_btn = st.columns([0.8, 1.5, 1.5, 3, 1, 1])
+    with col_date:
         todo_date = st.date_input("Date Created", datetime.today(), key="todo_date")
+    with col_client:
         todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
-    with col2:
+    with col_category:
         client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
         todo_category = st.selectbox("Category", client_categories if client_categories else ["No categories"], key="todo_category")
-    with col3:
+    with col_task:
         todo_task = st.text_input("Task", key="todo_task")
-    with col4:
+    with col_priority:
         priority = st.slider("Priority", 1, 5, 3, key="todo_priority")
-    with col5:
+    with col_btn:
         if st.button("Add Task", key="add_task"):
             if todo_task.strip() and todo_category != "No categories":
                 df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(todo_date), "", ""]
                 df_todos.to_csv(TODOS_FILE, index=False)
-                push_to_github("data/todos.csv", "Added new task with DateCreated")
+                push_to_github("data/todos.csv", "Added new task")
                 st.success("Task added successfully!")
             else:
                 st.error("Please enter a valid task and category.")
@@ -933,6 +936,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
