@@ -668,7 +668,7 @@ elif selected_page == "Data Entry":
                 filtered_todos = filtered_todos.sort_values(by="DateCreated", ascending=True)
 
             edited_todos = st.data_editor(
-                filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]].reset_index(drop=True),
+                filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted", "Notes"]].reset_index(drop=True),
                 num_rows="dynamic",
                 width="stretch",
                 hide_index=True
@@ -987,6 +987,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
