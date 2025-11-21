@@ -42,4 +42,4 @@ University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0
 DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1,1.0,,,
 General Non-client,Streamlit App,Fix date created function,1.0,,2025-11-21,
 General Non-client,Streamlit App,Ensure editing notes doesnt override the notes in the app,3.0,,2025-11-21,
-General Non-client,Streamlit App,Add search function to Data entry,3.0,2025-11-21,,
+General Non-client,Streamlit App,Add search function to Data entry,3.0,2025-11-21,,also change name
