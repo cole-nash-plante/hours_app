@@ -266,8 +266,8 @@ if selected_page == "Home":
     else:
         col1, col2, col3, col4, col5 = st.columns([2, 2, 3, 2, 1])
         with col1:
-    todo_date = st.date_input("Date Created", datetime.today(), key="todo_date")
-    todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
+            todo_date = st.date_input("Date Created", datetime.today(), key="todo_date")
+            todo_client = st.selectbox("Client", df_clients["Client"].tolist(), key="todo_client")
         with col2:
             client_categories = df_categories[df_categories["Client"] == todo_client]["Category"].tolist()
             todo_category = st.selectbox("Category", client_categories if client_categories else ["No categories"], key="todo_category")
@@ -994,6 +994,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
