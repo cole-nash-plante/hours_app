@@ -19,7 +19,9 @@ order by count(distinct student_pidm) desc
 select campus_code, academic_organization, count(distinct student_pidm)  from test_raw.dsdmgr.dsd_registration
 where term_code = '202403' and campus_code = '6'
 group by campus_code, academic_organization
-order by count(distinct student_pidm) desc"
+order by count(distinct student_pidm) desc
+
+Finished- some irregularities in comparing the two  queries in the ao_adj file inDIM_itr_2, but lots of different campuses and data sources are different but worth bnoting if it is revisited."
 University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,,"--DIM_APPLICATION_DESCISION
 select 
 STVAPDC_CODE APPLICATION_DECISION_CODE, 
