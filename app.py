@@ -650,7 +650,6 @@ elif selected_page == "Reports":
 
 
 
-
 elif selected_page == "Data Entry":
     st.title("History")
 
@@ -663,30 +662,46 @@ elif selected_page == "Data Entry":
     df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
     df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
 
-    # -------------------------------
+    # -------------------------
     # Client Filter
-    # -------------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    # -------------------------
+    st.markdown('\n', unsafe_allow_html=True)
     st.subheader("Filter by Client")
     all_clients = sorted(set(df_hours["Client"].dropna().tolist() + df_todos["Client"].dropna().tolist()))
     selected_clients = st.multiselect("Select Clients", all_clients, default=all_clients)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('\n', unsafe_allow_html=True)
 
-    # Apply filter
+    # Apply client filter
     filtered_hours = df_hours[df_hours["Client"].isin(selected_clients)] if len(selected_clients) > 0 else df_hours
     filtered_todos = df_todos[df_todos["Client"].isin(selected_clients)] if len(selected_clients) > 0 else df_todos
 
-    # -------------------------------
+    # -------------------------
+    # Search Filter
+    # -------------------------
+    st.markdown('\n', unsafe_allow_html=True)
+    search_query = st.text_input("Search (applies to both tables):").strip().lower()
+
+    if search_query:
+        # Filter hours table
+        filtered_hours = filtered_hours[
+            filtered_hours.apply(lambda row: row.astype(str).str.lower().str.contains(search_query).any(), axis=1)
+        ]
+        # Filter todos table
+        filtered_todos = filtered_todos[
+            filtered_todos.apply(lambda row: row.astype(str).str.lower().str.contains(search_query).any(), axis=1)
+        ]
+
+    # -------------------------
     # Editable Hours + To-Do History
-    # -------------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    # -------------------------
+    st.markdown('\n', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
 
     # Editable Hours History
     with col1:
         st.subheader("Logged Hours History")
         if len(filtered_hours) == 0:
-            st.info("No hours logged for selected client(s).")
+            st.info("No hours logged for selected client(s) or search term.")
         else:
             sort_hours_by = st.selectbox("Sort Hours By", ["Date (Newest)", "Date (Oldest)", "Hours (High to Low)", "Hours (Low to High)"])
             if sort_hours_by == "Date (Newest)":
@@ -700,13 +715,10 @@ elif selected_page == "Data Entry":
 
             edited_hours = st.data_editor(
                 filtered_hours[["Date", "Client", "Hours", "Description"]].reset_index(drop=True),
-                num_rows="dynamic",
-                width="stretch",
-                hide_index=True
+                num_rows="dynamic", width="stretch", hide_index=True
             )
 
             if st.button("Save Hours Changes"):
-                # Remove rows where all columns are empty
                 cleaned_hours = edited_hours.dropna(how="all")
                 cleaned_hours = cleaned_hours[(cleaned_hours != "").any(axis=1)]
                 cleaned_hours.to_csv(HOURS_FILE, index=False)
@@ -717,7 +729,7 @@ elif selected_page == "Data Entry":
     with col2:
         st.subheader("To-Do History")
         if len(filtered_todos) == 0:
-            st.info("No tasks recorded for selected client(s).")
+            st.info("No tasks recorded for selected client(s) or search term.")
         else:
             sort_todos_by = st.selectbox("Sort To-Dos By", ["Priority (High to Low)", "Priority (Low to High)", "Date Created (Newest)", "Date Created (Oldest)"])
             if sort_todos_by == "Priority (High to Low)":
@@ -731,162 +743,15 @@ elif selected_page == "Data Entry":
 
             edited_todos = st.data_editor(
                 filtered_todos[["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted", "Notes"]].reset_index(drop=True),
-                num_rows="dynamic",
-                width="stretch",
-                hide_index=True
+                num_rows="dynamic", width="stretch", hide_index=True
             )
 
             if st.button("Save To-Do Changes"):
-                # Remove rows where all columns are empty
                 cleaned_todos = edited_todos.dropna(how="all")
                 cleaned_todos = cleaned_todos[(cleaned_todos != "").any(axis=1)]
                 cleaned_todos.to_csv(TODOS_FILE, index=False)
                 push_to_github("data/todos.csv", "Updated To-Do history (removed empty rows)")
                 st.success("To-Do history updated! Empty rows deleted.")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-    # -------------------------
-    # Add New Client (Middle)
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Add New Client")
-    new_client = st.text_input("Client Name")
-    client_color = st.color_picker("Pick Client Color", "#FFFFFF")
-    if st.button("Add Client"):
-        if new_client.strip():
-            df_clients = pd.read_csv(CLIENTS_FILE)
-    
-            # Ensure both columns exist
-            if "Color" not in df_clients.columns:
-                df_clients["Color"] = ""  # Add empty Color column if missing
-    
-            if new_client not in df_clients["Client"].values:
-                # Append new row safely
-                new_row = pd.DataFrame([[new_client, client_color]], columns=["Client", "Color"])
-                df_clients = pd.concat([df_clients, new_row], ignore_index=True)
-    
-                # Save and push
-                df_clients.to_csv(CLIENTS_FILE, index=False)
-                st.success(f"Client '{new_client}' added with color {client_color}!")
-                push_to_github("data/clients.csv", "Updated clients list")
-            else:
-                st.warning("Client already exists.")
-        else:
-            st.error("Please enter a valid client name.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-    # -------------------------
-    # Set Hour Goals (Bottom)
-    # -------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Set Hour Goals")
-    month = st.selectbox("Month", [f"{m:02d}" for m in range(1, 13)])
-    goal_hours = st.number_input("Goal Hours", min_value=0.0, step=1.0)
-    if st.button("Save Goal"):
-        df_goals = pd.read_csv(GOALS_FILE)
-        df_goals.loc[len(df_goals)] = [month, goal_hours]
-        df_goals.to_csv(GOALS_FILE, index=False)
-        st.success("Goal saved successfully!")
-        push_to_github("data/goals.csv", "Updated goals list")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    #----------------------------------
-    #Days Off
-    #-----------------------------------
-    # File path
-    DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
-
-    # Ensure file exists
-    if not os.path.exists(DAYS_OFF_FILE):
-        pd.DataFrame(columns=["Date", "Reason"]).to_csv(DAYS_OFF_FILE, index=False)
-
-    # Load data
-    df_days_off = pd.read_csv(DAYS_OFF_FILE)
-
-    # -------------------------------
-    # Add New Day Off
-    # -------------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Add a Day Off")
-    new_date = st.date_input("Select Date")
-    new_reason = st.text_input("Reason for Day Off")
-    if st.button("Add Day Off"):
-        if new_reason.strip():
-            df_days_off.loc[len(df_days_off)] = [str(new_date), new_reason]
-            df_days_off.to_csv(DAYS_OFF_FILE, index=False)
-            push_to_github("data/days_off.csv", "Added new day off")
-            st.success("Day off added successfully!")
-        else:
-            st.error("Please enter a reason.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # -------------------------------
-    # Editable Days Off Table
-    # -------------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    st.subheader("Manage Days Off")
-    edited_days_off = st.data_editor(
-        df_days_off.reset_index(drop=True),
-        num_rows="dynamic",
-        width="stretch"
-    )
-
-    if st.button("Save Changes"):
-        df_days_off = edited_days_off
-        df_days_off.to_csv(DAYS_OFF_FILE, index=False)
-        push_to_github("data/days_off.csv", "Updated days off list")
-        st.success("Changes saved!")
-    st.markdown('</div>', unsafe_allow_html=True)
-
- # Today's Hours
-    # -----------------------
-    HOURS_FILE = "data/hours.csv"
-    df_hours = pd.read_csv(HOURS_FILE)
-    today_str = datetime.today().strftime("%Y-%m-%d")
-    df_today = df_hours[df_hours["Date"] == today_str]
-    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
-    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
-    half = len(df_today_with_blank) // 2
-    df_left = df_today_with_blank.iloc[:half+1]
-    df_right = df_today_with_blank.iloc[half+1:]
-    col1, col2 = st.columns(2)
-    with col1:
-        edited_left = st.data_editor(df_left, num_rows="dynamic", key="editor_left")
-    with col2:
-        edited_right = st.data_editor(df_right, num_rows="dynamic", key="editor_right")
-
-    edited_hours = pd.concat([edited_left, edited_right], ignore_index=True)
-
-    st.markdown('\n', unsafe_allow_html=True)
-
-    # -----------------------
-    # Unified Save Button
-    # -----------------------
-    if st.button("Save All Hours Changes"):
-
-       
-        # Save Hours edits
-        edited_hours = edited_hours.dropna(subset=["Client"])
-        edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
-        df_hours = pd.read_csv(HOURS_FILE)
-        df_hours = df_hours[df_hours["Date"] != today_str]
-        df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
-
-        # Remove rows with empty Client
-        df_hours = df_hours[df_hours["Client"].notna() & (df_hours["Client"].str.strip() != "")]
-
-        df_hours.to_csv(HOURS_FILE, index=False)
-
-        # Push updates
-        push_to_github("data/todos.csv", "Updated To-Do list")
-        push_to_github("data/hours.csv", "Updated hours log")
-
-        st.success("All changes saved successfully!")
-
-
-    st.markdown('\n', unsafe_allow_html=True)
 
 
 
@@ -1049,6 +914,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
