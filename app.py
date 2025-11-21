@@ -197,10 +197,13 @@ body {
 # -------------------------------------------------
 # Page: Data Entry
 # -------------------------------------------------
-# Load To-Dos
+# Load required data
+df_clients = pd.read_csv(CLIENTS_FILE)
 df_todos = pd.read_csv(TODOS_FILE)
+df_categories = pd.read_csv(CATEGORIES_FILE)
+df_hours = pd.read_csv(HOURS_FILE)
 
-# Ensure required columns exist
+# Ensure required columns exist in df_todos
 required_cols = ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted", "Notes"]
 for col in required_cols:
     if col not in df_todos.columns:
@@ -224,13 +227,7 @@ else:
         description = st.text_input("Description", key="log_description")
     with col5:
         if st.button("Save Hours", key="save_hours"):
-            df_hours = pd.read_csv(HOURS_FILE)
-            new_row = {
-                "Date": str(date_val),
-                "Client": client,
-                "Hours": hours,
-                "Description": description
-            }
+            new_row = {"Date": str(date_val), "Client": client, "Hours": hours, "Description": description}
             df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
             df_hours.to_csv(HOURS_FILE, index=False)
             push_to_github("data/hours.csv", "Updated hours log")
@@ -263,7 +260,6 @@ else:
                 st.success("Task added successfully!")
             else:
                 st.error("Please enter a valid task and category.")
-    st.markdown('\\n', unsafe_allow_html=True)
 
 # -----------------------------
 # Active To-Dos with Expanders
@@ -285,8 +281,7 @@ else:
                 with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
                     st.markdown(f"### Task: {row['Task']}")
                     st.write(f"Category: {row['Category']}")
-                    created_date = row["DateCreated"]
-                    st.write(f"Created: {created_date}")
+                    st.write(f"Created: {row['DateCreated']}")
                     new_priority = st.slider("Priority", 1, 5, int(row['Priority']), key=f"priority_{client}_{idx}")
                     new_notes = st.text_area("Notes", value=row.get("Notes", ""), key=f"notes_{client}_{idx}")
                     if st.button("Save Changes", key=f"save_{client}_{idx}"):
@@ -310,7 +305,6 @@ else:
 # Today's Hours (Single Table)
 # -----------------------------
 st.subheader("Today's Hours")
-df_hours = pd.read_csv(HOURS_FILE)
 today_str = datetime.today().strftime("%Y-%m-%d")
 df_today = df_hours[df_hours["Date"] == today_str]
 new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
@@ -324,6 +318,7 @@ if st.button("Save Hours", key="save_hours_today"):
     df_hours.to_csv(HOURS_FILE, index=False)
     push_to_github("data/hours.csv", "Updated today's hours")
     st.success("Hours saved successfully!")
+
 
 
 
@@ -938,6 +933,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
