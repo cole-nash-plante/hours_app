@@ -121,4 +121,4 @@ Date,Client,Hours,Description
 ,Client,0.0,Description
 2025-11-24,University of Alaska,1.0,DIM_APPLICATION_DECISION creation and testing
 2025-11-24,University of Alaska,1.0,ODS tables distinct list
-2025-11-24,University of Alaska,0.75,BANNER Tables distinct list
+2025-11-24,University of Alaska,1.75,BANNER Tables distinct list and removing tables from cmi
