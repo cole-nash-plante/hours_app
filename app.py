@@ -286,7 +286,20 @@ if selected_page == "Home":
         # Filter active todos for selected clients
         active_todos = df_todos[
             ((df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")) &
-            (df_todos["Client"].isin(selected_clients))]
+            (df_todos["Client"].isin(selected_clients))
+        ].copy()
+
+        if len(active_todos) == 0:
+            st.info("No active tasks for selected clients.")
+        else:
+            cols = st.columns(len(selected_clients))
+            for i, client in enumerate(selected_clients):
+                with cols[i]:
+                    color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0] if "Color" in df_clients.columns else "#333333"
+                    st.markdown(f"<div style='background-color:{color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>{client}</h4></div>", unsafe_allow_html=True)
+                    client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
+
+        
 
         cols = st.columns(len(selected_clients))
         for i, client in enumerate(selected_clients):
@@ -927,6 +940,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
