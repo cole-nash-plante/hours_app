@@ -1,4 +1,24 @@
 Client,Category,Task,Priority,DateCreated,DateCompleted,Notes
+University of Alaska,Develupment,Come up with a list of all distinct source tables used in iteration 1 and 2 dfor UA,5.0,2025-11-24,,"List all banner source tables, will be in UA_MartDesign"
+General Non-client,Streamlit App,Add in active indicator for hours/tasks,3.0,2025-11-24,,
+University of Alaska,Develupment,Add Source tables for Banner Freeze ,5.0,2025-11-24,,
+General Non-client,Streamlit App,Add weekly total to report BANS,1.0,2025-11-22,,
+General Non-client,Streamlit App,"Change when today ends, after 5PM hours disapear from below",1.0,2025-11-22,,
+General Non-client,Streamlit App,Add search function to Data entry,3.0,2025-11-21,,also change name
+General Non-client,Streamlit App,Add client notes page,1.0,2025-11-21,,
+University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,,"--DIM_APPLICATION_DESCISION
+select 
+STVAPDC_CODE APPLICATION_DECISION_CODE, 
+STVAPDC_DESC APPLICATION_DECISION_DESC, 
+STVAPDC_SIGNF_IND, --This field indicates whether the decision affects the acceptance of the         application.  Y - Application acceptance is effected by decision.
+STVAPDC_INST_ACC_IND, --This field specifies whether institutional acceptance of application is         effected by the decision.  Y - Institution accepts application.
+STVAPDC_STDN_ACC_IND, --This field specifies whether student acceptance is indicated by the             decision.  Y - Student accepts offer of admission.
+STVAPDC_APPL_INACT --This field indicates whether decision causes application to become inactive.    Y - Application is inactive.
+from test_raw.banner_student.stvapdc;
+
+
+11/21 ODS complete
+11/24 DIM Complete"
 DHCS,HCAI,Test FIPS errors,5.0,,,"Check to make sure if FIPS errors arent happening with JDBC connection, change back the following  mappings
 m_HCAI_APCD_CDL_PC_1
 m_TMSIS_PROVIDER"
@@ -22,19 +42,6 @@ group by campus_code, academic_organization
 order by count(distinct student_pidm) desc
 
 Finished- some irregularities in comparing the two  queries in the ao_adj file inDIM_itr_2, but lots of different campuses and data sources are different but worth bnoting if it is revisited."
-University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,,"--DIM_APPLICATION_DESCISION
-select 
-STVAPDC_CODE APPLICATION_DECISION_CODE, 
-STVAPDC_DESC APPLICATION_DECISION_DESC, 
-STVAPDC_SIGNF_IND, --This field indicates whether the decision affects the acceptance of the         application.  Y - Application acceptance is effected by decision.
-STVAPDC_INST_ACC_IND, --This field specifies whether institutional acceptance of application is         effected by the decision.  Y - Institution accepts application.
-STVAPDC_STDN_ACC_IND, --This field specifies whether student acceptance is indicated by the             decision.  Y - Student accepts offer of admission.
-STVAPDC_APPL_INACT --This field indicates whether decision causes application to become inactive.    Y - Application is inactive.
-from test_raw.banner_student.stvapdc;
-
-
-11/21 ODS complete
-11/24 DIM Complete"
 General Non-client,Streamlit App,Make the hours one big table on the bottom,3.0,,2025-11-21 00:00:00,
 University of Alaska,Unit Testing,Create DIM Application status,3.0,,,"--DIM_APPLICATION_STATUS
 SELECT
@@ -42,16 +49,12 @@ STVAPST_CODE APPLICATION_STATUS_CODE,
 STVAPST_DESC APPLICATION_STATUS_DESC
 FROM test_raw.banner_student.stvapst;"
 General Non-client,Streamlit App,Ensure editing notes doesnt override the notes in the app,3.0,,2025-11-21 00:00:00,
-General Non-client,Streamlit App,Add search function to Data entry,3.0,2025-11-21,,also change name
 DHCS,TMSIS,wf_TMSIS_PROVIDER_DD3_V1,1.0,,,
 DHCS,TMSIS,wf_TMSIS_Claims_RX_DD3_V1,1.0,,,
 University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0,,,
 General Non-client,Streamlit App,Fix reports page,1.0,,2025-11-21 00:00:00,
 General Non-client,Streamlit App,Fix date created function,1.0,,2025-11-21 00:00:00,
 DHCS,TMSIS,wf_TMSIS_Claims_OT_DD3_V1,1.0,,,
-General Non-client,Streamlit App,Add client notes page,1.0,2025-11-21,,
-General Non-client,Streamlit App,Add weekly total to report BANS,1.0,2025-11-22,,
-General Non-client,Streamlit App,"Change when today ends, after 5PM hours disapear from below",1.0,2025-11-22,,
 University of Alaska,Develupment,DIM and ODS Registration,,,1900-01-01 12:00:00,
 University of Alaska,Develupment,Registration voice Type Code is null,,,1900-01-01 12:00:00,
 University of Alaska,Develupment,DIM and ODS Grading Mode,,,1900-01-01 12:00:00,
@@ -126,6 +129,3 @@ DHCS,TMIS,wf_VALIDATE_TMSIS_FTX_Create,,,1900-01-01 12:00:00,
 DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_IP_DD4_Create,,,1900-01-01 12:00:00,
 DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_LT_Create,,,1900-01-01 12:00:00,
 DHCS,Mercer,wf_MERCER_CLAIMS_HDR_V0_0,,,1900-01-01 12:00:00,
-University of Alaska,Develupment,Come up with a list of all distinct source tables used in iteration 1 and 2 dfor UA,5.0,2025-11-24,2025-11-24,"List all banner source tables, will be in UA_MartDesign"
-General Non-client,Streamlit App,Add in active indicator for hours/tasks,3.0,2025-11-24,,
-University of Alaska,Unit Testing,Add Source tables for Banner Freeze ,5.0,2025-11-24,,
