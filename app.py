@@ -211,9 +211,6 @@ if selected_page == "Home":
         if col not in df_todos.columns:
             df_todos[col] = ""
 
-    # Normalize DateCompleted for filtering
-    df_todos["DateCompleted"] = df_todos["DateCompleted"].replace(["", " ", "nan", "NaN"], pd.NA)
-
     # -------------------------------
     # Log Hours Section
     # -------------------------------
@@ -260,7 +257,7 @@ if selected_page == "Home":
         with col_btn:
             if st.button("Add Task", key="add_task"):
                 if todo_task.strip() and todo_category != "No categories":
-                    df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(todo_date), pd.NA, ""]
+                    df_todos.loc[len(df_todos)] = [todo_client, todo_category, todo_task, priority, str(todo_date), "", ""]
                     df_todos.to_csv(TODOS_FILE, index=False)
                     push_to_github("data/todos.csv", "Added new task")
                     st.success("Task added successfully!")
@@ -285,18 +282,20 @@ if selected_page == "Home":
         )
 
         # Filter active todos for selected clients
-        active_todos = df_todos[df_todos["DateCompleted"].isna() & df_todos["Client"].isin(selected_clients)].copy()
+        active_todos = df_todos[
+            ((df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")) &
+            (df_todos["Client"].isin(selected_clients))
+        ].copy()
 
-        cols = st.columns(len(selected_clients))
-        for i, client in enumerate(selected_clients):
-            with cols[i]:
-                color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0] if "Color" in df_clients.columns else "#333333"
-                st.markdown(f"<div style='background-color:{color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>{client}</h4></div>", unsafe_allow_html=True)
-                
-                client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
-                if client_tasks.empty:
-                    st.write("✅ No active tasks for this client.")
-                else:
+        if len(active_todos) == 0:
+            st.info("No active tasks for selected clients.")
+        else:
+            cols = st.columns(len(selected_clients))
+            for i, client in enumerate(selected_clients):
+                with cols[i]:
+                    color = df_clients.loc[df_clients["Client"] == client, "Color"].values[0] if "Color" in df_clients.columns else "#333333"
+                    st.markdown(f"<div style='background-color:{color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>{client}</h4></div>", unsafe_allow_html=True)
+                    client_tasks = active_todos[active_todos["Client"] == client].sort_values(by="Priority", ascending=False)
                     for idx, row in client_tasks.iterrows():
                         with st.expander(f"{row['Task']} (Priority: {row['Priority']})", expanded=False):
                             st.markdown(f"### Task: {row['Task']}")
@@ -337,7 +336,6 @@ if selected_page == "Home":
         df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
         df_hours.to_csv(HOURS_FILE, index=False)
         push_to_github("data/hours.csv", "Updated today's hours")
-
 
 
 
@@ -931,8 +929,6 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
-
-
 
 
 
