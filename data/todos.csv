@@ -130,7 +130,7 @@ DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_IP_DD4_Create,,,1900-01-01 12:00:00,
 DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_LT_Create,,,1900-01-01 12:00:00,
 DHCS,Mercer,wf_MERCER_CLAIMS_HDR_V0_0,,,1900-01-01 12:00:00,
 University of Alaska,Develupment,Remove tables from cmi_saturn and cmi_general,5.0,2025-11-24,,"Removing anything not needed in iteration 1 and 2 mappings or freeze process
-TABLES REMOVED FROM SATURN:
+Tables Removed from Saturn Job:
 SMRPRLE
 SOBSBG
 STVAPSTI
@@ -144,4 +144,16 @@ STVETHN
 STVVTYP
 STVLANG
 STVLEAV
-STVMATL"
+STVMATL
+STVSPON
+STVNATN
+STVSATT
+STVATYP
+STVTELE
+STVCNTY
+STVSGBI
+SORLCUR
+Tables Removed from General Job:
+GORRACE
+GTVCELG
+GTVEMAL"
