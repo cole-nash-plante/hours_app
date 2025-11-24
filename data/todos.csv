@@ -1,5 +1,5 @@
 Client,Category,Task,Priority,DateCreated,DateCompleted,Notes
-University of Alaska,Develupment,Create DIM Application Decision,3.0,2025-11-20,,"--DIM_APPLICATION_DESCISION
+University of Alaska,Develupment,Create DIM Application Decision,3.0,2025-11-20,2025-11-24,"--DIM_APPLICATION_DESCISION
 select 
 STVAPDC_CODE APPLICATION_DECISION_CODE, 
 STVAPDC_DESC APPLICATION_DECISION_DESC, 
