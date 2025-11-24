@@ -129,4 +129,4 @@ DHCS,TMIS,wf_VALIDATE_TMSIS_FTX_Create,,,1900-01-01 12:00:00,
 DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_IP_DD4_Create,,,1900-01-01 12:00:00,
 DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_LT_Create,,,1900-01-01 12:00:00,
 DHCS,Mercer,wf_MERCER_CLAIMS_HDR_V0_0,,,1900-01-01 12:00:00,
-University of Alaska,Develupment,Remove tables from cmi_saturn and cmi_general,5.0,2025-11-24,,
+University of Alaska,Develupment,Remove tables from cmi_saturn and cmi_general,5.0,2025-11-24,,Removing anything not needed in iteration 1 and 2 mappings or freeze process
