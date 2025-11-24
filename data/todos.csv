@@ -19,7 +19,7 @@ from test_raw.banner_student.stvapdc;
 
 11/21 ODS complete
 11/24 DIM Complete"
-DHCS,HCAI,Test FIPS errors,5.0,,,"Check to make sure if FIPS errors arent happening with JDBC connection, change back the following  mappings
+DHCS,HCAI,Test FIPS errors,5.0,,2025-11-24,"Check to make sure if FIPS errors arent happening with JDBC connection, change back the following  mappings
 m_HCAI_APCD_CDL_PC_1
 m_TMSIS_PROVIDER"
 General Non-client,Streamlit App,Fix the notes make them  save,5.0,,2025-11-21 00:00:00,
