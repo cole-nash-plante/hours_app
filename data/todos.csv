@@ -127,3 +127,4 @@ DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_IP_DD4_Create,,,1900-01-01 12:00:00,
 DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_LT_Create,,,1900-01-01 12:00:00,
 DHCS,Mercer,wf_MERCER_CLAIMS_HDR_V0_0,,,1900-01-01 12:00:00,
 University of Alaska,Develupment,Come up with a list of all distinct source tables used in iteration 1 and 2 dfor UA,5.0,2025-11-24,,"List all banner source tables, will be in UA_MartDesign"
+General Non-client,Streamlit App,Add in active indicator for hours/tasks,3.0,2025-11-24,,
