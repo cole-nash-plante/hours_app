@@ -273,7 +273,6 @@ if selected_page == "Home":
     if len(active_todos) == 0:
         st.info("No active tasks.")
     else:
-        
         # Build dropdown from ALL clients that have tasks (active or completed)
         all_clients_with_tasks = df_todos["Client"].dropna().unique().tolist()
         
@@ -287,7 +286,7 @@ if selected_page == "Home":
         # Filter active todos for selected clients
         active_todos = df_todos[
             ((df_todos["DateCompleted"].isna()) | (df_todos["DateCompleted"] == "")) &
-            (df_todos["Client"].isin(selected_clients))
+            (df_todos["Client"].isin(selected_clients))]
 
         cols = st.columns(len(selected_clients))
         for i, client in enumerate(selected_clients):
@@ -928,6 +927,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
