@@ -3,4 +3,9 @@ Date,Client,Meeting,Notes
 Running lots of troubleshooting trying to figure out errors with new connectors"
 2025-11-20,University of Alaska,Quick Dev Meeting with Michael,"Quick meeting on 2 new DIM Application tables, as well as fixing some of the problems with AO CODE
 3 weeks to get the dims done, AO codes are the prority"
-2025-11-25,General Non-client,Cert Tracker,
+2025-11-25,General Non-client,Cert Tracker,"- Emails are 80% accurate?
+- Wants amore dynamic staff ID finder
+-Add NULL to blanks
+-Need for staff to be able to make an update in the power BI using a separate form
+-Need to have a technical document and user manual
+-User guide should be 1-2 pages "
