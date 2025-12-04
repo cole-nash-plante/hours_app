@@ -86,7 +86,7 @@ def apply_css_from_github(css_path="data/style.css"):
         st.warning(f"CSS file '{css_path}' not found in GitHub.")
 
 # Call this early in your app (after st.set_page_config)
-apply_css_from_github()
+#apply_css_from_github()
 
 
 
@@ -928,6 +928,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
