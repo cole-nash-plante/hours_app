@@ -11,8 +11,7 @@ import plotly.express as px
 # -------------------------------------------------
 # GitHub Config (from Streamlit Secrets)
 # -------------------------------------------------
-GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
-GITHUB_REPO = st.secrets["GITHUB_REPO"]
+
 BRANCH = "main"
 
 # -------------------------------------------------
@@ -929,6 +928,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
