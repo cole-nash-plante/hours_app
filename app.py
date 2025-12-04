@@ -38,36 +38,137 @@ st.set_page_config(layout="wide")
 # -------------------------------------------------
 # GitHub Functions
 # -------------------------------------------------
-def fetch_from_github(file_path):
-    """Fetch file content from GitHub and save locally."""
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}?ref={BRANCH}"
-    response = requests.get(url, headers={"Authorization": f"token {GITHUB_TOKEN}"})
-    if response.status_code == 200:
-        content = base64.b64decode(response.json()["content"]).decode("utf-8")
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
-    else:
-        st.warning(f"{file_path} not found in GitHub. Will create locally.")
 
-def push_to_github(file_path, commit_message):
-    """Push local file to GitHub."""
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
-    with open(file_path, "rb") as f:
-        content = base64.b64encode(f.read()).decode("utf-8")
-    response = requests.get(url, headers={"Authorization": f"token {GITHUB_TOKEN}"})
-    sha = response.json().get("sha")
-    data = {
-        "message": commit_message,
-        "content": content,
-        "branch": BRANCH
-    }
-    if sha:
-        data["sha"] = sha
-    r = requests.put(url, json=data, headers={"Authorization": f"token {GITHUB_TOKEN}"})
-    if r.status_code in [200, 201]:
-        True
+import streamlit as st
+import pandas as pd
+from datetime import datetime, date
+import os, requests, base64, calendar
+import plotly.graph_objects as go
+import plotly.express as px
+
+# -------------------------------------------------
+# GitHub Config — public-safe defaults
+# -------------------------------------------------
+BRANCH = "main"
+
+# Your public repo full name (owner/repo)
+GITHUB_REPO = "cole-nash-plante/hours_app"
+
+# Read token from Streamlit Cloud secrets if set.
+# On a public repo, reads can be unauthenticated; writes need a token.
+GITHUB_TOKEN = None
+try:
+    # You can store this in Streamlit Cloud → App → Settings → Edit secrets
+    GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", None)
+except Exception:
+    GITHUB_TOKEN = None
+
+# Build headers conditionally. Add 'Accept' for GitHub API v3.
+BASE_HEADERS = {"Accept": "application/vnd.github.v3+json"}
+AUTH_HEADERS = (
+    {**BASE_HEADERS, "Authorization": f"token {GITHUB_TOKEN}"}
+    if GITHUB_TOKEN
+    else BASE_HEADERS
+)
+
+# -------------------------------------------------
+# Data Setup
+# -------------------------------------------------
+DATA_DIR = "data"
+CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")
+HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
+GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
+CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
+TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
+os.makedirs(DATA_DIR, exist_ok=True)
+st.set_page_config(layout="wide")
+
+# -------------------------------------------------
+# GitHub Functions
+# -------------------------------------------------
+def fetch_from_github(file_path: str):
+    """
+    Fetch file content from the public GitHub repo and save locally.
+    Works without a token if the repo/content is public.
+    """
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}?ref={BRANCH}"
+    resp = requests.get(url, headers=AUTH_HEADERS)
+
+    if resp.status_code == 200:
+        j = resp.json()
+        content_b64 = j.get("content", "")
+        if content_b64:
+            content = base64.b64decode(content_b64).decode("utf-8")
+            # Ensure parent dirs exist
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(content)
+        else:
+            st.warning(f"No content for {file_path} in GitHub response.")
+    elif resp.status_code == 404:
+        # File not yet in repo; create locally and push later if desired
+        st.info(f"'{file_path}' not found in GitHub (404). Will create locally.")
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        if file_path.endswith(".css"):
+            # start with empty css if missing
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write("")
+        # For CSVs, they’ll be created below from init_files
     else:
-        st.error(f"Failed to push {file_path}: {r.json()}")
+        st.warning(
+            f"Could not fetch '{file_path}' (HTTP {resp.status_code}). "
+            f"Response: {resp.text[:200]}"
+        )
+
+def push_to_github(file_path: str, commit_message: str):
+    """
+    Push local file to GitHub. Requires GITHUB_TOKEN with 'repo' scope.
+    """
+    if not GITHUB_TOKEN:
+        st.error(
+            "GitHub token not set. Add GITHUB_TOKEN in Streamlit secrets to enable pushing."
+        )
+        return False
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+    # Read local content
+    with open(file_path, "rb") as f:
+        content_b64 = base64.b64encode(f.read()).decode("utf-8")
+
+    # Check if file exists to get SHA
+    get_resp = requests.get(url, headers=AUTH_HEADERS)
+    sha = None
+    if get_resp.status_code == 200:
+        sha = get_resp.json().get("sha")
+
+    payload = {"message": commit_message, "content": content_b64, "branch": BRANCH}
+    if sha:
+        payload["sha"] = sha
+
+    put_resp = requests.put(url, json=payload, headers=AUTH_HEADERS)
+    if put_resp.status_code in (200, 201):
+        return True
+    st.error(
+        f"Failed to push '{file_path}' (HTTP {put_resp.status_code}). "
+        f"Response: {put_resp.text[:300]}"
+    )
+    return False
+
+def apply_css_from_github(css_path="data/style.css"):
+    """
+    Fetch CSS from GitHub (public read) and apply to the Streamlit app.
+    """
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{css_path}?ref={BRANCH}"
+    resp = requests.get(url, headers=AUTH_HEADERS)
+    if resp.status_code == 200:
+        content = base64.b64decode(resp.json()["content"]).decode("utf-8")
+        st.markdown(f"<style>{content}</style>", unsafe_allow_html=True)
+    elif os.path.exists(css_path):
+        # Fallback: local CSS
+        with open(css_path, "r", encoding="utf-8") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    else:
+        st.warning(f"CSS file '{css_path}' not found in GitHub or locally.")
 
 # -------------------------------------------------
 # Initialize Data
@@ -97,18 +198,35 @@ for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv", "data/categ
 
 st.markdown('<link rel="stylesheet" href="YOUR_GITHUB_RAW_CSS_URL">', unsafe_allow_html=True)
 # Ensure files exist locally
-init_files = [
-    (CLIENTS_FILE, ["Client"]),
-    (HOURS_FILE, ["Date", "Client", "Hours", "Description"]),
-    (GOALS_FILE, ["Month", "GoalHours"]),
-    (CATEGORIES_FILE, ["Client", "Category"]),
-    (TODOS_FILE, ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"])
-]
 
+# Sync public files from GitHub
+for file in [
+    "data/clients.csv",
+    "data/hours.csv",
+    "data/goals.csv",
+    "data/categories.csv",
+    "data/todos.csv",
+    "data/style.css",
+]:
+    fetch_from_github(file)
+
+# Optionally apply CSS from the synced file
+apply_css_from_github("data/style.css")
+
+# Ensure files exist locally (create empty CSVs if missing, then attempt to push if you have a token)
+init_files = [
+    ("data/clients.csv", ["Client"]),
+    ("data/hours.csv", ["Date", "Client", "Hours", "Description"]),
+    ("data/goals.csv", ["Month", "GoalHours"]),
+    ("data/categories.csv", ["Client", "Category"]),
+    ("data/todos.csv", ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]),
+]
 for file, cols in init_files:
     if not os.path.exists(file):
+        os.makedirs(os.path.dirname(file), exist_ok=True)
         pd.DataFrame(columns=cols).to_csv(file, index=False)
-        push_to_github(file, f"Created {file}")
+        # Push only if token exists (safe on public)
+        push_to_github(file, f"Initialize {file}")
 
 # -------------------------------------------------
 # Sidebar Navigation
@@ -928,6 +1046,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
