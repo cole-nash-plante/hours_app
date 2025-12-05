@@ -1066,6 +1066,8 @@ elif selected_page == "Data Entry":
     # Load data
     df_hours = pd.read_csv(HOURS_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
+    df_clients = pd.read_csv(CLIENTS_FILE)
+    df_categories = pd.read_csv(CALEGORIES_FILE)
 
     # Convert date columns for compatibility
     df_hours["Date"] = pd.to_datetime(df_hours["Date"], errors="coerce")
@@ -1342,6 +1344,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
