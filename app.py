@@ -211,7 +211,7 @@ for file in [
     fetch_from_github(file)
 
 # Optionally apply CSS from the synced file
-apply_css_from_github("data/style.css")
+
 
 # Ensure files exist locally (create empty CSVs if missing, then attempt to push if you have a token)
 init_files = [
@@ -1324,6 +1324,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
