@@ -1076,21 +1076,19 @@ elif selected_page == "Data Entry":
     # Enter data
     #--------------------------
     st.subheader("Add Client Category")
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 1, 3])
-        with col1:
-            client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
-        with col2:
-            category = st.text_input("Category", key="todo_task")
-        with col5:
-            if st.button("Save Hours", key="save_hours"):
-                new_row = {"Client": str(client), "Category": category, "Hours": hours, "Description": description}
-                df_categories = pd.concat([df_categories, pd.DataFrame([new_row])], ignore_index=True)
-                df_hours.to_csv(CATEGORIES_FILE, index=False)
-                push_to_github("data/hours.csv", "Updated hours log")
-                st.success("Hours logged successfully!")
+
+    col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 1, 3])
+    with col1:
+        client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
+    with col2:
+        category = st.text_input("Category", key="todo_task")
+    with col5:
+        if st.button("Save Hours", key="save_hours"):
+            new_row = {"Client": str(client), "Category": category, "Hours": hours, "Description": description}
+            df_categories = pd.concat([df_categories, pd.DataFrame([new_row])], ignore_index=True)
+            df_hours.to_csv(CATEGORIES_FILE, index=False)
+            push_to_github("data/hours.csv", "Updated hours log")
+            st.success("Hours logged successfully!")
 
     # -------------------------
     # Client Filter
@@ -1344,6 +1342,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
