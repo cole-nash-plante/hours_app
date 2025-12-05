@@ -238,6 +238,7 @@ selected_page = st.sidebar.radio("Go to", pages)
 
 
 st.markdown("""
+<style>
 /* Dark Theme for Streamlit App */
 :root {
   --bg-primary: #0f0f23;
@@ -515,7 +516,7 @@ h1 {
     color: #FFFFFF !important;
     font-weight: 600; /* Optional: make them bold */
 }
-<style>
+
 /* Override the problematic padding */
 .stSelectbox > div > div {
     padding: 0 !important; /* Remove extra padding */
@@ -1323,6 +1324,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
