@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import requests
 import base64
+
 from datetime import datetime, date
 import calendar
 import plotly.graph_objects as go
@@ -39,12 +40,8 @@ st.set_page_config(layout="wide")
 # GitHub Functions
 # -------------------------------------------------
 
-import streamlit as st
-import pandas as pd
-from datetime import datetime, date
-import os, requests, base64, endar
-import plotly.graph_objects as go
-import plotly.express as px
+
+
 
 # -------------------------------------------------
 # GitHub Config — public-safe defaults
@@ -1344,6 +1341,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
