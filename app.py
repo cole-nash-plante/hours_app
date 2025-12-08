@@ -42,7 +42,7 @@ st.set_page_config(layout="wide")
 import streamlit as st
 import pandas as pd
 from datetime import datetime, date
-import os, requests, base64, calendar
+import os, requests, base64, endar
 import plotly.graph_objects as go
 import plotly.express as px
 
@@ -88,7 +88,7 @@ st.set_page_config(layout="wide")
 # -------------------------------------------------
 def fetch_from_github(file_path: str):
     """
-    Fetch file content from the public GitHub repo and save locally.
+    Fetch file content from the public GitHub repo and save loly.
     Works without a token if the repo/content is public.
     """
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}?ref={BRANCH}"
@@ -106,7 +106,7 @@ def fetch_from_github(file_path: str):
         else:
             st.warning(f"No content for {file_path} in GitHub response.")
     elif resp.status_code == 404:
-        # File not yet in repo; create locally and push later if desired
+        # File not yet in repo; create loly and push later if desired
         st.info(f"'{file_path}' not found in GitHub (404). Will create locally.")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         if file_path.endswith(".css"):
@@ -1067,7 +1067,7 @@ elif selected_page == "Data Entry":
     df_hours = pd.read_csv(HOURS_FILE)
     df_todos = pd.read_csv(TODOS_FILE)
     df_clients = pd.read_csv(CLIENTS_FILE)
-    df_categories = pd.read_csv(CALEGORIES_FILE)
+    df_categories = pd.read_csv(CATEGORIES_FILE)
 
     # Convert date columns for compatibility
     df_hours["Date"] = pd.to_datetime(df_hours["Date"], errors="coerce")
@@ -1344,6 +1344,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
