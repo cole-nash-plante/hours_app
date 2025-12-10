@@ -10,4 +10,28 @@ Running lots of troubleshooting trying to figure out errors with new connectors"
 -Need to have a technical document and user manual
 -User guide should be 1-2 pages "
 2025-12-05,General Non-client,Lunch In,
-2025-12-09,DHCS,JDBC Meeting,
+2025-12-09,DHCS,JDBC Meeting,"Original tracker
+Make sure we are doing validated work flows
+Get new git hub keys
+ 
+Copy query from (hcai are more complicated and ned changes)
+Swithc to teradate_JDBC_V2
+Look for any parameters (cmd f on $param - test read souces or go into param files (only for testing)) - will change back
+Check what the parm file is
+Copy EXALTY
+Reference a functional to review work - field names and Precision
+Type, precision, and scale
+Cmd f - as cdlxx field name - match case is slected updat to match th efield name -- replace all
+ 
+Precsion and scal issue
+Options - edit metadata - only precsion
+Making edits to 0 doesn’t stick
+Update query to find loophole - trick into getting precsion of 1 where '' as TO ' ' as - doble check every field name is changes AS
+Don’t want unecessary saces in ed product- go to source edit query edit what we did with adding a=spaces - ' ' as -> replace all ''as then retian existing fields metadata
+ 
+Once funcitons as expexted - switch hard coding to parameter
+ 
+Target
+Make sure formatting is correct I use PC
+ 
+Target final is in final task in session log"
