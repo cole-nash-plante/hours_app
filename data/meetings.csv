@@ -56,8 +56,11 @@ Ad Hoc-gotta find out what that means
 Use Cases: quality checks, medicare enrollment over time, number eligible, group vs private policies, clients without insurance
 "
 2025-12-16,DHCS,Working Session,"-m_TMSIS_FTX_V4_0_DD4 ############# Formatting Checked, mt ran in taskflow failed: [FATAL] [Teradata JDBC Driver] [TeraJDBC 17.00.00.02] [Error 1005] [SQLState HY000] Unexpected parcel kind received: 24323
-Total Transformation Errors:1
+Total Transformation Errors:1 - Want to check into this a little more
 
 -m_TMSIS_Claims_OT_V4_01_EVV1_DD3_Modify ########## error [Failed to validate the data object because the entry [P_Field { annotations: [], anonymousType: null, changeData: null, defaultValue: null, extensions: TableFieldExtensions { isPartitionKey: false }, fieldType: INOUT_TYPE, length: 10, name: ""PROVIDER_ID_NBR"", nativeCodepage: 0, nativeName: ""PROVIDER_ID_NBR"", nullableField: false, optional: false, precision: 10, scale: 0, type: <REF:DataType>, typeConfig: null }] already exists in the collection [null]. Provide a unique name for the entry.]
+-----------SQ_HDR_and_DTL
 
-"
+-wf_TMSIS_Claims_RX_DD3_V1 all ran indivisually, tf last
+
+-mt_TMSIS_PRV_All_Combine_Count_V1_1_DD3 Still on hold????"
