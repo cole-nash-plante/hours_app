@@ -63,4 +63,9 @@ Total Transformation Errors:1 - Want to check into this a little more
 
 -wf_TMSIS_Claims_RX_DD3_V1 all ran indivisually, tf last
 
--mt_TMSIS_PRV_All_Combine_Count_V1_1_DD3 Still on hold????"
+-mt_TMSIS_PRV_All_Combine_Count_V1_1_DD3 Still on hold????
+
+m_HCAI_APCD_CDL_PC_1
+12/11 CN: [FATAL] [Teradata JDBC Driver] [TeraJDBC 17.00.00.02] [Error 1079] [SQLState HY000] executeQuery() cannot be used when the request contains multiple statements; use execute()
+
+Wouldnt be a problem if JDBC is larger than the "
