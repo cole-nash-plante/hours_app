@@ -75,4 +75,9 @@ Would like to put them in a tf
 - DIM_ADMIT
 Updates made, would like to add more to the decode statement
 -Would like to start next step of development with dim_student_level updates
-"
+
+DHCS
+•	wf_TMSIS_Claims_RX_DD3_V1 
+Need to do the precision check, ODBC holdup
+•	wf_TMSIS_Claims_OT_DD3_V1
+Need to change the downstream field names."
