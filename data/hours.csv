@@ -62,11 +62,9 @@ Date,Client,Hours,Description
 2025-11-03,DHCS,1.5,wf_TMSIS_Claims_RX_DD3_V1
 2025-11-03,University of Alaska,0.5,Ingestion troubleshooting
 2025-11-03,DHCS,0.75,wf_TMSIS_Claims_OT_DD3_V1
-2025-10-31,OFM,0.5,OFM Standup
 2025-10-31,DHCS,0.5,Meeting
 2025-10-31,University of Alaska,0.5,UA Raw Ingestion
 2025-10-31,DHCS,1.5,Mappings
-2025-10-31,OFM,1.75,Formatting
 2025-10-30,DHCS,0.5,HCAI Mappings
 2025-10-30,DHCS,0.5,Meeting
 2025-10-30,University of Alaska,0.75,UA Raw Ingestion
@@ -74,20 +72,16 @@ Date,Client,Hours,Description
 2025-10-29,University of Alaska,0.5,UA Meeting
 2025-10-29,University of Alaska,3.5,Final Updated Iteration 1
 2025-10-29,University of Alaska,0.75,UA Raw Ingestion
-2025-10-29,OFM,1.0,OFM Standup and Ben Meeting
 2025-10-29,DHCS,0.25,HCAI Updates
 2025-10-28,University of Alaska,0.75,UA Dev Faculty SK
 2025-10-28,University of Alaska,1.25,DIM Academic Org
 2025-10-28,University of Alaska,0.5,Meeting
-2025-10-28,OFM,0.5,Ben Meeting and script tuning
 2025-10-28,DHCS,1.0,Meeting and mapping adjustment
 2025-10-28,University of Alaska,2.5,UA Raw Ingestion
 2025-10-27,University of Alaska,0.5,Meeting on Faculty SK
 2025-10-27,University of Alaska,1.0,UA Meeting
 2025-10-27,University of Alaska,0.75,Rename Rules and try to delete rule occurrences
-2025-10-27,OFM,1.5,Python file movement
 2025-10-27,University of Alaska,1.25,Faculty SK dev
-2025-10-27,OFM,1.0,Meeting with Ben on Python script
 2025-10-24,University of Alaska,0.75,Testing AO_CODE
 2025-10-24,DHCS,1.5,TMIS Mappings
 2025-10-24,University of Alaska,0.25,Meeting
