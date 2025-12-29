@@ -25,3 +25,157 @@ DHCS,Mercer,wf_MERCER_CLAIMS_HDR_V0_0,,,1900-01-01 12:00:00,
 General Non-client,Streamlit App,Follow up with Donna on master requirements,5.0,2025-12-02,2025-12-05,"Power BI, tableau, 5tran, snowflake, altryx"
 General Non-client,Streamlit App,look into changing power automate power bi changing data forms,5.0,2025-12-02,2025-12-05,
 DHCS,TMSIS,Update all ODBC Connections,4.0,2025-12-10,,
+University of Alaska,Develupment,Come up with a list of all distinct source tables used in iteration 1 and 2 dfor UA,5.0,2025-11-24,2025-11-24,"List all banner source tables, will be in UA_MartDesign"
+University of Alaska,Develupment,Add Source tables for Banner Freeze ,5.0,2025-11-24,2025-11-24,
+University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,2025-11-24,"--DIM_APPLICATION_DESCISION
+select 
+STVAPDC_CODE APPLICATION_DECISION_CODE, 
+STVAPDC_DESC APPLICATION_DECISION_DESC, 
+STVAPDC_SIGNF_IND, --This field indicates whether the decision affects the acceptance of the         application.  Y - Application acceptance is effected by decision.
+STVAPDC_INST_ACC_IND, --This field specifies whether institutional acceptance of application is         effected by the decision.  Y - Institution accepts application.
+STVAPDC_STDN_ACC_IND, --This field specifies whether student acceptance is indicated by the             decision.  Y - Student accepts offer of admission.
+STVAPDC_APPL_INACT --This field indicates whether decision causes application to become inactive.    Y - Application is inactive.
+from test_raw.banner_student.stvapdc;
+
+
+11/21 ODS complete
+11/24 DIM Complete"
+University of Alaska,Unit Testing,Fix AO_CODES,4.0,,2025-11-21 00:00:00,"------------------------------------------------------------
+-- AO Counts in Snowflake by student enrollment
+------------------------------------------------------------
+select dc.campus_code, ao_code, count(distinct student_pidm) from test_refined.ods.ods_course_enrollment fce
+join test_curated.edw.dim_course dc on dc.term_code = fce.term_code and dc.crn = fce.crn
+where fce.term_code = '202403' and dc.campus_code = '6'
+group by dc.campus_code, ao_code
+order by count(distinct student_pidm) desc
+;
+ 
+------------------------------------------------------------
+-- AO Counts in dsdmgr registration table
+------------------------------------------------------------
+select campus_code, academic_organization, count(distinct student_pidm)  from test_raw.dsdmgr.dsd_registration
+where term_code = '202403' and campus_code = '6'
+group by campus_code, academic_organization
+order by count(distinct student_pidm) desc
+
+Finished- some irregularities in comparing the two  queries in the ao_adj file inDIM_itr_2, but lots of different campuses and data sources are different but worth bnoting if it is revisited."
+University of Alaska,Unit Testing,Create DIM Application status,3.0,,2025-12-01,"--DIM_APPLICATION_STATUS
+SELECT
+STVAPST_CODE APPLICATION_STATUS_CODE,
+STVAPST_DESC APPLICATION_STATUS_DESC
+FROM test_raw.banner_student.stvapst;"
+University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0,,,
+University of Alaska,Develupment,DIM and ODS Registration,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Registration voice Type Code is null,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,DIM and ODS Grading Mode,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Grading Mode Desc is shortened,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,ODS COURSE ENROLLMENT,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Add default records in the EDW,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,ODS Course Enrollment credit hours decimal and hash issues,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,DIM and ODS Faculty,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,ODS_FACULTY need to recreate and run,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,faculty PIDM and ID,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,fct_ennrollment,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Create Table and Add metadata,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Fix SQL Push,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Add a column to DIM_COURSE,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,SELECT SSBSECT_TERM_CODE ... academic_org,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Create Mapping changes,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,"add sequence number seq_number, acct_code",,,1900-01-01 12:00:00,
+University of Alaska,Develupment,check on dsd registration,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Update Datamart xl,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Verify row counts per AO Code,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Rerun ODS_STUDENT with the filter on PIDM,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Check and make sure you didn’t break ODS-row counts,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Add dim Faculty_ID to ODS_COURSE ENROLLMENT,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,"Join to SIRASIGN, filter for primary instructor",,,1900-01-01 12:00:00,
+University of Alaska,Develupment,change instructor PIDM to Faculty PIDM?,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Add the faculty SK under CRN placement,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Create new Ingestion Process,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,TRX_SGASTN in Banner Student,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,don’t need insert and update date for now,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,"Add SK to end, check UA_Ingestion",,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Snowflake there is no specific date datatype only datetime,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Max 4.5 including meeting,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Create DIM_Academic_Org,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Use DIM_FTPT as an example,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Final Updated Iteration 1,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,select * from dim_faculty; --Update instructor_id to faculty_id,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,select * from dim_academic_org; --Update dim_academic_org_sk,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Select * from dim_date; --add 0 and -1 record,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Select * from dim_course order by 1; --reload,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Academic_Org neexs the XX row,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,"NULL everything for 0, -1 can have one invalid DIM_FACULTY, DIM_COURSE",,,1900-01-01 12:00:00,
+University of Alaska,Develupment,"for -1 just the start can be inv, for 0 everything but MD% is",,,1900-01-01 12:00:00,
+University of Alaska,Develupment,ODS Enrollment to DIM COUrSe and DIM Course to Academic OrG,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,FACT MD5 Hash is null,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Make sure that there are dummy rows by noon 30 for SARADAP_TRX,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,make m_ua_hr_active_job_emp_curren work,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Remove Views and Fix schedule,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Stagger refined and currated,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Refresh the views pf,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Olivia Meeting,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Create Rules for CDGC Dashboard-Refine it,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Include the fake rules for the dashboard,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,SPRIDEN_STUDENT_ID,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Run the Raw format,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,ODS_COURSE.SESSION_CODE,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Need to change thresholds,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,ODS_STUDENT.STUDENT_ID,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,GOBINTL Duplicates,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Find a way to check for duplicates in CDGC,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,ODS_ENROLLMENT NULLS,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Create Rules,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,ODS_ENROLLMENT and FCT_ENROLLEMENT,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Look into creating separate rules to test PKs for 0s and 1s,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,Rename rules in CDGC,,,1900-01-01 12:00:00,
+University of Alaska,Data Profiling and Rules,See if we can make the total rows higher in the rules,,,1900-01-01 12:00:00,
+University of Alaska,Unit Testing,Iteration 2 Testing,,,1900-01-01 12:00:00,
+University of Alaska,Unit Testing,DIM_FACULTY Large troubleshoot,,,1900-01-01 12:00:00,
+University of Alaska,Develupment,Remove tables from cmi_saturn and cmi_general,5.0,2025-11-24,2025-11-24,"Removing anything not needed in iteration 1 and 2 mappings or freeze process
+Tables Removed from Saturn Job:
+SMRPRLE
+SOBSBG
+STVAPSTI
+STVASTD
+STVCLAS
+STVCSTS
+STVDEGS
+STVEMPT
+STVESTS
+STVETHN
+STVVTYP
+STVLANG
+STVLEAV
+STVMATL
+STVSPON
+STVNATN
+STVSATT
+STVATYP
+STVTELE
+STVCNTY
+STVSGBI
+SORLCUR
+Tables Removed from General Job:
+GORRACE
+GTVCELG
+GTVEMAL"
+University of Alaska,Unit Testing,Check on <> for AO Codes,3.0,2025-12-05,2025-12-10,"for an logic that assigns a AO based on a <> seq, we should order those at the end as well."
+University of Alaska,Develupment,Documentation of all infa assets,5.0,2025-12-10,2025-12-15,"Informatica scheduled ingestion jobs:
+Automated Process workflows:
+Profiling & Cleansing jobs:
+Data catalog assets (draft):
+Data glossary terms:
+Not sure, a list and count would probably be great
+ 
+"
+University of Alaska,Unit Testing,Truncate FCT_COURSE_ENROLLMENT,3.0,2025-12-10,2025-12-15,
+University of Alaska,Unit Testing,Slowly Changing dimmensions,3.0,2025-12-16,,"-BANNER POC for slowly changing dimmensions
+-Do an other mapping and document it one pager step by step
+-copy the created and turn it into a template
+-Started on STVDTYP
+-Term filters should be recent
+-Create a template for her to work with"
+University of Alaska,Unit Testing,"Retest SARAPPD, no updates in ingestion",2.0,2025-12-17,2025-12-17,
+University of Alaska,Unit Testing,SFRSTCR  testing,3.0,2025-12-17,2025-12-18,
+University of Alaska,Develupment,Dim Admit Update,2.0,2025-12-29,,
