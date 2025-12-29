@@ -69,4 +69,10 @@ m_HCAI_APCD_CDL_PC_1
 12/11 CN: [FATAL] [Teradata JDBC Driver] [TeraJDBC 17.00.00.02] [Error 1079] [SQLState HY000] executeQuery() cannot be used when the request contains multiple statements; use execute()
 
 Wouldnt be a problem if JDBC is larger than the "
-2025-12-29,University of Alaska,Cole Michael Sync,
+2025-12-29,University of Alaska,Cole Michael Sync,"- Transaction mappings all done and tested on my end, emailed lara
+SSRFEES (Cole) 
+Would like to put them in a tf
+- DIM_ADMIT
+Updates made, would like to add more to the decode statement
+-Would like to start next step of development with dim_student_level updates
+"
