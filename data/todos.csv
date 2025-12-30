@@ -64,7 +64,6 @@ SELECT
 STVAPST_CODE APPLICATION_STATUS_CODE,
 STVAPST_DESC APPLICATION_STATUS_DESC
 FROM test_raw.banner_student.stvapst;"
-University of Alaska,Data Profiling and Rules,Create rules for the dashboard,1.0,,,
 University of Alaska,Develupment,DIM and ODS Registration,,,1900-01-01 12:00:00,
 University of Alaska,Develupment,Registration voice Type Code is null,,,1900-01-01 12:00:00,
 University of Alaska,Develupment,DIM and ODS Grading Mode,,,1900-01-01 12:00:00,
