@@ -86,4 +86,5 @@ Need to change the downstream field names."
 2026-01-05,University of Alaska,UA Develupment Client Touch Base,"Ask about DIM_ADMIT_TYPE
 
 Testing
--STVADMT : No Mapping Task"
+-STVADMT, STVAPDC : No Mapping Task
+-STVADMT - Mappint trx_END_DATE and trx_ACR+TIVE INDICATOR"
