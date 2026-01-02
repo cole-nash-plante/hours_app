@@ -87,4 +87,6 @@ Need to change the downstream field names."
 
 Testing
 -STVADMT, STVAPDC : No Mapping Task
--STVADMT - Mappint trx_END_DATE and trx_ACR+TIVE INDICATOR"
+-STVADMT - Mappint trx_END_DATE and trx_ACR+TIVE INDICATOR
+
+Over IPU usage is not an issue, we are running a lot in develupment and prod-okay to go over informatica is fine with it"
