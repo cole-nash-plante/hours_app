@@ -184,3 +184,4 @@ University of Alaska,Unit Testing,Validate DIM_ADMIT.ADMIT_TYPE,3.0,2025-12-29,2
 University of Alaska,Unit Testing,DIM_Student Level Updates,4.0,2025-12-30,,Line 85??
 University of Alaska,Unit Testing,Monitor IPU Usage with trx taskflows,3.0,2025-12-30,2026-01-08,
 University of Alaska,Develupment,Update documentation for everything in michaels email,3.0,2026-01-07,,
+University of Alaska,Develupment,INvestigate non-pushdown in trx mappings,3.0,2026-01-08,,
