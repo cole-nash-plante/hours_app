@@ -174,3 +174,4 @@ Date,Client,Hours,Description
 2026-01-08,University of Alaska,1.0,IPU Consumption checks and Pushdown investigation
 2026-01-08,University of Alaska,3.0,FCT_ADMISSION_DECISION
 2026-01-08,DHCS,0.25,ETS Check In
+2026-01-09,University of Alaska,1.5,"Final updates to name changes, column removal, and fct_admission_decision_log finish and testing"
