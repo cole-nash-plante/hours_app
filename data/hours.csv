@@ -180,3 +180,4 @@ Date,Client,Hours,Description
 2026-01-12,DHCS,1.0,"Conversions and documentation, primarily FTX returned"
 2026-01-14,University of Alaska,1.25,Documentation and Testing
 2026-01-14,DHCS,3.25,"Conversions of FTX, RX, and validating completed conversions before moving them to signoff"
+2026-01-14,University of Alaska,0.25,Investigate why pushdown isnt working
