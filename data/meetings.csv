@@ -105,3 +105,4 @@ Check create table statement with michael on ODS_ADMISSION_DECISION
 Change seq_num name"
 2026-01-14,University of Alaska,Alex meeting,"TRX not running with full pushdown. Amy updates werent going through until pushdown was disables on Student Level updates
 ODS student level 0 rows without pushdown and 83 rows with pushdown"
+2026-01-15,FRSG,FRSG Kickoff,
