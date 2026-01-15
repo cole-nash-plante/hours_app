@@ -114,4 +114,14 @@ ODS student level 0 rows without pushdown and 83 rows with pushdown"
 -FRSG has 9 divisions wwhich do additional aquisitions-all have their own softwares
 -New aquisition yesterday want pulled into data warehouse
 
-####BACKROUND####"
+####BACKROUND####
+-Onenote is  in the shared onenote-all notes should be in the onenote
+-conceptual module is heigharchy
+-entity is the branch, 100+ entities sourcing data-equivilant to a company
+-Margin is often around 50% - why PE is in the space
+Matrix is fct and dim tables
+-Process flow-matilian moves things from source to ODS-snowflake is where the ODS lands, Drom there similar to alaska-STG,EDW.
+-The PE buys a division and needs to know the state of the company, backlog, etc.
+-They have financial analysts building models off the data
+-Workflow diagram shows the source systems rebuilding equipment mart right now
+-Logical model shows all source systems and tables-think mart design"
