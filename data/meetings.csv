@@ -124,5 +124,13 @@ Matrix is fct and dim tables
 -The PE buys a division and needs to know the state of the company, backlog, etc.
 -They have financial analysts building models off the data
 -Workflow diagram shows the source systems rebuilding equipment mart right now
--Logical model shows all source systems and tables-think mart design"
+-Logical model shows all source systems and tables-think mart design
+-They are using transaction records to track records
+
+
+###DEMO MATILIAN###
+-When running a mapping looking thing you need to change the source query and change the company name, one of the passwords, and the user ID.
+-SOURCE_DATa is the company code, NAT in the example
+-FRSG_DEV.ODS.SOURCE_METADATA is the table that has all the tables in it
+-Check last loaded column for transaction row start date."
 2026-01-15,FRSG,test,
