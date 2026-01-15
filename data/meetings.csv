@@ -142,6 +142,16 @@ Matrix is fct and dim tables
 -ODs works like trx tables in the Alaska system
 
 -STG is where we start standardizing tables
-- number of procedures is the number of stg tables * number of companies
-"
+- number of procedures is the number of stg tables * number of companies because they are all going into the DIM tables.
+-procedures take the parameters we enter in the pipeline and then they put them into the query to load the tables.
+
+STG procedures
+-To create the procedures he is coppying the pss procedures and changing the naming conventions to NAT
+-If the procedure is not drawing from an EDW table, it is independent. You need to start from the independent tables as the other ones will rely on EDW
+-parent IDs in the location table might be different then the PE companies naming conventions
+
+LD_COMAPNY_SODOCUMENT is all bills/income
+LD_CONMPANY_PROJECTS effe3ctivly contracts table
+LD_COMAPNY_LOCATION 
+2 more - there are 5 important tables you need to move on"
 2026-01-15,FRSG,test,
