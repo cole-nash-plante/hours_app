@@ -130,7 +130,18 @@ Matrix is fct and dim tables
 
 ###DEMO MATILIAN###
 -When running a mapping looking thing you need to change the source query and change the company name, one of the passwords, and the user ID.
--SOURCE_DATa is the company code, NAT in the example
--FRSG_DEV.ODS.SOURCE_METADATA is the table that has all the tables in it
--Check last loaded column for transaction row start date."
+-SOURCE_DATA is the company code, NAT in the example
+
+#######FRSG_DEV.ODS.SOURCE_METADATA is the table that has all the tables in it,  and data about the tables-Key Columns show the unique identifier being used to determien if a record is changing
+-Load column list- in the case of a  wide table, there is a list of tables. if it is null it will be a star.
+-last load is not a trx table it is just a record of the last time a table was loaded
+
+-Tables are being truncated every night into RAW
+-LD_COMANY_TABLE is the naming convention LD= Load, company is the 3 letter code
+-ODS_COMPANY_table- is the naming convention.
+-ODs works like trx tables in the Alaska system
+
+-STG is where we start standardizing tables
+- number of procedures is the number of stg tables * number of companies
+"
 2026-01-15,FRSG,test,
