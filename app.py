@@ -858,12 +858,12 @@ elif selected_page == "Reports":
     hours_df = pd.read_csv(HOURS_FILE)
     goals_df = pd.read_csv(GOALS_FILE)
     days_off_df = pd.read_csv(DAYS_OFF_FILE)
-    df_clients = pd.read_csv(CLIENTS_FILE)
+    df_clients_active = pd.read_csv(CLIENTS_FILE)
     
     df_archive = pd.read_csv(ARCHIVE_CLIENTS)
     
     # Concatenate the two dataframes
-    df_clients = pd.concat([df_clients, df_archive], ignore_index=True)
+    df_clients = pd.concat([df_clients_active, df_archive], ignore_index=True)
 
     # ✅ Safe date conversion
     hours_df["Date"] = pd.to_datetime(hours_df["Date"], errors="coerce")
@@ -1343,6 +1343,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
