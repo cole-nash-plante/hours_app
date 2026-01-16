@@ -1232,13 +1232,11 @@ elif selected_page == "Archive":
             df_archive_clients = pd.concat([df_archive_clients, df_clients[df_clients["Client"] == selected_client]], ignore_index=True)
             df_archive_categories = pd.concat([df_archive_categories, df_categories[df_categories["Client"] == selected_client]], ignore_index=True)
             df_archive_todos = pd.concat([df_archive_todos, df_todos[df_todos["Client"] == selected_client]], ignore_index=True)
-            df_archive_hours = pd.concat([df_archive_hours, df_hours[df_hours["Client"] == selected_client]], ignore_index=True)
 
             # Remove from active files
             df_clients = df_clients[df_clients["Client"] != selected_client]
             df_categories = df_categories[df_categories["Client"] != selected_client]
             df_todos = df_todos[df_todos["Client"] != selected_client]
-            df_hours = df_hours[df_hours["Client"] != selected_client]
 
             # Save all files
             df_clients.to_csv(CLIENTS_FILE, index=False)
@@ -1248,7 +1246,6 @@ elif selected_page == "Archive":
             df_archive_clients.to_csv(ARCHIVE_CLIENTS, index=False)
             df_archive_categories.to_csv(ARCHIVE_CATEGORIES, index=False)
             df_archive_todos.to_csv(ARCHIVE_TODOS, index=False)
-            df_archive_hours.to_csv(ARCHIVE_HOURS, index=False)
 
             # Push to GitHub
             push_to_github("data/clients.csv", "Archived client")
@@ -1258,7 +1255,6 @@ elif selected_page == "Archive":
             push_to_github("data/archive_clients.csv", "Updated archive clients")
             push_to_github("data/archive_categories.csv", "Updated archive categories")
             push_to_github("data/archive_todos.csv", "Updated archive todos")
-            push_to_github("data/archive_hours.csv", "Updated archive hours")
 
             st.success(f"Client '{selected_client}' archived successfully!")
     st.markdown('</div>', unsafe_allow_html=True)
@@ -1341,6 +1337,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
