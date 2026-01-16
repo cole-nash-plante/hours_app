@@ -184,7 +184,7 @@ University of Alaska,Unit Testing,Validate DIM_ADMIT.ADMIT_TYPE,3.0,2025-12-29,2
 University of Alaska,Unit Testing,DIM_Student Level Updates,4.0,2025-12-30,2026-01-09,Line 85??
 University of Alaska,Unit Testing,Monitor IPU Usage with trx taskflows,3.0,2025-12-30,2026-01-08,
 University of Alaska,Develupment,Update documentation for everything in michaels email,3.0,2026-01-07,2026-01-16,Also update all -1 and 0 records
-University of Alaska,Develupment,INvestigate non-pushdown in trx mappings,3.0,2026-01-08,,
+University of Alaska,Develupment,INvestigate non-pushdown in trx mappings,3.0,2026-01-08,2026-01-16,
 University of Alaska,Unit Testing,Check on FCT_ADMISSION_DECISION joins (note in query),3.0,2026-01-09,,
 DHCS,TMSIS,Make Claires changes and notes from Susan,3.0,2026-01-09,,
 University of Alaska,Unit Testing,change admission decision log names,3.0,2026-01-09,2026-01-14,
