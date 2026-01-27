@@ -19,7 +19,7 @@ DHCS,TMIS,wf_VALIDATE_TMSIS_CLAIM_LT_Create,,,1900-01-01 12:00:00,
 DHCS,Mercer,wf_MERCER_CLAIMS_HDR_V0_0,,,1900-01-01 12:00:00,
 General Non-client,Streamlit App,Follow up with Donna on master requirements,5.0,2025-12-02,2025-12-05,"Power BI, tableau, 5tran, snowflake, altryx"
 General Non-client,Streamlit App,look into changing power automate power bi changing data forms,5.0,2025-12-02,2025-12-05,
-DHCS,TMSIS,Update all ODBC Connections,4.0,2025-12-10,,
+DHCS,TMSIS,Update all ODBC Connections,4.0,2025-12-10,2026-01-27,
 University of Alaska,Develupment,Come up with a list of all distinct source tables used in iteration 1 and 2 dfor UA,5.0,2025-11-24,2025-11-24,"List all banner source tables, will be in UA_MartDesign"
 University of Alaska,Develupment,Add Source tables for Banner Freeze ,5.0,2025-11-24,2025-11-24,
 University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,2025-11-24,"--DIM_APPLICATION_DESCISION
