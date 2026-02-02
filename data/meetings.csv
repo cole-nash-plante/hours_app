@@ -157,7 +157,7 @@ LD_COMAPNY_LOCATION
 
 MEGAENTITYID is likely one you need to check the source alias for the company"
 2026-01-15,FRSG,test,
-2026-01-30,General Non-client,Python follow Up,"-Using Regression analysis for forecasting with the audit team
--template_regression.py is the main regression code
+2026-01-30,Regression Clients,Python follow Up,"-Using Regression analysis for forecasting with the audit team
+-template_regression.py is the main regression codeRegression Clients
 -ignore profit lag for now
 "
