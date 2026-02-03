@@ -164,4 +164,6 @@ MEGAENTITYID is likely one you need to check the source alias for the company"
 2026-02-02,Regression Clients,Python Follow Up,"##PRE MEETING QUESTIONS##
 - Where is concat_data_savino.csv?
 -Where are the divisions in the folder?
-"
+
+-Inflation numbers are commented out
+-738-750 changed date fields to infer format"
