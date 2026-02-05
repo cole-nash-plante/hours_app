@@ -834,12 +834,6 @@ elif selected_page == "Meeting Notes":
 
 
 
-
-
-
-# -------------------------------------------------
-# Placeholder Pages
-# -------------------------------------------------
 elif selected_page == "Reports":
     st.title("Reports")
 
@@ -859,9 +853,8 @@ elif selected_page == "Reports":
     goals_df = pd.read_csv(GOALS_FILE)
     days_off_df = pd.read_csv(DAYS_OFF_FILE)
     df_clients_active = pd.read_csv(CLIENTS_FILE)
-    
     df_archive = pd.read_csv(ARCHIVE_CLIENTS)
-    
+
     # Concatenate the two dataframes
     df_clients = pd.concat([df_clients_active, df_archive], ignore_index=True)
 
@@ -900,33 +893,86 @@ elif selected_page == "Reports":
             st.success("Performance period updated!")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # BAN Calculations
-    period_hours_df = hours_df[(hours_df["Date"].dt.date >= period_start) & (hours_df["Date"].dt.date <= period_end)]
+    # ============================
+    #        BAN Calculations
+    # ============================
+
+    # Filter hours to performance period
+    period_hours_df = hours_df[
+        (hours_df["Date"].dt.date >= period_start) &
+        (hours_df["Date"].dt.date <= period_end)
+    ].copy()
+
+    # Normalize hours to the month start
+    period_hours_df["MonthDate"] = period_hours_df["Date"].dt.to_period("M").dt.to_timestamp()
+
+    # Parse goals "Month" (e.g., "11/25") -> datetime month start
+    def parse_mm_yy_to_month_start(value) -> pd.Timestamp:
+        s = str(value).strip()
+        dt = pd.to_datetime(s, format="%m/%y", errors="coerce")
+        if pd.isna(dt):
+            # Fall back to a few common variants in case of mixed formats
+            for fmt in ("%m/%Y", "%m-%y", "%m-%Y", "%Y-%m", "%Y/%m"):
+                dt = pd.to_datetime(s, format=fmt, errors="coerce")
+                if not pd.isna(dt):
+                    break
+        return dt
+
     period_goals_df = goals_df.copy()
-    period_hours_df["Month"] = period_hours_df["Date"].dt.strftime("%Y-%m")
-    period_goals_df["Month"] = period_goals_df["Month"].apply(lambda m: f"{now.year}-{int(m):02d}")
+    period_goals_df["MonthDate"] = period_goals_df["Month"].apply(parse_mm_yy_to_month_start)
+    period_goals_df = period_goals_df.dropna(subset=["MonthDate"]).copy()
 
-    monthly_actual_period = period_hours_df.groupby("Month")["Hours"].sum().reset_index()
-    monthly_actual_period.rename(columns={"Hours": "ActualHours"}, inplace=True)
+    # Ensure numeric GoalHours
+    if "GoalHours" in period_goals_df.columns:
+        period_goals_df["GoalHours"] = pd.to_numeric(period_goals_df["GoalHours"], errors="coerce").fillna(0)
 
-    all_months_period = pd.DataFrame({"Month": sorted(set(period_hours_df["Month"]).union(set(period_goals_df["Month"])))})
+    # Filter goals to performance period as well
+    period_goals_df = period_goals_df[
+        (period_goals_df["MonthDate"].dt.date >= period_start) &
+        (period_goals_df["MonthDate"].dt.date <= period_end)
+    ].copy()
 
-    merged_period = (
-        all_months_period
-        .merge(period_goals_df, on="Month", how="left")
-        .merge(monthly_actual_period, on="Month", how="left")
-        .fillna(0)
+    # Aggregate actuals by month
+    monthly_actual_period = (
+        period_hours_df.groupby("MonthDate", as_index=False)["Hours"].sum()
+        .rename(columns={"Hours": "ActualHours"})
     )
 
-    total_goal_hours = merged_period["GoalHours"].sum()
-    total_actual_hours = merged_period["ActualHours"].sum()
-    remaining_hours_period = max(total_goal_hours - total_actual_hours, 0)
+    # Combine months present in actuals or goals (already within period)
+    all_months_period = pd.DataFrame({
+        "MonthDate": sorted(set(period_hours_df["MonthDate"]).union(set(period_goals_df["MonthDate"])))
+    })
 
-    remaining_days_period = pd.date_range(start=max(now, pd.to_datetime(period_start)), end=pd.to_datetime(period_end), freq="B")
-    days_off_period = days_off_df[(days_off_df["Date"].dt.date >= period_start) & (days_off_df["Date"].dt.date <= period_end)]
+    # Merge planned vs actual
+    merged_period = (
+        all_months_period
+        .merge(period_goals_df[["MonthDate", "GoalHours"]], on="MonthDate", how="left")
+        .merge(monthly_actual_period, on="MonthDate", how="left")
+        .fillna(0)
+        .sort_values("MonthDate")
+        .reset_index(drop=True)
+    )
+
+    # Also keep a label version for charts (YYYY-MM)
+    merged_period["Month"] = merged_period["MonthDate"].dt.strftime("%Y-%m")
+
+    # Totals and BAN metrics
+    total_goal_hours = float(merged_period["GoalHours"].sum())
+    total_actual_hours = float(merged_period["ActualHours"].sum())
+    remaining_hours_period = max(total_goal_hours - total_actual_hours, 0.0)
+
+    remaining_days_period = pd.date_range(
+        start=max(now, pd.to_datetime(period_start)),
+        end=pd.to_datetime(period_end),
+        freq="B"
+    )
+    days_off_period = days_off_df[
+        (days_off_df["Date"].dt.date >= period_start) &
+        (days_off_df["Date"].dt.date <= period_end)
+    ]
     remaining_weekdays_period = len(remaining_days_period) - len(days_off_period)
-    avg_hours_left_period = remaining_hours_period / remaining_weekdays_period if remaining_weekdays_period > 0 else 0
-    todays_hours = hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum()
+    avg_hours_left_period = (remaining_hours_period / remaining_weekdays_period) if remaining_weekdays_period > 0 else 0.0
+    todays_hours = float(hours_df.loc[hours_df["Date"].dt.date == today, "Hours"].sum())
 
     # Display BAN Metrics
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
@@ -937,14 +983,18 @@ elif selected_page == "Reports":
     with col4: st.metric("Today's Hours", f"{todays_hours:.2f}")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Weekly Snapshot Chart
+    # ============================
+    #     Weekly Snapshot Chart
+    # ============================
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     if "week_offset" not in st.session_state:
         st.session_state.week_offset = 0
+
     today_ts = pd.Timestamp.today()
     start_of_week = (today_ts + pd.Timedelta(weeks=st.session_state.week_offset)).normalize() - pd.Timedelta(days=today_ts.weekday())
     end_of_week = start_of_week + pd.Timedelta(days=6)
     week_label = f"{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d')}"
+
     st.subheader(f"Weekly Snapshot: Billed Hours by Client ({week_label})")
     nav_col1, nav_col2 = st.columns([1, 1])
     with nav_col1:
@@ -962,7 +1012,12 @@ elif selected_page == "Reports":
 
     fig_weekly = go.Figure()
     for client in weekly_data["Client"].unique():
-        client_df = weekly_data[weekly_data["Client"] == client].groupby("Date")["Hours"].sum().reindex(weekdays, fill_value=0)
+        client_df = (
+            weekly_data[weekly_data["Client"] == client]
+            .groupby("Date")["Hours"]
+            .sum()
+            .reindex(weekdays, fill_value=0)
+        )
         fig_weekly.add_trace(go.Scatter(
             x=[d.strftime("%a") for d in weekdays], y=client_df.values,
             mode="lines+markers", name=client,
@@ -982,7 +1037,9 @@ elif selected_page == "Reports":
     )
     st.plotly_chart(fig_weekly, use_container_width=True)
 
-    # Date Range Filter for Bottom Charts
+    # ===============================================
+    # Date Range Filter for Bottom Charts (Monthly & Pie)
+    # ===============================================
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
     st.subheader("Filter for Monthly & Client Charts")
     col_start, col_end = st.columns([1, 1])
@@ -991,12 +1048,16 @@ elif selected_page == "Reports":
     with col_end:
         chart_end = st.date_input("Chart End Date", date(now.year, now.month, calendar.monthrange(now.year, now.month)[1]))
 
-    filtered_hours = hours_df[(hours_df["Date"] >= pd.to_datetime(chart_start)) & (hours_df["Date"] <= pd.to_datetime(chart_end))]
-    filtered_merged = merged_period[
-        (pd.to_datetime(merged_period["Month"] + "-01") >= pd.to_datetime(chart_start)) &
-        (pd.to_datetime(merged_period["Month"] + "-01") <= pd.to_datetime(chart_end))
+    filtered_hours = hours_df[
+        (hours_df["Date"] >= pd.to_datetime(chart_start)) &
+        (hours_df["Date"] <= pd.to_datetime(chart_end))
     ]
-    filtered_merged["MonthDate"] = pd.to_datetime(filtered_merged["Month"] + "-01")
+
+    # ✅ Use MonthDate directly (no string-to-date back-and-forth)
+    filtered_merged = merged_period[
+        (merged_period["MonthDate"] >= pd.to_datetime(chart_start)) &
+        (merged_period["MonthDate"] <= pd.to_datetime(chart_end))
+    ].copy()
     filtered_merged = filtered_merged.sort_values("MonthDate")
     filtered_merged["MonthLabel"] = filtered_merged["MonthDate"].dt.strftime("%b %Y")
 
@@ -1004,6 +1065,7 @@ elif selected_page == "Reports":
     col1, col2 = st.columns([2, 1])
     chart_bg = "#0f0f23"
     text_color = "#FFFFFF"
+
     with col1:
         st.subheader("Monthly Actual vs Planned Hours")
         fig_line = go.Figure()
@@ -1028,6 +1090,7 @@ elif selected_page == "Reports":
             margin=dict(l=40, r=40, t=40, b=40)
         )
         st.plotly_chart(fig_line, use_container_width=True)
+
     with col2:
         st.subheader("Hours by Client")
         if len(filtered_hours) > 0:
@@ -1043,21 +1106,6 @@ elif selected_page == "Reports":
         else:
             st.info("No hours logged in this range.")
     st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1343,6 +1391,7 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
