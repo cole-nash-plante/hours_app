@@ -180,4 +180,9 @@ Projects maybe Olivia taking one slide and the new hires taking one
 2026-02-10,Regression Clients,Regression Check In,"-For Breush Pagan test we need the residuals for the test so we are really runningit on the test dataset
 -BP is meant to test on the results with a Null hypothesis that the data is homoskedastic, and that the residuals are evenly distributed. We test to determine if the variablitiy of the regression changes in a clear way based on the explanatory variables-so we need the test data to be what we are testing on.
 
--Changing the regression loops so we are running the BP test on each MODEL because it is really a test of each models explanatory power."
+-Breusch godfree is a test for autocoorelation, runs an auxillary regression on the data using the lagged residuals as predictors
+-We are testing if the residuals can be predictors of future residuals- does the error yesterday effect the error today - is there some force that is causing your model to predict poorly multiple predictions in a row consistently
+-Null hypothesis is that there is serial correlation
+
+-Changing the regression loops so we are running the BP test on each MODEL because it is really a test of each models explanatory power.
+- Same with BG"
