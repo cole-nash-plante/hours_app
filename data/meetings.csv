@@ -177,4 +177,7 @@ Cole and Fazeel taking the hiring process
 Claire and Fazeel internship process
 Projects maybe Olivia taking one slide and the new hires taking one
 "
-2026-02-10,Regression Clients,Regression Check In,
+2026-02-10,Regression Clients,Regression Check In,"-For Breush Pagan test we need the residuals for the test so we are really runningit on the test dataset
+-BP is meant to test on the results with a Null hypothesis that the data is homoskedastic, and that the residuals are evenly distributed. We test to determine if the variablitiy of the regression changes in a clear way based on the explanatory variables-so we need the test data to be what we are testing on.
+
+-Changing the regression loops so we are running the BP test on each MODEL because it is really a test of each models explanatory power."
