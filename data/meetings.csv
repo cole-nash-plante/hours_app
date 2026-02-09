@@ -186,7 +186,8 @@ Projects maybe Olivia taking one slide and the new hires taking one
 
 -Changing the regression loops so we are running the BP test on each MODEL because it is really a test of each models explanatory power.
 -change the regression type - we were running an RLM model for the heteroskedasticity tests and the autocoorelation which doesnt make sense because of the OLS use in the main function"
-2026-02-09,University of Alaska,Alaska Data Governance Touch Base,"
+2026-02-09,University of Alaska,Alaska Data Governance Touch Base,"Use maplets to determine if the pidms are in the bad table. 
+Put the rules on the ODS table
 
 
 
