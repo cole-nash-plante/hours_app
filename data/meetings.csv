@@ -185,7 +185,7 @@ Projects maybe Olivia taking one slide and the new hires taking one
 -Null hypothesis is that there is serial correlation
 
 -Changing the regression loops so we are running the BP test on each MODEL because it is really a test of each models explanatory power.
-- Same with BG"
+-change the regression type - we were running an RLM model for the heteroskedasticity tests and the autocoorelation which doesnt make sense because of the OLS use in the main function"
 2026-02-09,University of Alaska,Alaska Data Governance Touch Base,"
 
 
