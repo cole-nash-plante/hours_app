@@ -186,4 +186,39 @@ Projects maybe Olivia taking one slide and the new hires taking one
 
 -Changing the regression loops so we are running the BP test on each MODEL because it is really a test of each models explanatory power.
 - Same with BG"
-2026-02-09,University of Alaska,Alaska Data Governance Touch Base,
+2026-02-09,University of Alaska,Alaska Data Governance Touch Base,"
+
+
+
+Rules From Previous: 
+###########RAW###########
+SPRIDEN – Bad student IDs Raw
+	Logic – ultimately we need to confirm that the SPRIDEN_ID is a 30M formatted number, you may do this differently in Informatica. I don’t think the Length of Spriden_ID is going to work as a catch all.
+SELECT DISTINCT spriden_id
+FROM test_raw.banner_student.spriden
+WHERE spriden_change_ind IS NULL—indicates most recent record
+  AND spriden_entity_ind = 'P'--Indicates a person
+  AND LENGTH(spriden_id) = 8
+  AND spriden_id BETWEEN '30000000' AND '39999999'
+  order by 1;
+
+GOBINTL – Student with multiple records (PIDMs). Low priority as this currently has no invalid records
+
+
+
+############REFINED
+o	ODS_STUDENT – Bad Student IDs Refined
+	This rule should confirm that 0 bad IDs exist in out refined Zone. Threshold is 0.
+o	ODS_ENROLLMENT
+	Student without a home campus
+•	MAU_CAMPUS is not null
+	Student without a major code
+•	MAU_MAJOR is not null
+	Student without a degree code
+•	MAU_DEGREE is not null
+	Student without a student code level
+•	STUDENT_LEVEL_CODE is not null
+o	ODS_COURSE
+	Course with an invalid session code
+•	Session_code not in ('F', 'O', 'C', 'U', 'S')
+"
