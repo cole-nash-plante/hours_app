@@ -223,3 +223,4 @@ o	ODS_COURSE
 	Course with an invalid session code
 •	Session_code not in ('F', 'O', 'C', 'U', 'S')
 "
+2026-02-13,Regression Clients,Regression Check In,
