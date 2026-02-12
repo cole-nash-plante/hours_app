@@ -234,5 +234,11 @@ Looked into all the 0 data"
 -hours arent huge
 -contract that we didnt think we would have these hours to use, wants to walk through a new use case with informatica-I will be taking notes and doing research ahead of it
 -They want to integrate their new help desk ticket system- Fresh to Salesforce-something opened in salesforce pushed to ticketing system and back to salesforce
--Almost always API driven and only API driven"
+-Almost always API driven and only API driven
+
+-Informatica used to structure the api call in coordination with other API calls-informatica has application connector for salesforce, we will walk through building a service connector for this new system.
+
+-Familiarize myself with documentation and be prepared to take notes - might do a working session before hand 
+-application connector for fresh and salesforce and a process connector? <need to be familiar with that.
+-Dig into the API's or fresh service touch base in documentation"
 2026-02-12,CA PAI,Test,
