@@ -238,3 +238,4 @@ Date,Client,Hours,Description
 2026-02-12,Regression Clients,3.0,"Albatrans data investigation, statistical tests and regressions"
 2026-02-12,CA PAI,0.5,Into Phone Call
 2026-02-13,Regression Clients,1.0,Albatrans meeting result review
+2026-02-13,Regression Clients,1.0,Adjusting script templates to be more clear with department names in the output csv
