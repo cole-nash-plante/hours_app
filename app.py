@@ -719,9 +719,10 @@ if selected_page == "Home":
     today_str = datetime.today().strftime("%Y-%m-%d")
    df_today = (
         df_hours[df_hours["Date"] == today_str]
-        .sort_values(by="Client", ascending=True)
+        .groupby(["Client"], as_index=False)
+        .agg({"Hours": "sum"})
+        .sort_values("Client")
     )
-
     new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
     df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
     edited_hours = st.data_editor(df_today_with_blank, num_rows="dynamic", key="editor_today")
