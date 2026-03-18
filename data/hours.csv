@@ -1,9 +1,9 @@
 Date,Client,Hours,Description
 2026-03-17,OFM,1.25,SOAP/ RaaS API Research
-2026-03-17,General Non-client,1.0,Tennessee Python Training Revisions
-2026-03-17,General Non-client,1.25,Tenesse Python Training Meeting
+2026-03-17,TDH,1.0,Tennessee Python Training Revisions
+2026-03-17,TDH,1.25,Tenesse Python Training Meeting
 2026-03-17,University of Alaska,1.25,Ingestion Investigation and Communication
-2026-03-17,General Non-client,0.25,Tenessee Python Meeting
+2026-03-17,TDH,0.25,Tenessee Python Meeting
 2026-03-17,OFM,0.5,Research Meeting with Natalia
 2026-03-17,OFM,0.75,Morning Meetings and Notes
 2026-03-16,University of Alaska,0.75,PM/DWM Working Session
@@ -12,22 +12,22 @@ Date,Client,Hours,Description
 2026-03-16,University of Alaska,1.25,Streamlit App review and modification
 2026-03-16,University of Alaska,0.5,Taskflow sync meeting
 2026-03-13,University of Alaska,0.75,Starting moving admission into tf_enrollment and documentation
-2026-03-13,General Non-client,1.0,Python Training Meeting
+2026-03-13,TDH,1.0,Python Training Meeting
 2026-03-12,University of Alaska,0.5,Develupment Sync
-2026-03-12,General Non-client,1.5,Python Training Draft #3
+2026-03-12,TDH,1.5,Python Training Draft #3
 2026-03-11,University of Alaska,0.5,UA Sync with Michael
-2026-03-10,General Non-client,1.25,Tennessee Python Training
+2026-03-10,TDH,1.25,Tennessee Python Training
 2026-03-10,University of Alaska,1.25,Ingestion Research
 2026-03-09,University of Alaska,1.0,STG NSC and NSC_SENT
-2026-03-09,General Non-client,1.5,Tennessee Python Training Draft changes
+2026-03-09,TDH,1.5,Tennessee Python Training Draft changes
 2026-03-09,University of Alaska,0.75,Informatica Ingestion investigation and ticket creation
 2026-03-09,University of Alaska,0.75,Create full ingestion job
 2026-03-09,University of Alaska,0.75,DIM/ODS_GRADUATION 
 2026-03-09,University of Alaska,1.0,UA Working Session
-2026-03-06,General Non-client,0.75,Python Training
+2026-03-06,TDH,0.75,Python Training
 2026-03-06,University of Alaska,1.0,Ingestion Investigation
-2026-03-05,General Non-client,2.0,Tennessee Intermediate python training meeting
-2026-03-05,General Non-client,2.25,Tennessee Python Intermediate Training
+2026-03-05,TDH,2.0,Tennessee Intermediate python training meeting
+2026-03-05,TDH,2.25,Tennessee Python Intermediate Training
 2026-03-05,University of Alaska,1.5,Ingestion investigation on queries
 2026-03-04,OFM,0.75,Python troubleshooting meeting
 2026-03-04,University of Alaska,3.5,Log - Based ingestion research
@@ -36,13 +36,13 @@ Date,Client,Hours,Description
 2026-03-02,University of Alaska,1.0,DW/PM - DW Working Session
 2026-03-02,Regression Clients,2.0,Albatrans Script finalization and preparing additional visualizations for audit team members
 2026-03-02,Regression Clients,0.5,Albatrans meeting 
-2026-03-02,General Non-client,0.5,Tennessee Training Quick Synch with Natalia
+2026-03-02,TDH,0.5,Tennessee Training Quick Synch with Natalia
 2026-03-02,University of Alaska,0.5,Research and quick sync
-2026-02-26,General Non-client,1.75,Tennessee Python Trainiong
-2026-02-25,General Non-client,0.5,Python Training Updates and meeting with Natalia
+2026-02-26,TDH,1.75,Tennessee Python Trainiong
+2026-02-25,TDH,0.5,Python Training Updates and meeting with Natalia
 2026-02-25,Regression Clients,1.0,Analysis of failing regressions
 2026-02-25,DHCS,0.25,ETS Check In
-2026-02-25,General Non-client,0.5,Internal Python Training feedback meeting
+2026-02-25,TDH,0.5,Internal Python Training feedback meeting
 2026-02-25,DHCS,0.5,Conversion Working Session
 2026-02-25,Regression Clients,0.5,Meeting on Albatrans Regression Analysis
 2026-02-24,University of Alaska,2.25,DIM Graduation development 
@@ -51,28 +51,28 @@ Date,Client,Hours,Description
 2026-02-23,DHCS,0.25,Getting up to date on jobs before check in
 2026-02-23,University of Alaska,1.5,Graduation Development 
 2026-02-23,DHCS,0.25,ETS Check In
-2026-02-23,General Non-client,0.5,Tennessee Python training updates
+2026-02-23,TDH,0.5,Tennessee Python training updates
 2026-02-23,University of Alaska,0.5,Graduation Development meeting
 2026-02-23,University of Alaska,0.5,ODS/DIM _DEGREE_STATUS final checks
 2026-02-20,University of Alaska,0.5,Streamlit Review
 2026-02-20,University of Alaska,1.25,ODS/DIM_DEGREE_STATUS/
-2026-02-20,General Non-client,1.0,Tenessee Fininshing draft of day 2 python lesson
+2026-02-20,TDH,1.0,Tenessee Fininshing draft of day 2 python lesson
 2026-02-20,Regression Clients,1.0,Albatrans OE Prediction review
 2026-02-19,Regression Clients,0.75,Tenessee Python Training Meeting
 2026-02-19,DHCS,0.5,Pulling FTX DD4 Filenames
 2026-02-19,University of Alaska,0.75,Meeting and starting graduation iteration
 2026-02-19,Regression Clients,0.25,Albatrans Resression Meeting
 2026-02-19,DHCS,0.75,Meeting and pulling queries for claire
-2026-02-19,General Non-client,1.75,Tenessee Python training creation
+2026-02-19,TDH,1.75,Tenessee Python training creation
 2026-02-18,Regression Clients,0.75,Configure Notebooks in Jupyter and go over first lesson
 2026-02-18,DHCS,1.25,FTX final checks then changing notes
 2026-02-18,University of Alaska,0.75,UA Dev Touch Base and quick loook at queries for future fct tables
 2026-02-18,CA PAI,2.25,Meeting and Meeting Notes formatting
 2026-02-18,Regression Clients,0.75,Configure Notebooks in Jupyter and go over first lesson
 2026-02-18,CA PAI,0.25,Touch Base
-2026-02-17,General Non-client,0.5,Training Meeting
+2026-02-17,TDH,0.5,Training Meeting
 2026-02-17,DHCS,0.5,ETS Check In
-2026-02-16,General Non-client,0.5,Python Training onboarding and planning
+2026-02-16,TDH,0.5,Python Training onboarding and planning
 2026-02-16,CA PAI,1.5,API endpoint research
 2026-02-16,DHCS,2.25,FTX_DD4
 2026-02-13,Regression Clients,1.0,Albatrans meeting result review
