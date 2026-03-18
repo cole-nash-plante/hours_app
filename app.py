@@ -712,28 +712,65 @@ if selected_page == "Home":
                                 push_to_github("data/todos.csv", "Deleted a task")
                                 st.success("Task deleted!")
 
-    # -------------------------------
-    # Today's Hours Section
+# -------------------------------
+    # Today's Hours Section (with totals)
     # -------------------------------
     st.subheader("Today's Hours")
-    today_str = datetime.today().strftime("%Y-%m-%d")
-   df_today = (
-        df_hours[df_hours["Date"] == today_str]
-        .groupby(["Client"], as_index=False)
-        .agg({"Hours": "sum"})
-        .sort_values("Client")
-    )
-    new_row = {"Date": today_str, "Client": "", "Hours": 0.0, "Description": ""}
-    df_today_with_blank = pd.concat([df_today, pd.DataFrame([new_row])], ignore_index=True)
-    edited_hours = st.data_editor(df_today_with_blank, num_rows="dynamic", key="editor_today")
-    if st.button("Save Hours", key="save_hours_today"):
-        edited_hours = edited_hours.dropna(subset=["Client"])
-        edited_hours = edited_hours[edited_hours["Client"].str.strip() != ""]
-        df_hours = df_hours[df_hours["Date"] != today_str]
-        df_hours = pd.concat([df_hours, edited_hours], ignore_index=True)
-        df_hours.to_csv(HOURS_FILE, index=False)
-        push_to_github("data/hours.csv", "Updated today's hours")
 
+    today_str = datetime.today().strftime("%Y-%m-%d")
+
+    # Filter today's hours
+    df_today = df_hours[df_hours["Date"] == today_str].copy()
+
+    # Sort by Client
+    df_today = df_today.sort_values(by="Client", ascending=True)
+
+    # Build totals per client
+    totals = (
+        df_today.groupby("Client", as_index=False)["Hours"]
+        .sum()
+        .assign(Description="TOTAL")
+    )
+
+    # Merge detail rows + totals
+    df_display = pd.concat(
+        [df_today, totals],
+        ignore_index=True
+    )
+
+    # Add a blank row for new entry
+    blank_row = {
+        "Date": today_str,
+        "Client": "",
+        "Hours": 0.0,
+        "Description": ""
+    }
+
+    df_display = pd.concat(
+        [df_display, pd.DataFrame([blank_row])],
+        ignore_index=True
+    )
+
+    edited_hours = st.data_editor(
+        df_display,
+        num_rows="dynamic",
+        key="editor_today"
+    )
+
+    if st.button("Save Hours", key="save_hours_today"):
+        # Remove TOTAL rows before saving
+        cleaned = edited_hours[edited_hours["Description"] != "TOTAL"]
+
+        # Drop empty clients
+        cleaned = cleaned.dropna(subset=["Client"])
+        cleaned = cleaned[cleaned["Client"].str.strip() != ""]
+
+        # Replace today's rows
+        df_hours = df_hours[df_hours["Date"] != today_str]
+        df_hours = pd.concat([df_hours, cleaned], ignore_index=True)
+
+        df_hours.to_csv(HOURS_FILE, index=False)
+        push_to_github("data/hours.csv", "Updated today's hours with totals")
 
 
 
