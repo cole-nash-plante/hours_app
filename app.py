@@ -1169,6 +1169,8 @@ elif selected_page == "Data Entry":
     df_todos["DateCreated"] = pd.to_datetime(df_todos["DateCreated"], errors="coerce")
     df_todos["DateCompleted"] = pd.to_datetime(df_todos["DateCompleted"], errors="coerce")
 
+    df_hours = df_hours.sort_values(by = ['Date','Client'])
+
     #--------------------------
     # Enter data
     #--------------------------
