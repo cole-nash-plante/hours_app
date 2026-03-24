@@ -897,6 +897,8 @@ elif selected_page == "Reports":
     df_clients_active = pd.read_csv(CLIENTS_FILE)
     df_archive = pd.read_csv(ARCHIVE_CLIENTS)
 
+    hours_df = hours_df.sort_values(by = ['Date', 'Client'])
+
     # Concatenate the two dataframes
     df_clients = pd.concat([df_clients_active, df_archive], ignore_index=True)
 
