@@ -1207,6 +1207,10 @@ elif selected_page == "Reports":
     # PlannedHours(month) = BAN1_req_avg_hours_per_day * (business days in month within period - time off in month within period)
     period_months = pd.date_range(start=period_start, end=period_end, freq="MS")
     planned_rows = []
+    # Total business days in the full period
+    period_bdays = business_days(period_start, period_end)
+    period_time_off = time_off_count(period_start, period_end)
+    period_total_workdays = max(len(period_bdays) - period_time_off, 1)
     for m in period_months:
         m_start = m.date()
         m_end = date(m_start.year, m_start.month, calendar.monthrange(m_start.year, m_start.month)[1])
@@ -1218,9 +1222,9 @@ elif selected_page == "Reports":
         off_in_month = time_off_count(s, e)
         workdays_in_month = max(bdays_in_month - off_in_month, 0)
         planned_rows.append({
-            "MonthDate": pd.Timestamp(m_start),
-            "PlannedHours": req_avg_hours_per_day * workdays_in_month
-        })
+        "MonthDate": pd.Timestamp(m_start),
+        "PlannedHours": hours_goal * (workdays_in_month / period_total_workdays)
+    })
 
     planned_df = pd.DataFrame(planned_rows)
     if len(planned_df) == 0:
