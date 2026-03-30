@@ -995,48 +995,68 @@ elif selected_page == "Reports":
             pace_period = hours_to_date_in_period / elapsed_workdays
         else:
             pace_period = 0.0
-
-    # -----------------------------
-    # ROW 1: BANs (3)
-    # -----------------------------
+    
+     # ===========================
+    # BANS — WEEK / MONTH / PERIOD
+    # ===========================
+    
+    def ban_row(label, avg_req, goal, actual, delta_label, delta_value):
+        st.markdown(f"### {label}")
+        c1, c2, c3 = st.columns([2, 1, 1])
+    
+        with c1:
+            st.metric(
+                "Avg Hours / Day (Required)",
+                f"{avg_req:.2f}",
+                delta=f"{delta_label}: {delta_value:.2f}"
+            )
+        with c2:
+            st.metric("Goal Hours", f"{goal:.2f}")
+        with c3:
+            st.metric("Actual Hours", f"{actual:.2f}")
+    
+        st.markdown("---")
+    
+    
     st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    b1, b2, b3 = st.columns([1, 1, 1])
-
-    with b1:
-        st.metric("Avg Hours/Day (Required)", f"{req_avg_hours_per_day:.2f}")
-
-    with b2:
-        st.metric("Week Goal Hours", f"{goal_hours_this_week:.2f}")
-
-    with b3:
-        st.metric(
-            "Req Avg / Workday (This Month)",
-            f"{req_avg_hours_per_day_month:.2f}",
-            delta=f"Pace since period start: {pace_period:.2f}"
-        )
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # -----------------------------
-    # ROW 2: BANs (4)
-    # -----------------------------
-    st.markdown('<div class="form-box">', unsafe_allow_html=True)
-    c1, c2, c3, c4 = st.columns([1, 1, 1, 1])
-
-    with c1:
-        st.metric("Actual Hours (This Week)", f"{actual_hours_this_week:.2f}")
-
-    with c2:
-        st.metric("Actual Hours (This Month)", f"{actual_hours_this_month:.2f}")
-
-    with c3:
-        st.metric("Goal Hours (This Week)", f"{goal_hours_this_week:.2f}")
-
-    with c4:
-        st.metric("Goal Hours (This Month)", f"{month_goal_hours:.2f}")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
+    
+    # WEEK
+    remaining_week_days = max(week_workdays_in_period - time_off_this_week, 1)
+    req_avg_week = max(
+        (goal_hours_this_week - actual_hours_this_week) / remaining_week_days,
+        0
+    )
+    
+    ban_row(
+        "WEEK",
+        req_avg_week,
+        goal_hours_this_week,
+        actual_hours_this_week,
+        "Change since week start",
+        req_avg_week - req_avg_hours_per_day
+    )
+    
+    # MONTH
+    ban_row(
+        "MONTH",
+        req_avg_hours_per_day_month,
+        month_goal_hours,
+        actual_hours_this_month,
+        "Change since month start",
+        req_avg_hours_per_day_month - req_avg_hours_per_day
+    )
+    
+    # PERIOD
+    ban_row(
+        "PERIOD",
+        req_avg_hours_per_day,
+        hours_goal,
+        hours_to_date_in_period,
+        "Change since period start",
+        req_avg_hours_per_day - pace_period
+    )
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     # -----------------------------
     # ROW 3: Weekly Snapshot (KEEP AS IS)
     # -----------------------------
