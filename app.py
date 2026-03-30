@@ -1375,73 +1375,73 @@ elif selected_page == "Data Entry":
                 st.success("Time off saved!")
     
     with right_col:
-    st.markdown("### Upcoming Time Off (Editable)")
-
-    # Build an editable view of upcoming time off dates
-    today_dt = pd.to_datetime(date.today())
-    upcoming_df = days_off_df[days_off_df["Date"] >= today_dt].copy()
-    upcoming_df = upcoming_df.sort_values("Date").reset_index(drop=True)
-
-    # Display as strings for editing consistency
-    upcoming_display = upcoming_df.copy()
-    upcoming_display["Date"] = upcoming_display["Date"].dt.strftime("%Y-%m-%d")
-
-    edited_upcoming = st.data_editor(
-        upcoming_display[["Date"]],
-        num_rows="dynamic",        # allows delete rows + add rows
-        hide_index=True,
-        key="pto_upcoming_editor"
-    )
-
-    col_save, col_delete = st.columns([1, 1])
-
-    with col_save:
-        if st.button("Save Upcoming Changes", key="pto_save_upcoming"):
-            # Clean + validate
-            cleaned = edited_upcoming.dropna(how="all").copy()
-            cleaned["Date"] = cleaned["Date"].astype(str).str.strip()
-            cleaned["Date"] = pd.to_datetime(cleaned["Date"], errors="coerce")
-            cleaned = cleaned.dropna(subset=["Date"]).copy()
-
-            # Enforce weekdays only
-            cleaned = cleaned[cleaned["Date"].dt.weekday < 5].copy()
-
-            # Merge back with past time-off dates (so editing upcoming doesn't wipe history)
-            past_df = days_off_df[days_off_df["Date"] < today_dt].copy()
-            combined = pd.concat([past_df, cleaned], ignore_index=True)
-
-            # De-dupe + sort
-            combined["Date"] = combined["Date"].dt.strftime("%Y-%m-%d")
-            combined = combined.drop_duplicates(subset=["Date"]).sort_values("Date").reset_index(drop=True)
-
-            combined.to_csv(DAYS_OFF_FILE, index=False)
-            push_to_github("data/days_off.csv", "Updated upcoming time off (editable table)")
-            st.success("Upcoming time off updated!")
-
-    with col_delete:
-        # Optional: quick multi-delete without editing rows
-        if len(upcoming_display) > 0:
-            to_delete = st.multiselect(
-                "Delete selected dates",
-                upcoming_display["Date"].tolist(),
-                key="pto_delete_dates"
-            )
-            if st.button("Delete Selected", key="pto_delete_selected"):
-                if to_delete:
-                    remaining = days_off_df.copy()
-                    remaining["DateStr"] = remaining["Date"].dt.strftime("%Y-%m-%d")
-                    remaining = remaining[~remaining["DateStr"].isin(to_delete)].copy()
-                    remaining = remaining.drop(columns=["DateStr"])
-                    remaining["Date"] = remaining["Date"].dt.strftime("%Y-%m-%d")
-                    remaining = remaining.drop_duplicates(subset=["Date"]).sort_values("Date").reset_index(drop=True)
-
-                    remaining.to_csv(DAYS_OFF_FILE, index=False)
-                    push_to_github("data/days_off.csv", "Deleted selected time off dates")
-                    st.success("Selected dates deleted!")
-                else:
-                    st.info("No dates selected.")
-        else:
-            st.info("No upcoming time off saved.")
+        st.markdown("### Upcoming Time Off (Editable)")
+    
+        # Build an editable view of upcoming time off dates
+        today_dt = pd.to_datetime(date.today())
+        upcoming_df = days_off_df[days_off_df["Date"] >= today_dt].copy()
+        upcoming_df = upcoming_df.sort_values("Date").reset_index(drop=True)
+    
+        # Display as strings for editing consistency
+        upcoming_display = upcoming_df.copy()
+        upcoming_display["Date"] = upcoming_display["Date"].dt.strftime("%Y-%m-%d")
+    
+        edited_upcoming = st.data_editor(
+            upcoming_display[["Date"]],
+            num_rows="dynamic",        # allows delete rows + add rows
+            hide_index=True,
+            key="pto_upcoming_editor"
+        )
+    
+        col_save, col_delete = st.columns([1, 1])
+    
+        with col_save:
+            if st.button("Save Upcoming Changes", key="pto_save_upcoming"):
+                # Clean + validate
+                cleaned = edited_upcoming.dropna(how="all").copy()
+                cleaned["Date"] = cleaned["Date"].astype(str).str.strip()
+                cleaned["Date"] = pd.to_datetime(cleaned["Date"], errors="coerce")
+                cleaned = cleaned.dropna(subset=["Date"]).copy()
+    
+                # Enforce weekdays only
+                cleaned = cleaned[cleaned["Date"].dt.weekday < 5].copy()
+    
+                # Merge back with past time-off dates (so editing upcoming doesn't wipe history)
+                past_df = days_off_df[days_off_df["Date"] < today_dt].copy()
+                combined = pd.concat([past_df, cleaned], ignore_index=True)
+    
+                # De-dupe + sort
+                combined["Date"] = combined["Date"].dt.strftime("%Y-%m-%d")
+                combined = combined.drop_duplicates(subset=["Date"]).sort_values("Date").reset_index(drop=True)
+    
+                combined.to_csv(DAYS_OFF_FILE, index=False)
+                push_to_github("data/days_off.csv", "Updated upcoming time off (editable table)")
+                st.success("Upcoming time off updated!")
+    
+        with col_delete:
+            # Optional: quick multi-delete without editing rows
+            if len(upcoming_display) > 0:
+                to_delete = st.multiselect(
+                    "Delete selected dates",
+                    upcoming_display["Date"].tolist(),
+                    key="pto_delete_dates"
+                )
+                if st.button("Delete Selected", key="pto_delete_selected"):
+                    if to_delete:
+                        remaining = days_off_df.copy()
+                        remaining["DateStr"] = remaining["Date"].dt.strftime("%Y-%m-%d")
+                        remaining = remaining[~remaining["DateStr"].isin(to_delete)].copy()
+                        remaining = remaining.drop(columns=["DateStr"])
+                        remaining["Date"] = remaining["Date"].dt.strftime("%Y-%m-%d")
+                        remaining = remaining.drop_duplicates(subset=["Date"]).sort_values("Date").reset_index(drop=True)
+    
+                        remaining.to_csv(DAYS_OFF_FILE, index=False)
+                        push_to_github("data/days_off.csv", "Deleted selected time off dates")
+                        st.success("Selected dates deleted!")
+                    else:
+                        st.info("No dates selected.")
+            else:
+                st.info("No upcoming time off saved.")
 
     st.subheader("Filter by Client")
     all_clients = sorted(set(df_hours["Client"].dropna().tolist() + df_todos["Client"].dropna().tolist()))
