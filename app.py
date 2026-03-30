@@ -757,10 +757,8 @@ if selected_page == "Home":
     
     unentered_df = pd.read_csv(UNENTERED_HOURS_FILE)
     unentered_df["Date"] = pd.to_datetime(unentered_df["Date"], errors="coerce")
-    
-    # Sort: Client → Date
-    # Sort: Client → Date
-    unentered_df = unentered_df.sort_values(by=["Client", "Date"])
+    # Sort detail rows by Client → Date
+    detail_rows = unentered_df.sort_values(by=["Client", "Date"])
     
     # Build totals per Client + Date
     totals = (
@@ -770,16 +768,12 @@ if selected_page == "Home":
     )
     totals["Description"] = "TOTAL"
     
-    # Merge detail rows + totals
-    unentered_display = pd.concat([unentered_df, totals], ignore_index=True)
+    # Keep totals ordered nicely (optional)
+    totals = totals.sort_values(by=["Client", "Date"])
     
-    # Final sort ensures totals appear after detail rows
-    unentered_display = unentered_display.sort_values(
-        by=["Client", "Date", "Description"],
-        ascending=[True, True, False]
-    )
+    # Final display: details first, totals at bottom
+    unentered_display = pd.concat([detail_rows, totals], ignore_index=True)
 
-    
     # Editable table
     edited_unentered = st.data_editor(
         unentered_display,
