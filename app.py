@@ -630,11 +630,34 @@ if selected_page == "Home":
             description = st.text_input("Description", key="log_description")
         with col5:
             if st.button("Save Hours", key="save_hours"):
-                new_row = {"Date": str(date_val), "Client": client, "Hours": hours, "Description": description}
-                df_hours = pd.concat([df_hours, pd.DataFrame([new_row])], ignore_index=True)
-                df_hours.to_csv(HOURS_FILE, index=False)
-                push_to_github("data/hours.csv", "Updated hours log")
-                st.success("Hours logged successfully!")
+                new_row = {
+                    "Date": str(date_val),
+                    "Client": client,
+                    "Hours": hours,
+                    "Description": description
+                }
+            
+                # Load unentered hours
+                if os.path.exists(UNENTERED_HOURS_FILE):
+                    unentered_df = pd.read_csv(UNENTERED_HOURS_FILE)
+                else:
+                    unentered_df = pd.DataFrame(
+                        columns=["Date", "Client", "Hours", "Description"]
+                    )
+            
+                unentered_df = pd.concat(
+                    [unentered_df, pd.DataFrame([new_row])],
+                    ignore_index=True
+                )
+            
+                unentered_df.to_csv(UNENTERED_HOURS_FILE, index=False)
+                push_to_github(
+                    "data/unentered_hours.csv",
+                    "Added new unentered hours"
+                )
+            
+                st.success("Hours added to unentered backlog.")
+            
 
     # -------------------------------
     # Add To-Do Item Section
