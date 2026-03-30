@@ -78,6 +78,7 @@ HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
 GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
 CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
+PERIOD_FILE = os.path.join(DATA_DIR, "period_settings.csv")
 os.makedirs(DATA_DIR, exist_ok=True)
 st.set_page_config(layout="wide")
 
@@ -191,7 +192,7 @@ def apply_css_from_github(css_path="data/style.css"):
 
 
 # Sync Files from GitHub
-for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv", "data/days_off.csv", "data/categories.csv", "data/todos.csv", "data/style.css"]:
+for file in ["data/clients.csv", "data/period_settings.csv","data/hours.csv", "data/goals.csv", "data/days_off.csv", "data/categories.csv", "data/todos.csv", "data/style.css"]:
     fetch_from_github(file)
 
 st.markdown('<link rel="stylesheet" href="YOUR_GITHUB_RAW_CSS_URL">', unsafe_allow_html=True)
@@ -205,6 +206,7 @@ for file in [
     "data/categories.csv",
     "data/todos.csv",
     "data/style.css",
+    "data/period_settings.csv"
 ]:
     fetch_from_github(file)
 
@@ -219,6 +221,7 @@ init_files = [
     ("data/categories.csv", ["Client", "Category"]),
     ("data/todos.csv", ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]),
     ("data/days_off.csv", ["Date"]),
+    ("data/period_settings.csv", ["StartDate", "EndDate", "HoursGoal"]),
 ]
 for file, cols in init_files:
     if not os.path.exists(file):
@@ -1288,6 +1291,105 @@ elif selected_page == "Data Entry":
                 cleaned_todos.to_csv(TODOS_FILE, index=False)
                 push_to_github("data/todos.csv", "Updated To-Do history (removed empty rows)")
                 st.success("To-Do history updated! Empty rows deleted.")
+
+    # =========================================================
+    # Period Settings (Bottom of Data Entry)
+    # =========================================================
+    st.markdown("\n", unsafe_allow_html=True)
+    st.subheader("Performance Period Settings")
+    
+    # Ensure the file exists with the expected columns
+    if not os.path.exists(PERIOD_FILE):
+        pd.DataFrame(columns=["StartDate", "EndDate", "HoursGoal"]).to_csv(PERIOD_FILE, index=False)
+    
+    period_df = pd.read_csv(PERIOD_FILE)
+    
+    # Normalize column names (handles your " HoursGoal" header)
+    period_df.columns = [c.strip() for c in period_df.columns]
+    
+    # Ensure required columns exist
+    for col in ["StartDate", "EndDate", "HoursGoal"]:
+        if col not in period_df.columns:
+            period_df[col] = ""
+    
+    # Coerce dates safely for UI defaults
+    period_df["StartDate"] = pd.to_datetime(period_df["StartDate"], errors="coerce")
+    period_df["EndDate"] = pd.to_datetime(period_df["EndDate"], errors="coerce")
+    
+    # Coerce HoursGoal to numeric safely (handles " 653")
+    period_df["HoursGoal"] = pd.to_numeric(period_df["HoursGoal"], errors="coerce")
+    
+    # Default values (use first row if it exists)
+    default_start = period_df["StartDate"].iloc[0].date() if len(period_df) > 0 and pd.notna(period_df["StartDate"].iloc[0]) else date.today()
+    default_end = period_df["EndDate"].iloc[0].date() if len(period_df) > 0 and pd.notna(period_df["EndDate"].iloc[0]) else date.today()
+    default_goal = float(period_df["HoursGoal"].iloc[0]) if len(period_df) > 0 and pd.notna(period_df["HoursGoal"].iloc[0]) else 0.0
+    
+    # Quick entry row (start/end/hours + save)
+    c1, c2, c3, c4 = st.columns([1, 1, 1, 1])
+    with c1:
+        ps_start = st.date_input("Start Date", value=default_start, key="ps_start")
+    with c2:
+        ps_end = st.date_input("End Date", value=default_end, key="ps_end")
+    with c3:
+        ps_goal = st.number_input("Hours Goal", min_value=0.0, step=1.0, value=default_goal, key="ps_goal")
+    with c4:
+        if st.button("Save Period", key="ps_save_period", use_container_width=True):
+            if ps_start > ps_end:
+                st.error("Start Date must be on or before End Date.")
+            else:
+                # Store as a single-row settings file (overwrite row 0)
+                new_settings = pd.DataFrame([{
+                    "StartDate": ps_start.strftime("%Y-%m-%d"),
+                    "EndDate": ps_end.strftime("%Y-%m-%d"),
+                    "HoursGoal": ps_goal
+                }])
+    
+                new_settings.to_csv(PERIOD_FILE, index=False)
+                push_to_github("data/period_settings.csv", "Updated period settings (dates + hours goal)")
+                st.success("Period settings saved!")
+    
+    # Editable view (for quick edits)
+    st.markdown("### Edit period_settings.csv")
+    editable = period_df.copy()
+    # Convert back to strings for display/editing
+    editable["StartDate"] = editable["StartDate"].dt.strftime("%Y-%m-%d")
+    editable["EndDate"] = editable["EndDate"].dt.strftime("%Y-%m-%d")
+    editable["HoursGoal"] = editable["HoursGoal"].fillna(0)
+    
+    edited_period = st.data_editor(
+        editable[["StartDate", "EndDate", "HoursGoal"]],
+        num_rows="dynamic",
+        hide_index=True,
+        key="ps_editor"
+    )
+    
+    if st.button("Save Period Settings Changes", key="ps_save_editor"):
+        cleaned = edited_period.dropna(how="all").copy()
+    
+        # Strip whitespace
+        for col in ["StartDate", "EndDate"]:
+            cleaned[col] = cleaned[col].astype(str).str.strip()
+    
+        # Validate and coerce
+        cleaned["StartDate"] = pd.to_datetime(cleaned["StartDate"], errors="coerce")
+        cleaned["EndDate"] = pd.to_datetime(cleaned["EndDate"], errors="coerce")
+        cleaned["HoursGoal"] = pd.to_numeric(cleaned["HoursGoal"], errors="coerce").fillna(0)
+    
+        cleaned = cleaned.dropna(subset=["StartDate", "EndDate"])
+    
+        # Validate date order per row
+        bad_rows = cleaned[cleaned["StartDate"] > cleaned["EndDate"]]
+        if len(bad_rows) > 0:
+            st.error("One or more rows have StartDate after EndDate. Fix and try again.")
+        else:
+            # Save in consistent format
+            cleaned["StartDate"] = cleaned["StartDate"].dt.strftime("%Y-%m-%d")
+            cleaned["EndDate"] = cleaned["EndDate"].dt.strftime("%Y-%m-%d")
+            cleaned = cleaned[["StartDate", "EndDate", "HoursGoal"]].reset_index(drop=True)
+    
+            cleaned.to_csv(PERIOD_FILE, index=False)
+            push_to_github("data/period_settings.csv", "Edited period settings table")
+            st.success("period_settings.csv updated!")
 
 
 
