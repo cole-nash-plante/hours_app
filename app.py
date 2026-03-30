@@ -903,8 +903,7 @@ elif selected_page == "Reports":
     remaining_hours_in_period = max(hours_goal - hours_to_date_in_period, 0.0)
 
     # Remaining business days in period: "weekdays left" -> exclude today
-    remaining_start = max(period_start, today + pd.Timedelta(days=1).to_pytimedelta().days * 0)  # placeholder to avoid mypy
-    remaining_start = max(period_start, today + pd.Timedelta(days=1)).date()  # tomorrow, clamped to period
+    remaining_start = max(period_start, (pd.Timestamp(today) + pd.Timedelta(days=1)).date())
     if remaining_start > period_end:
         remaining_bdays = []
     else:
