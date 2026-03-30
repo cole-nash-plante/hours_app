@@ -229,7 +229,7 @@ for file, cols in init_files:
 # Sidebar Navigation
 # -------------------------------------------------
 st.sidebar.title("Navigation")
-pages = ["Home", "Meeting Notes", "Reports", "Data Entry", "Archive"]
+pages = ["Home", "Reports", "Data Entry", "Archive"]
 selected_page = st.sidebar.radio("Go to", pages)
 
 
@@ -771,110 +771,6 @@ if selected_page == "Home":
 
         df_hours.to_csv(HOURS_FILE, index=False)
         push_to_github("data/hours.csv", "Updated today's hours with totals")
-
-
-
-
-#----------------------------------------------------
-# Meeting Notes
-#---------------------------------------------------
-elif selected_page == "Meeting Notes":
-    st.title("Meeting Notes")
-
-    MEETINGS_FILE = os.path.join(DATA_DIR, "meetings.csv")
-    if not os.path.exists(MEETINGS_FILE):
-        pd.DataFrame(columns=["Date", "Client", "Meeting", "Notes"]).to_csv(MEETINGS_FILE, index=False)
-        push_to_github("data/meetings.csv", "Created meetings file")
-
-    df_meetings = pd.read_csv(MEETINGS_FILE)
-    df_clients = pd.read_csv(CLIENTS_FILE)
-    df_categories = pd.read_csv(CATEGORIES_FILE)
-    df_todos = pd.read_csv(TODOS_FILE)
-
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        # Select Client
-        selected_client = st.selectbox("Select Client", df_clients["Client"].tolist(), key="meeting_client")
-
-        # Header with color coding
-        client_color = df_clients.loc[df_clients["Client"] == selected_client, "Color"].values[0]
-        st.markdown(f"<div style='background-color:{client_color}; padding:10px; border-radius:5px;'><h4 style='color:white; font-size:20px;'>Meeting Notes for {selected_client}</h4></div>", unsafe_allow_html=True)
-
-        # New Meeting Form (all on one line)
-        st.subheader("New Meeting")
-        col_date, col_title, col_btn = st.columns([1.2, 3, 1])
-        with col_date:
-            meeting_date = st.date_input("Date", datetime.today().date(), key="meeting_date")
-        with col_title:
-            meeting_title = st.text_input("Meeting Title", key="meeting_title")
-        with col_btn:
-            if st.button("Save Meeting", key="save_meeting"):
-                if meeting_title.strip():
-                    new_row = {"Date": str(meeting_date), "Client": selected_client, "Meeting": meeting_title, "Notes": ""}
-                    df_meetings = pd.concat([df_meetings, pd.DataFrame([new_row])], ignore_index=True)
-                    df_meetings.to_csv(MEETINGS_FILE, index=False)
-                    push_to_github("data/meetings.csv", "Added new meeting")
-                    st.success("Meeting saved successfully!")
-                else:
-                    st.error("Please enter a meeting title.")
-
-        # Navigation for meetings
-        client_meetings = df_meetings[df_meetings["Client"] == selected_client]
-        if len(client_meetings) == 0:
-            st.info("No meetings for this client yet.")
-        else:
-            st.subheader("Select a Meeting")
-            meeting_options = client_meetings.apply(lambda row: f"{row['Date']} - {row['Meeting']}", axis=1).tolist()
-            selected_meeting = st.selectbox("Meetings", meeting_options, key="meeting_select")
-
-            meeting_index = meeting_options.index(selected_meeting)
-            notes_key = f"notes_{meeting_index}"
-            current_notes = client_meetings.iloc[meeting_index]["Notes"]
-
-            # Notes editor
-            st.subheader("Meeting Notes")
-            updated_notes = st.text_area("Notes", value=current_notes, height=300, key=notes_key)
-
-            col_save, col_delete = st.columns([1, 1])
-            with col_save:
-                if st.button("Save Notes", key="save_notes"):
-                    df_meetings.at[client_meetings.index[meeting_index], "Notes"] = updated_notes
-                    df_meetings.to_csv(MEETINGS_FILE, index=False)
-                    push_to_github("data/meetings.csv", "Updated meeting notes")
-                    st.success("Notes saved successfully!")
-            with col_delete:
-                if st.button("Delete Meeting", key="delete_meeting"):
-                    df_meetings = df_meetings.drop(index=client_meetings.index[meeting_index])
-                    df_meetings.to_csv(MEETINGS_FILE, index=False)
-                    push_to_github("data/meetings.csv", "Deleted meeting")
-                    st.success("Meeting deleted successfully!")
-
-        # Add To-Do Item (with priority slider)
-        st.subheader("Add To-Do Item")
-        client_categories = df_categories[df_categories["Client"] == selected_client]["Category"].tolist()
-        col_cat, col_task, col_notes, col_priority, col_btn = st.columns([1.5, 2, 3, 1, 1])
-        with col_cat:
-            todo_category = st.selectbox("Category", client_categories if client_categories else ["No categories"], key="todo_category_meeting")
-        with col_task:
-            todo_task = st.text_input("Task", key="todo_task_meeting")
-        with col_notes:
-            todo_notes = st.text_area("Notes", key="todo_notes_meeting", height=100)
-        with col_priority:
-            priority = st.slider("Priority", 1, 5, 3, key="todo_priority_meeting")
-        with col_btn:
-            if st.button("Add Task", key="add_task_meeting"):
-                if todo_task.strip() and todo_category != "No categories":
-                    df_todos.loc[len(df_todos)] = [selected_client, todo_category, todo_task, priority, str(datetime.today().date()), "", todo_notes]
-                    df_todos.to_csv(TODOS_FILE, index=False)
-                    push_to_github("data/todos.csv", "Added new task from meeting notes")
-                    st.success("Task added successfully!")
-                else:
-                    st.error("Please enter a valid category and task.")
-
-
-
-
 
 elif selected_page == "Reports":
     st.title("Reports")
