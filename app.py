@@ -24,7 +24,9 @@ HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
 GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
 CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
 DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
+UNENTERED_HOURS_FILE = os.path.join(DATA_DIR, "unentered_hours.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
+
 os.makedirs(DATA_DIR, exist_ok=True)
 st.set_page_config(layout="wide")
 
@@ -204,6 +206,7 @@ for file in [
     "data/hours.csv",
     "data/goals.csv",
     "data/categories.csv",
+    "data/unentered_hours.csv",
     "data/todos.csv",
     "data/style.css",
     "data/period_settings.csv"
