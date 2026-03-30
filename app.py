@@ -23,6 +23,7 @@ CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")
 HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
 GOALS_FILE = os.path.join(DATA_DIR, "goals.csv")
 CATEGORIES_FILE = os.path.join(DATA_DIR, "categories.csv")
+DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
 TODOS_FILE = os.path.join(DATA_DIR, "todos.csv")
 os.makedirs(DATA_DIR, exist_ok=True)
 st.set_page_config(layout="wide")
@@ -190,7 +191,7 @@ def apply_css_from_github(css_path="data/style.css"):
 
 
 # Sync Files from GitHub
-for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv", "data/categories.csv", "data/todos.csv", "data/style.css"]:
+for file in ["data/clients.csv", "data/hours.csv", "data/goals.csv", "data/days_off.csv", "data/categories.csv", "data/todos.csv", "data/style.css"]:
     fetch_from_github(file)
 
 st.markdown('<link rel="stylesheet" href="YOUR_GITHUB_RAW_CSS_URL">', unsafe_allow_html=True)
@@ -217,6 +218,7 @@ init_files = [
     ("data/goals.csv", ["Month", "GoalHours"]),
     ("data/categories.csv", ["Client", "Category"]),
     ("data/todos.csv", ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]),
+    ("data/days_off.csv", ["Date"]),
 ]
 for file, cols in init_files:
     if not os.path.exists(file):
@@ -1089,6 +1091,92 @@ elif selected_page == "Data Entry":
     # Client Filter
     # -------------------------
     st.markdown('\n', unsafe_allow_html=True)
+    # -------------------------
+# Time Off (PTO) Section
+# -------------------------
+st.markdown("\n", unsafe_allow_html=True)
+st.subheader("Time Off")
+
+# Load or initialize days_off.csv (keeps schema: Date only)
+if not os.path.exists(DAYS_OFF_FILE):
+    pd.DataFrame(columns=["Date"]).to_csv(DAYS_OFF_FILE, index=False)
+
+days_off_df = pd.read_csv(DAYS_OFF_FILE)
+if "Date" not in days_off_df.columns:
+    # Safety: keep structure minimal + compatible with Reports
+    days_off_df = pd.DataFrame(columns=["Date"])
+
+# Parse existing dates safely
+days_off_df["Date"] = pd.to_datetime(days_off_df["Date"], errors="coerce")
+days_off_df = days_off_df.dropna(subset=["Date"]).copy()
+
+left_col, right_col = st.columns(2)
+
+with left_col:
+    st.markdown("### Add Time Off")
+
+    start_date = st.date_input("Start Date", value=date.today(), key="pto_start_date")
+    end_date = st.date_input("End Date", value=date.today(), key="pto_end_date")
+    weekdays_only = st.checkbox("Weekdays only (Mon–Fri)", value=True, key="pto_weekdays_only")
+
+    if start_date > end_date:
+        st.error("Start Date must be on or before End Date.")
+    else:
+        if st.button("Save Time Off", key="save_time_off"):
+            # Expand range into individual dates (stored as one row per date)
+            rng = pd.date_range(start=start_date, end=end_date, freq="D")
+            if weekdays_only:
+                rng = [d for d in rng if d.weekday() < 5]  # Mon-Fri only
+
+            new_dates = pd.DataFrame({"Date": [d.strftime("%Y-%m-%d") for d in rng]})
+
+            # Combine + de-duplicate
+            combined = pd.concat(
+                [days_off_df.assign(Date=days_off_df["Date"].dt.strftime("%Y-%m-%d")), new_dates],
+                ignore_index=True
+            ).drop_duplicates(subset=["Date"])
+
+            # Save back (keep schema: Date)
+            combined = combined.sort_values("Date").reset_index(drop=True)
+            combined.to_csv(DAYS_OFF_FILE, index=False)
+
+            # Push to GitHub (optional; uses your existing helper)
+            push_to_github("data/days_off.csv", "Updated days off / time off")
+
+            st.success("Time off saved!")
+
+with right_col:
+    st.markdown("### Upcoming Time Off")
+
+    today_dt = pd.to_datetime(date.today())
+    upcoming = days_off_df[days_off_df["Date"] >= today_dt].copy()
+    upcoming = upcoming.sort_values("Date")
+
+    if upcoming.empty:
+        st.info("No upcoming time off saved.")
+    else:
+        # Group consecutive dates into ranges for a cleaner list
+        dates = upcoming["Date"].dt.date.tolist()
+        ranges = []
+        range_start = dates[0]
+        prev = dates[0]
+
+        for d in dates[1:]:
+            if (d - prev).days == 1:
+                prev = d
+            else:
+                ranges.append((range_start, prev))
+                range_start = d
+                prev = d
+        ranges.append((range_start, prev))
+
+        for s, e in ranges:
+            if s == e:
+                st.markdown(f"- **{s.isoformat()}**")
+            else:
+                num_days = (e - s).days + 1
+                st.markdown(f"- **{s.isoformat()} → {e.isoformat()}** ({num_days} days)")
+
     st.subheader("Filter by Client")
     all_clients = sorted(set(df_hours["Client"].dropna().tolist() + df_todos["Client"].dropna().tolist()))
     selected_clients = st.multiselect("Select Clients", all_clients, default=all_clients)
