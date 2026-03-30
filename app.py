@@ -759,11 +759,30 @@ if selected_page == "Home":
     unentered_df["Date"] = pd.to_datetime(unentered_df["Date"], errors="coerce")
     
     # Sort: Client → Date
+    # Sort: Client → Date
     unentered_df = unentered_df.sort_values(by=["Client", "Date"])
+    
+    # Build totals per Client + Date
+    totals = (
+        unentered_df
+        .groupby(["Client", "Date"], as_index=False)["Hours"]
+        .sum()
+    )
+    totals["Description"] = "TOTAL"
+    
+    # Merge detail rows + totals
+    unentered_display = pd.concat([unentered_df, totals], ignore_index=True)
+    
+    # Final sort ensures totals appear after detail rows
+    unentered_display = unentered_display.sort_values(
+        by=["Client", "Date", "Description"],
+        ascending=[True, True, False]
+    )
+
     
     # Editable table
     edited_unentered = st.data_editor(
-        unentered_df,
+        unentered_display,
         num_rows="dynamic",
         hide_index=True,
         key="unentered_hours_editor"
