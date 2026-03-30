@@ -222,6 +222,7 @@ init_files = [
     ("data/todos.csv", ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]),
     ("data/days_off.csv", ["Date"]),
     ("data/period_settings.csv", ["StartDate", "EndDate", "HoursGoal"]),
+    ("data/unentered_hours.csv", ["Date", "Client", "Hours", "Description"]),
 ]
 for file, cols in init_files:
     if not os.path.exists(file):
