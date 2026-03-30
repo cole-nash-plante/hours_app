@@ -1072,20 +1072,45 @@ elif selected_page == "Data Entry":
     #--------------------------
     # Enter data
     #--------------------------
+    #--------------------------
+    # Enter data
+    #--------------------------
     st.subheader("Add Client Category")
-
-    col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 1, 3])
+    
+    col1, col2, col3 = st.columns([2, 2, 1])
+    
     with col1:
-        client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
+        category_client = st.selectbox(
+            "Client",
+            df_clients["Client"].tolist(),
+            key="de_category_client"   # unique key (avoid collisions with other pages)
+        )
+    
     with col2:
-        category = st.text_input("Category", key="todo_task")
-    with col5:
-        if st.button("Save Hours", key="save_hours"):
-            new_row = {"Client": str(client), "Category": category, "Hours": hours, "Description": description}
-            df_categories = pd.concat([df_categories, pd.DataFrame([new_row])], ignore_index=True)
-            df_hours.to_csv(CATEGORIES_FILE, index=False)
-            push_to_github("data/hours.csv", "Updated hours log")
-            st.success("Hours logged successfully!")
+        category_name = st.text_input(
+            "Category",
+            key="de_category_name"
+        )
+    
+    with col3:
+        if st.button("Save Category", key="de_save_category"):
+            if str(category_name).strip() == "":
+                st.error("Category cannot be blank.")
+            else:
+                # Only store what categories.csv actually needs: Client + Category
+                new_row = {"Client": str(category_client), "Category": str(category_name).strip()}
+                df_categories = pd.concat([df_categories, pd.DataFrame([new_row])], ignore_index=True)
+    
+                # Optional: prevent duplicates (same client/category)
+                df_categories = df_categories.drop_duplicates(subset=["Client", "Category"]).reset_index(drop=True)
+    
+                # Save correct dataframe -> correct file
+                df_categories.to_csv(CATEGORIES_FILE, index=False)
+    
+                # Push correct file
+                push_to_github("data/categories.csv", "Added/updated category")
+    
+                st.success("Hours logged successfully!")
 
     # -------------------------
     # Client Filter
