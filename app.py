@@ -718,64 +718,91 @@ if selected_page == "Home":
                                 st.success("Task deleted!")
 
 # -------------------------------
-    # Today's Hours Section (with totals)
-    # -------------------------------
-    st.subheader("Today's Hours")
+# Unentered Hours (Persistent Backlog)
+# -------------------------------
+st.subheader("Unentered Hours")
 
-    today_str = datetime.today().strftime("%Y-%m-%d")
-
-    # Filter today's hours
-    df_today = df_hours[df_hours["Date"] == today_str].copy()
-
-    # Sort by Client
-    df_today = df_today.sort_values(by="Client", ascending=True)
-
-    # Build totals per client
-    totals = (
-        df_today.groupby("Client", as_index=False)["Hours"]
-        .sum()
-        .assign(Description="TOTAL")
+# Ensure file exists
+if not os.path.exists(UNENTERED_HOURS_FILE):
+    pd.DataFrame(columns=["Date", "Client", "Hours", "Description"]).to_csv(
+        UNENTERED_HOURS_FILE, index=False
     )
 
-    # Merge detail rows + totals
-    df_display = pd.concat(
-        [df_today, totals],
-        ignore_index=True
-    )
+unentered_df = pd.read_csv(UNENTERED_HOURS_FILE)
+unentered_df["Date"] = pd.to_datetime(unentered_df["Date"], errors="coerce")
 
-    # Add a blank row for new entry
-    blank_row = {
-        "Date": today_str,
-        "Client": "",
-        "Hours": 0.0,
-        "Description": ""
-    }
+# Sort: Client → Date
+unentered_df = unentered_df.sort_values(by=["Client", "Date"])
 
-    df_display = pd.concat(
-        [df_display, pd.DataFrame([blank_row])],
-        ignore_index=True
-    )
+# Editable table
+edited_unentered = st.data_editor(
+    unentered_df,
+    num_rows="dynamic",
+    hide_index=True,
+    key="unentered_hours_editor"
+)
 
-    edited_hours = st.data_editor(
-        df_display,
-        num_rows="dynamic",
-        key="editor_today"
-    )
+col_save, col_mark = st.columns([1, 1])
 
-    if st.button("Save Hours", key="save_hours_today"):
-        # Remove TOTAL rows before saving
-        cleaned = edited_hours[edited_hours["Description"] != "TOTAL"]
+# Save edits (but do NOT post to hours.csv yet)
+with col_save:
+    if st.button("Save Unentered Changes"):
+        cleaned = edited_unentered.dropna(how="all").copy()
+        cleaned["Client"] = cleaned["Client"].astype(str).str.strip()
+        cleaned = cleaned[cleaned["Client"] != ""]
+        cleaned["Hours"] = pd.to_numeric(cleaned["Hours"], errors="coerce").fillna(0)
+        cleaned["Date"] = pd.to_datetime(cleaned["Date"], errors="coerce")
 
-        # Drop empty clients
-        cleaned = cleaned.dropna(subset=["Client"])
-        cleaned = cleaned[cleaned["Client"].str.strip() != ""]
+        cleaned.to_csv(UNENTERED_HOURS_FILE, index=False)
+        push_to_github(
+            "data/unentered_hours.csv",
+            "Updated unentered hours backlog"
+        )
+        st.success("Unentered hours saved.")
+    
+    # Mark as entered (by client)
+    with col_mark:
+        clients_in_table = sorted(
+            edited_unentered["Client"]
+            .dropna()
+            .astype(str)
+            .unique()
+            .tolist()
+        )
+    
+        if clients_in_table:
+            selected_client = st.selectbox(
+                "Mark entries as entered (by client)",
+                clients_in_table
+            )
+    
+            if st.button("Mark as Entered"):
+                to_post = edited_unentered[
+                    edited_unentered["Client"] == selected_client
+                ].copy()
+    
+                remaining = edited_unentered[
+                    edited_unentered["Client"] != selected_client
+                ].copy()
+    
+                # Append to HOURS_FILE
+                hours_df = pd.read_csv(HOURS_FILE)
+                combined = pd.concat([hours_df, to_post], ignore_index=True)
+                combined.to_csv(HOURS_FILE, index=False)
+    
+                # Save remaining unentered
+                remaining.to_csv(UNENTERED_HOURS_FILE, index=False)
+    
+                push_to_github("data/hours.csv", f"Entered hours for {selected_client}")
+                push_to_github(
+                    "data/unentered_hours.csv",
+                    f"Cleared unentered hours for {selected_client}"
+                )
+    
+                st.success(f"Hours for {selected_client} marked as entered.")
+        else:
+            st.info("No unentered hours.")
 
-        # Replace today's rows
-        df_hours = df_hours[df_hours["Date"] != today_str]
-        df_hours = pd.concat([df_hours, cleaned], ignore_index=True)
-
-        df_hours.to_csv(HOURS_FILE, index=False)
-        push_to_github("data/hours.csv", "Updated today's hours with totals")
 
 elif selected_page == "Reports":
     st.title("Reports")
