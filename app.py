@@ -743,164 +743,164 @@ if selected_page == "Home":
                                 df_todos.to_csv(TODOS_FILE, index=False)
                                 push_to_github("data/todos.csv", "Deleted a task")
                                 st.success("Task deleted!")
-
-# -------------------------------
-# Unentered Hours (Persistent Backlog)
-# -------------------------------
-st.subheader("Unentered Hours")
-
-# Ensure file exists
-if not os.path.exists(UNENTERED_HOURS_FILE):
-    pd.DataFrame(columns=["Date", "Client", "Hours", "Description"]).to_csv(
-        UNENTERED_HOURS_FILE, index=False
-    )
-
-raw = pd.read_csv(UNENTERED_HOURS_FILE)
-
-# Ensure required columns exist (defensive)
-for col in ["Date", "Client", "Hours", "Description"]:
-    if col not in raw.columns:
-        raw[col] = "" if col != "Hours" else 0
-
-# Normalize types
-raw["Client"] = raw["Client"].astype(str).str.strip()
-raw["Description"] = raw["Description"].astype(str).fillna("").str.strip()
-raw["Hours"] = pd.to_numeric(raw["Hours"], errors="coerce").fillna(0)
-
-# Parse dates -> keep as date (not timestamp)
-raw["Date"] = pd.to_datetime(raw["Date"], errors="coerce").dt.date
-
-# IMPORTANT: Strip any previously-saved TOTAL rows (cleans “polluted” files)
-is_total = raw["Description"].str.upper().eq("TOTAL")
-stale_total_count = int(is_total.sum())
-raw = raw[~is_total].copy()
-
-if stale_total_count > 0:
-    st.info(
-        f"Found {stale_total_count} stale TOTAL row(s) in unentered_hours.csv. "
-        "They will not be used and will be removed next time you save."
-    )
-
-# Drop empty rows
-raw = raw.dropna(subset=["Date"])
-raw = raw[raw["Client"] != ""].copy()
-
-# Detail rows (for editing)
-detail = raw.copy()
-detail["Date"] = pd.to_datetime(detail["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
-detail = detail.sort_values(by=["Client", "Date"]).reset_index(drop=True)
-
-# Computed totals (for display only)
-totals = (
-    raw.groupby(["Client", "Date"], as_index=False)["Hours"]
-    .sum()
-    .sort_values(by=["Client", "Date"])
-    .reset_index(drop=True)
-)
-totals["Description"] = "TOTAL"
-totals["Date"] = pd.to_datetime(totals["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
-
-# Display = details first, totals at bottom
-unentered_display = pd.concat([detail, totals], ignore_index=True)
-
-edited_unentered = st.data_editor(
-    unentered_display,
-    num_rows="dynamic",
-    hide_index=True,
-    key="unentered_hours_editor"
-)
-
-col_save, col_mark = st.columns([1, 1])
-
-# -----------------
-# Save edits (ONLY real rows; totals are recomputed)
-# -----------------
-with col_save:
-    if st.button("Save Unentered Changes"):
-        cleaned = edited_unentered.dropna(how="all").copy()
-
-        # Normalize again from edited grid
-        for col in ["Date", "Client", "Hours", "Description"]:
-            if col not in cleaned.columns:
-                cleaned[col] = "" if col != "Hours" else 0
-
-        cleaned["Client"] = cleaned["Client"].astype(str).str.strip()
-        cleaned["Description"] = cleaned["Description"].astype(str).fillna("").str.strip()
-        cleaned["Hours"] = pd.to_numeric(cleaned["Hours"], errors="coerce").fillna(0)
-        cleaned["Date"] = pd.to_datetime(cleaned["Date"], errors="coerce")
-
-        # Keep ONLY detail rows (exclude totals robustly)
-        cleaned = cleaned[~cleaned["Description"].str.upper().eq("TOTAL")].copy()
-
-        # Drop junk rows
-        cleaned = cleaned.dropna(subset=["Date"])
-        cleaned = cleaned[cleaned["Client"] != ""].copy()
-
-        # Store canonical date format
-        cleaned["Date"] = cleaned["Date"].dt.strftime("%Y-%m-%d")
-
-        # Save ONLY real rows
-        cleaned[["Date", "Client", "Hours", "Description"]].to_csv(
+    
+    # -------------------------------
+    # Unentered Hours (Persistent Backlog)
+    # -------------------------------
+    st.subheader("Unentered Hours")
+    
+    # Ensure file exists
+    if not os.path.exists(UNENTERED_HOURS_FILE):
+        pd.DataFrame(columns=["Date", "Client", "Hours", "Description"]).to_csv(
             UNENTERED_HOURS_FILE, index=False
         )
-        push_to_github("data/unentered_hours.csv", "Updated unentered hours backlog")
-        st.success("Unentered hours saved (totals are computed, not stored).")
-
-# -----------------
-# Mark as entered (by client) — ONLY real rows
-# -----------------
-with col_mark:
-    # Build client dropdown from detail rows only (exclude totals)
-    detail_only = edited_unentered.copy()
-    detail_only["Client"] = detail_only["Client"].astype(str).str.strip()
-    detail_only["Description"] = detail_only["Description"].astype(str).fillna("").str.strip()
-    detail_only = detail_only[~detail_only["Description"].str.upper().eq("TOTAL")].copy()
-    detail_only = detail_only[detail_only["Client"] != ""].copy()
-
-    clients_in_table = sorted(detail_only["Client"].dropna().unique().tolist())
-
-    if clients_in_table:
-        selected_client = st.selectbox("Mark entries as entered (by client)", clients_in_table)
-
-        if st.button("Mark as Entered"):
-            to_post = detail_only[detail_only["Client"] == selected_client].copy()
-            remaining = detail_only[detail_only["Client"] != selected_client].copy()
-
-            # Normalize posted rows
-            to_post["Hours"] = pd.to_numeric(to_post["Hours"], errors="coerce").fillna(0)
-            to_post["Date"] = pd.to_datetime(to_post["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
-
-            # Append to hours.csv
-            hours_df = pd.read_csv(HOURS_FILE)
+    
+    raw = pd.read_csv(UNENTERED_HOURS_FILE)
+    
+    # Ensure required columns exist (defensive)
+    for col in ["Date", "Client", "Hours", "Description"]:
+        if col not in raw.columns:
+            raw[col] = "" if col != "Hours" else 0
+    
+    # Normalize types
+    raw["Client"] = raw["Client"].astype(str).str.strip()
+    raw["Description"] = raw["Description"].astype(str).fillna("").str.strip()
+    raw["Hours"] = pd.to_numeric(raw["Hours"], errors="coerce").fillna(0)
+    
+    # Parse dates -> keep as date (not timestamp)
+    raw["Date"] = pd.to_datetime(raw["Date"], errors="coerce").dt.date
+    
+    # IMPORTANT: Strip any previously-saved TOTAL rows (cleans “polluted” files)
+    is_total = raw["Description"].str.upper().eq("TOTAL")
+    stale_total_count = int(is_total.sum())
+    raw = raw[~is_total].copy()
+    
+    if stale_total_count > 0:
+        st.info(
+            f"Found {stale_total_count} stale TOTAL row(s) in unentered_hours.csv. "
+            "They will not be used and will be removed next time you save."
+        )
+    
+    # Drop empty rows
+    raw = raw.dropna(subset=["Date"])
+    raw = raw[raw["Client"] != ""].copy()
+    
+    # Detail rows (for editing)
+    detail = raw.copy()
+    detail["Date"] = pd.to_datetime(detail["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    detail = detail.sort_values(by=["Client", "Date"]).reset_index(drop=True)
+    
+    # Computed totals (for display only)
+    totals = (
+        raw.groupby(["Client", "Date"], as_index=False)["Hours"]
+        .sum()
+        .sort_values(by=["Client", "Date"])
+        .reset_index(drop=True)
+    )
+    totals["Description"] = "TOTAL"
+    totals["Date"] = pd.to_datetime(totals["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    
+    # Display = details first, totals at bottom
+    unentered_display = pd.concat([detail, totals], ignore_index=True)
+    
+    edited_unentered = st.data_editor(
+        unentered_display,
+        num_rows="dynamic",
+        hide_index=True,
+        key="unentered_hours_editor"
+    )
+    
+    col_save, col_mark = st.columns([1, 1])
+    
+    # -----------------
+    # Save edits (ONLY real rows; totals are recomputed)
+    # -----------------
+    with col_save:
+        if st.button("Save Unentered Changes"):
+            cleaned = edited_unentered.dropna(how="all").copy()
+    
+            # Normalize again from edited grid
             for col in ["Date", "Client", "Hours", "Description"]:
-                if col not in hours_df.columns:
-                    hours_df[col] = "" if col != "Hours" else 0
-
-            combined = pd.concat(
-                [hours_df[["Date", "Client", "Hours", "Description"]],
-                 to_post[["Date", "Client", "Hours", "Description"]]],
-                ignore_index=True
-            )
-
-            # Canonicalize dates in hours.csv too
-            combined["Date"] = pd.to_datetime(combined["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
-            combined["Hours"] = pd.to_numeric(combined["Hours"], errors="coerce").fillna(0)
-
-            combined.to_csv(HOURS_FILE, index=False)
-            push_to_github("data/hours.csv", f"Entered hours for {selected_client}")
-
-            # Save remaining unentered (detail rows only)
-            remaining["Date"] = pd.to_datetime(remaining["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
-            remaining["Hours"] = pd.to_numeric(remaining["Hours"], errors="coerce").fillna(0)
-
-            remaining[["Date", "Client", "Hours", "Description"]].to_csv(
+                if col not in cleaned.columns:
+                    cleaned[col] = "" if col != "Hours" else 0
+    
+            cleaned["Client"] = cleaned["Client"].astype(str).str.strip()
+            cleaned["Description"] = cleaned["Description"].astype(str).fillna("").str.strip()
+            cleaned["Hours"] = pd.to_numeric(cleaned["Hours"], errors="coerce").fillna(0)
+            cleaned["Date"] = pd.to_datetime(cleaned["Date"], errors="coerce")
+    
+            # Keep ONLY detail rows (exclude totals robustly)
+            cleaned = cleaned[~cleaned["Description"].str.upper().eq("TOTAL")].copy()
+    
+            # Drop junk rows
+            cleaned = cleaned.dropna(subset=["Date"])
+            cleaned = cleaned[cleaned["Client"] != ""].copy()
+    
+            # Store canonical date format
+            cleaned["Date"] = cleaned["Date"].dt.strftime("%Y-%m-%d")
+    
+            # Save ONLY real rows
+            cleaned[["Date", "Client", "Hours", "Description"]].to_csv(
                 UNENTERED_HOURS_FILE, index=False
             )
-            push_to_github("data/unentered_hours.csv", f"Cleared unentered hours for {selected_client}")
-
-            st.success(f"Hours for {selected_client} marked as entered.")
-    else:
-        st.info("No unentered hours.")
+            push_to_github("data/unentered_hours.csv", "Updated unentered hours backlog")
+            st.success("Unentered hours saved (totals are computed, not stored).")
+    
+    # -----------------
+    # Mark as entered (by client) — ONLY real rows
+    # -----------------
+    with col_mark:
+        # Build client dropdown from detail rows only (exclude totals)
+        detail_only = edited_unentered.copy()
+        detail_only["Client"] = detail_only["Client"].astype(str).str.strip()
+        detail_only["Description"] = detail_only["Description"].astype(str).fillna("").str.strip()
+        detail_only = detail_only[~detail_only["Description"].str.upper().eq("TOTAL")].copy()
+        detail_only = detail_only[detail_only["Client"] != ""].copy()
+    
+        clients_in_table = sorted(detail_only["Client"].dropna().unique().tolist())
+    
+        if clients_in_table:
+            selected_client = st.selectbox("Mark entries as entered (by client)", clients_in_table)
+    
+            if st.button("Mark as Entered"):
+                to_post = detail_only[detail_only["Client"] == selected_client].copy()
+                remaining = detail_only[detail_only["Client"] != selected_client].copy()
+    
+                # Normalize posted rows
+                to_post["Hours"] = pd.to_numeric(to_post["Hours"], errors="coerce").fillna(0)
+                to_post["Date"] = pd.to_datetime(to_post["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    
+                # Append to hours.csv
+                hours_df = pd.read_csv(HOURS_FILE)
+                for col in ["Date", "Client", "Hours", "Description"]:
+                    if col not in hours_df.columns:
+                        hours_df[col] = "" if col != "Hours" else 0
+    
+                combined = pd.concat(
+                    [hours_df[["Date", "Client", "Hours", "Description"]],
+                     to_post[["Date", "Client", "Hours", "Description"]]],
+                    ignore_index=True
+                )
+    
+                # Canonicalize dates in hours.csv too
+                combined["Date"] = pd.to_datetime(combined["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
+                combined["Hours"] = pd.to_numeric(combined["Hours"], errors="coerce").fillna(0)
+    
+                combined.to_csv(HOURS_FILE, index=False)
+                push_to_github("data/hours.csv", f"Entered hours for {selected_client}")
+    
+                # Save remaining unentered (detail rows only)
+                remaining["Date"] = pd.to_datetime(remaining["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
+                remaining["Hours"] = pd.to_numeric(remaining["Hours"], errors="coerce").fillna(0)
+    
+                remaining[["Date", "Client", "Hours", "Description"]].to_csv(
+                    UNENTERED_HOURS_FILE, index=False
+                )
+                push_to_github("data/unentered_hours.csv", f"Cleared unentered hours for {selected_client}")
+    
+                st.success(f"Hours for {selected_client} marked as entered.")
+        else:
+            st.info("No unentered hours.")
 
     
 
