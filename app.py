@@ -828,7 +828,16 @@ if selected_page == "Home":
                     # Append to HOURS_FILE
                     hours_df = pd.read_csv(HOURS_FILE)
                     combined = pd.concat([hours_df, to_post], ignore_index=True)
+                    DATE_COL = "Date"  # <-- change if yours is named differently (e.g., "Date")
+
+                    combined[DATE_COL] = (
+                        pd.to_datetime(combined[DATE_COL], errors="coerce")   # parse anything date-like
+                          .dt.date                                           # drop time
+                          .astype("string")                                  # ensures consistent CSV output
+                    )
+                                        
                     combined.to_csv(HOURS_FILE, index=False)
+                    
         
                     # Save remaining unentered
                     remaining.to_csv(UNENTERED_HOURS_FILE, index=False)
