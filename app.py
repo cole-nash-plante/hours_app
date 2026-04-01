@@ -818,8 +818,10 @@ if selected_page == "Home":
         
                 if st.button("Mark as Entered"):
                     to_post = edited_unentered[
-                        edited_unentered["Client"] == selected_client
+                        (edited_unentered["Client"] == selected_client) &
+                        (edited_unentered["Description"] != "TOTAL")
                     ].copy()
+
         
                     remaining = edited_unentered[
                         edited_unentered["Client"] != selected_client
