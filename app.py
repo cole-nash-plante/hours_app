@@ -1892,7 +1892,13 @@ elif selected_page == "Archive":
             with col1:
                 st.text(row["Client"])
             with col2:
-                new_color = st.color_picker("", row["Color"], key=f"color_{i}")
+                default_color = (
+                    row["Color"]
+                    if isinstance(row["Color"], str) and row["Color"].startswith("#") and len(row["Color"]) == 7
+                    else "#1f77b4"
+                )
+                
+                new_color = st.color_picker("", default_color, key=f"color_{i}")
                 df_clients.at[i, "Color"] = new_color
         if st.button("Save Color Changes"):
             df_clients.to_csv(CLIENTS_FILE, index=False)
