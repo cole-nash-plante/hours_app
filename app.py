@@ -1453,6 +1453,7 @@ elif selected_page == "Data Entry":
             # After you write df to csv:
             st.write("Last 5 rows after add:")
             st.dataframe(pd.read_csv(CLIENTS_FILE).tail())
+            push_to_github("data/clients.csv", "Updated upcoming time off (editable table)")
 
     
             st.success(f"Client '{new_client}' added")
