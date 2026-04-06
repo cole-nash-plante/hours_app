@@ -602,6 +602,11 @@ body {
 if selected_page == "Home":
     # Load required data
     df_clients = pd.read_csv(CLIENTS_FILE)
+
+    # normalize headers + values
+    df_clients.columns = df_clients.columns.str.strip()
+    df_clients["Client"] = df_clients["Client"].str.strip()
+    df_clients["Color"] = df_clients["Color"].str.strip()
     df_todos = pd.read_csv(TODOS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_hours = pd.read_csv(HOURS_FILE)
