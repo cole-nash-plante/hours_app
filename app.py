@@ -1445,9 +1445,18 @@ elif selected_page == "Data Entry":
             )
     
             df_clients.to_csv(CLIENTS_FILE, index=False)
+            st.write("TOKEN present:", bool(GITHUB_TOKEN))
+            st.write("CLIENTS_FILE:", CLIENTS_FILE)
+            st.write("Local clients.csv exists:", os.path.exists(CLIENTS_FILE))
+            st.write("Local clients.csv size:", os.path.getsize(CLIENTS_FILE) if os.path.exists(CLIENTS_FILE) else None)
+            
+            # After you write df to csv:
+            st.write("Last 5 rows after add:")
+            st.dataframe(pd.read_csv(CLIENTS_FILE).tail())
+
     
             st.success(f"Client '{new_client}' added")
-            st.rerun()
+            
 
     st.subheader("Add Client Category")
     
