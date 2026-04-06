@@ -1410,6 +1410,28 @@ elif selected_page == "Data Entry":
     #--------------------------
     # Enter data
     #--------------------------
+    st.subheader("Add Client")
+
+    with st.form("add_client_form", clear_on_submit=True):
+        new_client = st.text_input("Client name")
+        new_color = st.color_picker("Client color", "#1f77b4")
+        submit_client = st.form_submit_button("Add Client")
+    
+    if submit_client:
+        if new_client.strip() == "":
+            st.warning("Client name is required.")
+        elif new_client in df_clients["Client"].values:
+            st.warning("Client already exists.")
+        else:
+            new_row = pd.DataFrame(
+                [{"Client": new_client.strip(), "Color": new_color}]
+            )
+    
+            df_clients = pd.concat([df_clients, new_row], ignore_index=True)
+            df_clients.to_csv(CLIENTS_FILE, index=False)
+    
+            st.success(f"Added client: {new_client}")
+            st.rerun()
     st.subheader("Add Client Category")
     
     col1, col2, col3 = st.columns([2, 2, 1])
