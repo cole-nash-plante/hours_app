@@ -602,11 +602,6 @@ body {
 if selected_page == "Home":
     # Load required data
     df_clients = pd.read_csv(CLIENTS_FILE)
-
-    # normalize headers + values
-    df_clients.columns = df_clients.columns.str.strip()
-    df_clients["Client"] = df_clients["Client"].str.strip()
-    df_clients["Color"] = df_clients["Color"].str.strip()
     df_todos = pd.read_csv(TODOS_FILE)
     df_categories = pd.read_csv(CATEGORIES_FILE)
     df_hours = pd.read_csv(HOURS_FILE)
@@ -908,180 +903,487 @@ if selected_page == "Home":
             st.info("No unentered hours.")
 
     
+
 elif selected_page == "Reports":
     st.title("Reports")
 
-    # ----------------------------
-    # Helpers (local to Reports)
-    # ----------------------------
-    from datetime import timedelta
+    # -----------------------------
+    # File paths (use global constants where possible)
+    # -----------------------------
+    HOURS_FILE = os.path.join(DATA_DIR, "hours.csv")
+    DAYS_OFF_FILE = os.path.join(DATA_DIR, "days_off.csv")
+    CLIENTS_FILE = os.path.join(DATA_DIR, "clients.csv")
+    PERIOD_FILE = os.path.join(DATA_DIR, "period_settings.csv")
+    ARCHIVE_CLIENTS = os.path.join(DATA_DIR, "archive_clients.csv")
 
-    def _safe_read_csv(path, cols=None):
-        """Read CSV if it exists; otherwise return empty DF with optional cols."""
-        if os.path.exists(path):
-            try:
-                return pd.read_csv(path)
-            except Exception:
-                return pd.DataFrame(columns=cols or [])
-        return pd.DataFrame(columns=cols or [])
+    # -----------------------------
+    # Ensure required files exist (safe defaults)
+    # -----------------------------
+    if not os.path.exists(HOURS_FILE):
+        pd.DataFrame(columns=["Date", "Client", "Hours", "Description"]).to_csv(HOURS_FILE, index=False)
 
-    def _to_date_series(s):
-        """Convert a pandas Series to python date objects; invalid -> NaT dropped."""
-        if s is None or len(s) == 0:
-            return pd.Series([], dtype="object")
-        return pd.to_datetime(s, errors="coerce").dt.date.dropna()
+    if not os.path.exists(DAYS_OFF_FILE):
+        pd.DataFrame(columns=["Date"]).to_csv(DAYS_OFF_FILE, index=False)
 
-    def _is_workday(d: date) -> bool:
-        # Mon=0 ... Sun=6
-        return d.weekday() < 5
+    if not os.path.exists(CLIENTS_FILE):
+        pd.DataFrame(columns=["Client", "Color"]).to_csv(CLIENTS_FILE, index=False)
 
-    def _count_remaining_workdays_from_tomorrow(end_d: date, days_off: set[date]) -> int:
-        """Count workdays from tomorrow through end_d, excluding weekends and days_off."""
-        start = date.today() + timedelta(days=1)
-        if end_d is None or start > end_d:
-            return 0
+    if not os.path.exists(ARCHIVE_CLIENTS):
+        pd.DataFrame(columns=["Client", "Color"]).to_csv(ARCHIVE_CLIENTS, index=False)
 
-        n = 0
-        cur = start
-        while cur <= end_d:
-            if _is_workday(cur) and cur not in days_off:
-                n += 1
-            cur += timedelta(days=1)
-        return n
+    # period_settings.csv is single-row source of truth
+    if not os.path.exists(PERIOD_FILE):
+        # Create a default single-row period + goal
+        today_tmp = date.today()
+        pd.DataFrame([{
+            "StartDate": str(date(today_tmp.year, 1, 1)),
+            "EndDate": str(date(today_tmp.year, 12, 31)),
+            "HoursGoal": 0
+        }]).to_csv(PERIOD_FILE, index=False)
+        push_to_github("data/period_settings.csv", "Initialized period_settings.csv (single row)")
 
-    def _avg_required(goal_hours: float, actual_hours: float, end_d: date, days_off: set[date]) -> float:
-        """Avg hours/day required from tomorrow to end_d."""
-        remaining = max(float(goal_hours) - float(actual_hours), 0.0)
-        remaining_days = _count_remaining_workdays_from_tomorrow(end_d, days_off)
-        return (remaining / remaining_days) if remaining_days > 0 else 0.0
-
-    def _sum_hours_between(df_hours, start_d: date, end_d: date) -> float:
-        if df_hours.empty:
-            return 0.0
-        dts = pd.to_datetime(df_hours.get("Date", pd.Series([])), errors="coerce").dt.date
-        hrs = pd.to_numeric(df_hours.get("Hours", pd.Series([])), errors="coerce").fillna(0.0)
-        mask = (dts >= start_d) & (dts <= end_d)
-        return float(hrs[mask].sum()) if mask.any() else 0.0
-
-    # ----------------------------
+    # -----------------------------
     # Load data
-    # ----------------------------
-    df_hours = _safe_read_csv(HOURS_FILE, cols=["Date", "Client", "Hours", "Description"])
-    df_goals = _safe_read_csv(GOALS_FILE, cols=["Month", "GoalHours"])
-    df_period = _safe_read_csv(PERIOD_FILE, cols=["StartDate", "EndDate", "HoursGoal"])
-    df_days_off = _safe_read_csv(DAYS_OFF_FILE, cols=["Date"])
+    # -----------------------------
+    hours_df = pd.read_csv(HOURS_FILE)
+    days_off_df = pd.read_csv(DAYS_OFF_FILE)
+    df_clients_active = pd.read_csv(CLIENTS_FILE)
+    df_archive = pd.read_csv(ARCHIVE_CLIENTS)
 
-    # Normalize dates
-    days_off = set(_to_date_series(df_days_off.get("Date", pd.Series([]))).tolist())
+    # Combine active + archive clients for charts/colors
+    df_clients = pd.concat([df_clients_active, df_archive], ignore_index=True)
 
-    today = date.today()
+    # Safe conversions
+    hours_df["Date"] = pd.to_datetime(hours_df.get("Date", None), errors="coerce")
+    hours_df["Hours"] = pd.to_numeric(hours_df.get("Hours", 0), errors="coerce").fillna(0)
 
-    # ----------------------------
-    # Define report windows
-    # ----------------------------
-    # Week window: Monday -> Sunday
-    week_start = today - timedelta(days=today.weekday())
-    week_end = week_start + timedelta(days=6)
+    days_off_df["Date"] = pd.to_datetime(days_off_df.get("Date", None), errors="coerce")
 
-    # Month window: 1st -> last day
-    month_start = date(today.year, today.month, 1)
-    last_day = calendar.monthrange(today.year, today.month)[1]
-    month_end = date(today.year, today.month, last_day)
+    hours_df = hours_df.dropna(subset=["Date"])
+    days_off_df = days_off_df.dropna(subset=["Date"])
 
-    # Period window: from period_settings.csv if present, else default to current month
-    period_start = month_start
-    period_end = month_end
-    period_goal = 0.0
+    # -----------------------------
+    # Load period settings (single row)
+    # -----------------------------
+    period_settings = pd.read_csv(PERIOD_FILE)
+    period_settings.columns = [c.strip() for c in period_settings.columns]  # handle whitespace
+    # Ensure columns exist
+    for col in ["StartDate", "EndDate", "HoursGoal"]:
+        if col not in period_settings.columns:
+            period_settings[col] = ""
 
-    if not df_period.empty:
-        try:
-            ps = df_period.iloc[-1]  # last row wins
-            period_start = pd.to_datetime(ps.get("StartDate"), errors="coerce").date()
-            period_end = pd.to_datetime(ps.get("EndDate"), errors="coerce").date()
-            period_goal = float(ps.get("HoursGoal", 0.0) or 0.0)
-        except Exception:
-            period_start, period_end, period_goal = month_start, month_end, 0.0
+    period_start = pd.to_datetime(period_settings["StartDate"].iloc[0], errors="coerce")
+    period_end = pd.to_datetime(period_settings["EndDate"].iloc[0], errors="coerce")
+    hours_goal = pd.to_numeric(period_settings["HoursGoal"].iloc[0], errors="coerce")
 
-    # Month goal from goals.csv (matches "Month" as YYYY-MM or similar). If missing, 0.
-    month_goal = 0.0
-    if not df_goals.empty:
-        # Try common formats: "YYYY-MM", "YYYY-MM-01", or month name.
-        m = str(today.strftime("%Y-%m"))
-        try:
-            df_goals["Month_str"] = df_goals["Month"].astype(str)
-            hit = df_goals[df_goals["Month_str"].str.contains(m, na=False)]
-            if not hit.empty:
-                month_goal = float(pd.to_numeric(hit.iloc[-1].get("GoalHours", 0), errors="coerce") or 0.0)
-        except Exception:
-            month_goal = 0.0
+    if pd.isna(period_start) or pd.isna(period_end) or pd.isna(hours_goal):
+        st.error("period_settings.csv must contain valid StartDate, EndDate, and HoursGoal (single row).")
+        st.stop()
 
-    # Week goal: pro-rate month goal by workdays in week vs workdays in month (fallback to 0)
-    def _workdays_in_range(start_d: date, end_d: date, days_off: set[date]) -> int:
+    period_start = period_start.date()
+    period_end = period_end.date()
+    hours_goal = float(hours_goal)
+
+    now = datetime.today()
+    today = now.date()
+
+    # -----------------------------
+    # Helper functions (business-day aware)
+    # -----------------------------
+    def business_days(start_d: date, end_d: date):
+        """Return list of business-day dates (Mon-Fri) between start_d and end_d inclusive."""
         if start_d > end_d:
-            return 0
-        n = 0
-        cur = start_d
-        while cur <= end_d:
-            if _is_workday(cur) and cur not in days_off:
-                n += 1
-            cur += timedelta(days=1)
-        return n
+            return []
+        rng = pd.date_range(start=start_d, end=end_d, freq="B")
+        return [d.date() for d in rng]
 
-    month_workdays = _workdays_in_range(month_start, month_end, days_off)
-    week_workdays = _workdays_in_range(week_start, week_end, days_off)
-    week_goal = (month_goal * (week_workdays / month_workdays)) if (month_goal and month_workdays) else 0.0
+    def time_off_count(start_d: date, end_d: date):
+        """Count time off days in [start_d, end_d] that are business days (weekdays only)."""
+        bdays = set(business_days(start_d, end_d))
+        off_days = set(days_off_df["Date"].dt.date.tolist())
+        return len(bdays.intersection(off_days))
 
-    # ----------------------------
-    # Actual hours in each window
-    # ----------------------------
-    week_actual = _sum_hours_between(df_hours, week_start, week_end)
-    month_actual = _sum_hours_between(df_hours, month_start, month_end)
-    period_actual = _sum_hours_between(df_hours, period_start, period_end)
+    def clamp_to_period(start_d: date, end_d: date):
+        """Clamp a date range to the performance period."""
+        s = max(start_d, period_start)
+        e = min(end_d, period_end)
+        if s > e:
+            return None, None
+        return s, e
 
-    # ----------------------------
-    # Required average (FROM TOMORROW!)
-    # ----------------------------
-    week_avg_req = _avg_required(week_goal, week_actual, week_end, days_off)
-    month_avg_req = _avg_required(month_goal, month_actual, month_end, days_off)
-    period_avg_req = _avg_required(period_goal, period_actual, period_end, days_off)
+    # -----------------------------
+    # Period-scoped slices
+    # -----------------------------
+    # Hours to date in period (only dates within [period_start, min(today, period_end)])
+    period_to_date_end = min(today, period_end)
+    if period_to_date_end < period_start:
+        hours_to_date_in_period = 0.0
+    else:
+        hours_to_date_in_period = float(
+            hours_df.loc[
+                (hours_df["Date"].dt.date >= period_start) &
+                (hours_df["Date"].dt.date <= period_to_date_end),
+                "Hours"
+            ].sum()
+        )
 
-    # ----------------------------
-    # Render UI
-    # ----------------------------
-    st.subheader("WEEK")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Avg Hours / Day (Required)", f"{week_avg_req:.2f}")
-    c2.metric("Goal Hours", f"{week_goal:.2f}")
-    c3.metric("Actual Hours", f"{week_actual:.2f}")
+    remaining_hours_in_period = max(hours_goal - hours_to_date_in_period, 0.0)
 
-    st.divider()
+    # Remaining business days in period: "weekdays left" -> exclude today
+    remaining_start = max(period_start, (pd.Timestamp(today) + pd.Timedelta(days=1)).date())
+    if remaining_start > period_end:
+        remaining_bdays = []
+    else:
+        remaining_bdays = business_days(remaining_start, period_end)
 
-    st.subheader("MONTH")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Avg Hours / Day (Required)", f"{month_avg_req:.2f}")
-    c2.metric("Goal Hours", f"{month_goal:.2f}")
-    c3.metric("Actual Hours", f"{month_actual:.2f}")
+    remaining_time_off = time_off_count(remaining_start, period_end) if remaining_bdays else 0
+    remaining_workdays = max(len(remaining_bdays) - remaining_time_off, 0)
 
-    st.divider()
+    # BAN 1: Required Avg Hours/Day for remainder of period
+    if remaining_workdays > 0:
+        req_avg_hours_per_day = remaining_hours_in_period / remaining_workdays
+    else:
+        req_avg_hours_per_day = 0.0
 
-    st.subheader("PERIOD")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Avg Hours / Day (Required)", f"{period_avg_req:.2f}")
-    c2.metric("Goal Hours", f"{period_goal:.2f}")
-    c3.metric("Actual Hours", f"{period_actual:.2f}")
+    # Week boundaries (Mon-Fri)
+    start_of_week = (pd.Timestamp(today) - pd.Timedelta(days=pd.Timestamp(today).weekday())).date()  # Monday
+    end_of_week = (pd.Timestamp(start_of_week) + pd.Timedelta(days=4)).date()  # Friday
 
-    # Small debug expander (optional but helpful)
-    with st.expander("Debug: calculation inputs", expanded=False):
-        st.write({
-            "today": str(today),
-            "week_start": str(week_start), "week_end": str(week_end),
-            "month_start": str(month_start), "month_end": str(month_end),
-            "period_start": str(period_start), "period_end": str(period_end),
-            "week_goal": week_goal, "week_actual": week_actual, "week_avg_req": week_avg_req,
-            "month_goal": month_goal, "month_actual": month_actual, "month_avg_req": month_avg_req,
-            "period_goal": period_goal, "period_actual": period_actual, "period_avg_req": period_avg_req,
-            "days_off_count": len(days_off),
-        })
+    # Clamp week to period
+    wk_s, wk_e = clamp_to_period(start_of_week, end_of_week)
+    if wk_s is None:
+        week_workdays_in_period = 0
+        time_off_this_week = 0
+        actual_hours_this_week = 0.0
+    else:
+        week_workdays_in_period = len(business_days(wk_s, wk_e))
+        time_off_this_week = time_off_count(wk_s, wk_e)
+        actual_hours_this_week = float(
+            hours_df.loc[
+                (hours_df["Date"].dt.date >= wk_s) &
+                (hours_df["Date"].dt.date <= wk_e),
+                "Hours"
+            ].sum()
+        )
+
+    # BAN 2 & Row2 Goal week hours
+    goal_hours_this_week = req_avg_hours_per_day * max(week_workdays_in_period - time_off_this_week, 0)
+
+    # Month boundaries (calendar month)
+    month_start = date(today.year, today.month, 1)
+    month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
+
+    # Clamp month to period
+    mo_s, mo_e = clamp_to_period(month_start, month_end)
+    if mo_s is None:
+        month_workdays_in_period = 0
+        time_off_this_month = 0
+        actual_hours_this_month = 0.0
+    else:
+        month_workdays_in_period = len(business_days(mo_s, mo_e))
+        time_off_this_month = time_off_count(mo_s, mo_e)
+        actual_hours_this_month = float(
+            hours_df.loc[
+                (hours_df["Date"].dt.date >= mo_s) &
+                (hours_df["Date"].dt.date <= min(today, mo_e)),
+                "Hours"
+            ].sum()
+        )
+
+    # Month goal based on BAN daily requirement * planned working days in month (period-only, weekdays only)
+    month_goal_hours = req_avg_hours_per_day * max(month_workdays_in_period - time_off_this_month, 0)
+
+    # Remaining workdays in month (exclude today for "remaining")
+    remaining_month_start = max(mo_s, (pd.Timestamp(today) + pd.Timedelta(days=1)).date())
+    if mo_s is None or remaining_month_start > mo_e:
+        remaining_month_workdays = 0
+        remaining_month_time_off = 0
+    else:
+        rem_month_bdays = business_days(remaining_month_start, mo_e)
+        remaining_month_time_off = time_off_count(remaining_month_start, mo_e)
+        remaining_month_workdays = max(len(rem_month_bdays) - remaining_month_time_off, 0)
+
+    # BAN 3: Required Avg Hours/Workday to hit THIS month's goal
+    remaining_month_hours_needed = max(month_goal_hours - actual_hours_this_month, 0.0)
+    if remaining_month_workdays > 0:
+        req_avg_hours_per_day_month = remaining_month_hours_needed / remaining_month_workdays
+    else:
+        req_avg_hours_per_day_month = 0.0
+
+    # Pace since start of period excluding time off (your Q10)
+    period_elapsed_end = min(today, period_end)
+    if period_elapsed_end < period_start:
+        pace_period = 0.0
+    else:
+        elapsed_bdays = business_days(period_start, period_elapsed_end)
+        elapsed_time_off = time_off_count(period_start, period_elapsed_end) if elapsed_bdays else 0
+        elapsed_workdays = max(len(elapsed_bdays) - elapsed_time_off, 0)
+        if elapsed_workdays > 0:
+            pace_period = hours_to_date_in_period / elapsed_workdays
+        else:
+            pace_period = 0.0
+    
+     # ===========================
+    # BANS — WEEK / MONTH / PERIOD
+    # ===========================
+    
+    def ban_row(label, avg_req, goal, actual, delta_label, delta_value):
+        st.markdown(f"### {label}")
+        c1, c2, c3 = st.columns([2, 1, 1])
+    
+        with c1:
+            st.metric(
+                "Avg Hours / Day (Required)",
+                f"{avg_req:.2f}",
+                delta=f"{delta_label}: {delta_value:.2f}"
+            )
+        with c2:
+            st.metric("Goal Hours", f"{goal:.2f}")
+        with c3:
+            st.metric("Actual Hours", f"{actual:.2f}")
+    
+        st.markdown("---")
+    
+    
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    
+    # WEEK
+    remaining_week_days = max(week_workdays_in_period - time_off_this_week, 1)
+    req_avg_week = max(
+        (goal_hours_this_week - actual_hours_this_week) / remaining_week_days,
+        0
+    )
+    
+    ban_row(
+        "WEEK",
+        req_avg_week,
+        goal_hours_this_week,
+        actual_hours_this_week,
+        "Change since week start",
+        req_avg_week - req_avg_hours_per_day
+    )
+    
+    # MONTH
+    ban_row(
+        "MONTH",
+        req_avg_hours_per_day_month,
+        month_goal_hours,
+        actual_hours_this_month,
+        "Change since month start",
+        req_avg_hours_per_day_month - req_avg_hours_per_day
+    )
+    
+    # PERIOD
+    ban_row(
+        "PERIOD",
+        req_avg_hours_per_day,
+        hours_goal,
+        hours_to_date_in_period,
+        "Change since period start",
+        req_avg_hours_per_day - pace_period
+    )
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    # -----------------------------
+    # ROW 3: Weekly Snapshot (KEEP AS IS)
+    # -----------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    if "week_offset" not in st.session_state:
+        st.session_state.week_offset = 0
+
+    today_ts = pd.Timestamp.today()
+    start_of_week_ts = (today_ts + pd.Timedelta(weeks=st.session_state.week_offset)).normalize() - pd.Timedelta(days=today_ts.weekday())
+    end_of_week_ts = start_of_week_ts + pd.Timedelta(days=6)
+    week_label = f"{start_of_week_ts.strftime('%b %d')} - {end_of_week_ts.strftime('%b %d')}"
+
+    st.subheader(f"Weekly Snapshot: Billed Hours by Client ({week_label})")
+
+    nav_col1, nav_col2 = st.columns([1, 1])
+    with nav_col1:
+        if st.button("⬅ Previous Week"):
+            st.session_state.week_offset -= 1
+    with nav_col2:
+        if st.button("Next Week ➡"):
+            st.session_state.week_offset += 1
+
+    weekly_data = hours_df[(hours_df["Date"] >= start_of_week_ts) & (hours_df["Date"] <= end_of_week_ts)]
+
+    # Client colors map (safe fallback)
+    client_colors = {}
+    if "Client" in df_clients.columns:
+        if "Color" in df_clients.columns:
+            client_colors = {row["Client"]: row["Color"] for _, row in df_clients.dropna(subset=["Client"]).iterrows()}
+
+    weekdays = pd.date_range(start_of_week_ts, end_of_week_ts, freq="D")
+    weekdays = [d for d in weekdays if d.weekday() < 5]
+
+    fig_weekly = go.Figure()
+    for client in weekly_data["Client"].dropna().unique():
+        client_df = (
+            weekly_data[weekly_data["Client"] == client]
+            .groupby("Date")["Hours"]
+            .sum()
+            .reindex(weekdays, fill_value=0)
+        )
+        fig_weekly.add_trace(go.Scatter(
+            x=[d.strftime("%a") for d in weekdays],
+            y=client_df.values,
+            mode="lines+markers",
+            name=client,
+            line=dict(color=client_colors.get(client, "#FFFFFF"), width=4),
+            marker=dict(size=10),
+            hovertemplate="Client: " + str(client) + "<br>Day: %{x}<br>Hours: %{y}<extra></extra>"
+        ))
+
+    fig_weekly.update_layout(
+        plot_bgcolor="#0f0f23",
+        paper_bgcolor="#0f0f23",
+        font=dict(color="#FFFFFF", size=14),
+        xaxis=dict(title="Day of Week", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
+        yaxis=dict(title="Hours", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
+        legend=dict(font=dict(color="#FFFFFF", size=18, family="Arial Bold"), orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
+        margin=dict(l=40, r=40, t=40, b=80)
+    )
+    st.plotly_chart(fig_weekly, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # -----------------------------
+    # ROW 4: Monthly Planned vs Actual + Pie (30 days default + date range picker)
+    # -----------------------------
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
+    col_left, col_right = st.columns([2, 1])
+
+    # Build all-time monthly actuals
+    hours_df["MonthDate"] = hours_df["Date"].dt.to_period("M").dt.to_timestamp()
+    monthly_actual_all = (
+        hours_df.groupby("MonthDate", as_index=False)["Hours"]
+        .sum()
+        .rename(columns={"Hours": "ActualHours"})
+        .sort_values("MonthDate")
+        .reset_index(drop=True)
+    )
+
+    # Build monthly planned for months in period only
+    # PlannedHours(month) = BAN1_req_avg_hours_per_day * (business days in month within period - time off in month within period)
+    period_months = pd.date_range(start=period_start, end=period_end, freq="MS")
+    planned_rows = []
+    # Total business days in the full period
+    period_bdays = business_days(period_start, period_end)
+    period_time_off = time_off_count(period_start, period_end)
+    period_total_workdays = max(len(period_bdays) - period_time_off, 1)
+    for m in period_months:
+        m_start = m.date()
+        m_end = date(m_start.year, m_start.month, calendar.monthrange(m_start.year, m_start.month)[1])
+        # Clamp this month window to period
+        s, e = clamp_to_period(m_start, m_end)
+        if s is None:
+            continue
+        bdays_in_month = len(business_days(s, e))
+        off_in_month = time_off_count(s, e)
+        workdays_in_month = max(bdays_in_month - off_in_month, 0)
+        planned_rows.append({
+        "MonthDate": pd.Timestamp(m_start),
+        "PlannedHours": hours_goal * (workdays_in_month / period_total_workdays)
+    })
+
+    planned_df = pd.DataFrame(planned_rows)
+    if len(planned_df) == 0:
+        planned_df = pd.DataFrame(columns=["MonthDate", "PlannedHours"])
+
+    # Merge for plotting across the full timeline:
+    # - actual: all-time months
+    # - planned: only months in the performance period (others remain NaN)
+    merged_monthly = monthly_actual_all.merge(planned_df, on="MonthDate", how="left")
+    merged_monthly["MonthLabel"] = merged_monthly["MonthDate"].dt.strftime("%b %Y")
+
+    with col_left:
+        st.subheader("Monthly Actual vs Planned Hours")
+
+        fig_line = go.Figure()
+        # Planned line (only shows where PlannedHours exists)
+        fig_line.add_trace(go.Scatter(
+            x=merged_monthly["MonthLabel"],
+            y=merged_monthly["PlannedHours"],
+            mode="lines+markers",
+            name="Planned Hours (Period Only)",
+            line=dict(color="#ff0000", width=3),
+            marker=dict(color="#ff0000", size=8),
+            connectgaps=False
+        ))
+        # Actual line (all-time)
+        fig_line.add_trace(go.Scatter(
+            x=merged_monthly["MonthLabel"],
+            y=merged_monthly["ActualHours"],
+            mode="lines+markers",
+            name="Actual Hours (All Time)",
+            line=dict(color="#00ff2f", width=3),
+            marker=dict(color="#00ff2f", size=8)
+        ))
+
+        fig_line.update_layout(
+            showlegend=True,
+            plot_bgcolor="#0f0f23",
+            paper_bgcolor="#0f0f23",
+            font=dict(color="#FFFFFF", size=14),
+            xaxis=dict(type="category", title="Month", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
+            yaxis=dict(title="Hours", color="#FFFFFF", tickfont=dict(color="#FFFFFF"), showgrid=True, gridcolor="#FFFFFF"),
+            margin=dict(l=40, r=40, t=40, b=40)
+        )
+        st.plotly_chart(fig_line, use_container_width=True)
+
+    with col_right:
+        st.subheader("Hours by Client (Rolling Window)")
+
+        # Default rolling 30-day window
+        default_end = date.today()
+        default_start = (pd.Timestamp(default_end) - pd.Timedelta(days=30)).date()
+
+        pie_start, pie_end = st.date_input(
+            "Pie Date Range",
+            value=(default_start, default_end),
+            key="pie_date_range"
+        )
+
+        # Ensure correct ordering
+        if pie_start > pie_end:
+            st.error("Pie start date must be on or before end date.")
+            filtered_pie = hours_df.iloc[0:0].copy()
+        else:
+            filtered_pie = hours_df[
+                (hours_df["Date"].dt.date >= pie_start) &
+                (hours_df["Date"].dt.date <= pie_end)
+            ].copy()
+
+        if len(filtered_pie) > 0:
+            pie_fig = px.pie(
+                filtered_pie,
+                names="Client",
+                values="Hours",
+                color="Client",
+                color_discrete_map=client_colors if client_colors else None
+            )
+            pie_fig.update_layout(
+                showlegend=True,
+                plot_bgcolor="#0f0f23",
+                paper_bgcolor="#0f0f23",
+                font=dict(color="#FFFFFF", size=14),
+                legend=dict(font=dict(color="#FFFFFF", size=14), orientation="v", x=1.05, y=0.5, bgcolor="rgba(0,0,0,0)")
+            )
+            st.plotly_chart(pie_fig, use_container_width=True)
+        else:
+            st.info("No hours logged in the selected pie date range.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+    
 
 
 
@@ -1108,50 +1410,6 @@ elif selected_page == "Data Entry":
     #--------------------------
     # Enter data
     #--------------------------
-    st.subheader("Add Client")
-    # --- Load clients ---
-    df_clients = pd.read_csv(CLIENTS_FILE)
-    
-    if "Color" not in df_clients.columns:
-        df_clients["Color"] = "#1f77b4"
-    
-    # --- Inputs ---
-    new_client = st.text_input("Client name", key="new_client_name")
-    new_color = st.color_picker("Client color", "#1f77b4", key="new_client_color")
-    
-    # --- Save button (same pattern as Time Off / Category) ---
-    if st.button("Add Client"):
-        if new_client.strip() == "":
-            st.warning("Client name is required.")
-        elif new_client.strip() in df_clients["Client"].values:
-            st.warning("Client already exists.")
-        else:
-            df_clients = pd.concat(
-                [
-                    df_clients,
-                    pd.DataFrame([{
-                        "Client": new_client.strip(),
-                        "Color": new_color
-                    }])
-                ],
-                ignore_index=True
-            )
-    
-            df_clients.to_csv(CLIENTS_FILE, index=False)
-            st.write("TOKEN present:", bool(GITHUB_TOKEN))
-            st.write("CLIENTS_FILE:", CLIENTS_FILE)
-            st.write("Local clients.csv exists:", os.path.exists(CLIENTS_FILE))
-            st.write("Local clients.csv size:", os.path.getsize(CLIENTS_FILE) if os.path.exists(CLIENTS_FILE) else None)
-            
-            # After you write df to csv:
-            st.write("Last 5 rows after add:")
-            st.dataframe(pd.read_csv(CLIENTS_FILE).tail())
-            push_to_github("data/clients.csv", "Updated upcoming time off (editable table)")
-
-    
-            st.success(f"Client '{new_client}' added")
-            
-
     st.subheader("Add Client Category")
     
     col1, col2, col3 = st.columns([2, 2, 1])
@@ -1662,105 +1920,4 @@ elif selected_page == "Archive":
             ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
         ].reset_index(drop=True), width="stretch", hide_index=True)
     st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
