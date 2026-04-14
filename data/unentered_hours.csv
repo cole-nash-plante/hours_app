@@ -1,13 +1,13 @@
 Date,Client,Hours,Description
-2026-04-13,University of Alaska,0.75,NSC Refresh
+2026-04-13,CDOT,0.75,CDOT Working Session
+2026-04-13,CDOT,0.5,Informatica Github setup and document updates
 2026-04-13,OFM,2.0,Error Handling Query Creations
 2026-04-13,OFM,0.5,Upload Tools and Error-Handling Project Standup (Microsoft Teams Meeting)
 2026-04-13,OFM,0.75,OFM Python Working Session Pt 2 (Microsoft Teams Meeting)
-2026-04-13,University of Alaska,0.75,DWM/PM - DW IT Work Session
-2026-04-13,CDOT,0.75,CDOT Working Session
-2026-04-13,CDOT,0.5,Informatica Github setup and document updates
-2026-04-14,University of Alaska,0.75,Freeze checks and email bug investigation
-2026-04-13,University of Alaska,0.75,Freeze Monitoring and Validation after hours
-2026-04-14,OFM,0.5,Error Handling SQL updates
-2026-04-14,University of Alaska,0.5,Ingestion IPU consumption investigation
+2026-04-14,OFM,2.5,Error Handling SQL
 2026-04-14,OFM,0.5,Error Handling SQL Statements (Microsoft Teams Meeting)
+2026-04-13,University of Alaska,0.75,NSC Refresh
+2026-04-13,University of Alaska,0.75,DWM/PM - DW IT Work Session
+2026-04-13,University of Alaska,0.75,Freeze Monitoring and Validation after hours
+2026-04-14,University of Alaska,0.75,Freeze checks and email bug investigation
+2026-04-14,University of Alaska,0.5,Ingestion IPU consumption investigation
