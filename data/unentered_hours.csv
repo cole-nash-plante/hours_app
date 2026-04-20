@@ -1,8 +1,8 @@
 Date,Client,Hours,Description
+2026-04-20,CDOT,1.25,Account setup and GBQ access follow up.
 2026-04-17,OFM,2.75,Creating stored procs for error handling and python functions in streamlit to use them
-2026-04-17,University of Alaska,1.25,NSC Develupment
-2026-04-20,University of Alaska,0.75,NSC Develupment
-2026-04-20,CDOT,0.5,Account setup and GBQ access follow up.
-2026-04-20,University of Alaska,1.0,NSC Working Session with Michael
 2026-04-20,OFM,0.25,Upload Tools and Error-Handling Project Standup (Microsoft Teams Meeting)
 2026-04-20,OFM,0.5,Error Handling Grooming Session Iteration 6 (Microsoft Teams Meeting)
+2026-04-17,University of Alaska,1.25,NSC Develupment
+2026-04-20,University of Alaska,0.75,NSC Develupment
+2026-04-20,University of Alaska,1.0,NSC Working Session with Michael
