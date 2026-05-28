@@ -770,7 +770,7 @@ if selected_page == "Home":
             color = client_color_map.get(client, "#333333")
 
             # Layout: color | text | slider | button
-            c0, c1, c2, c3 = st.columns([0.06, 0.54, 0.22, 0.18], vertical_alignment="center")
+            c0, c1, c2, c3 = st.columns([0.2, 0.54, 0.22, 0.05], vertical_alignment="center")
 
             with c0:
                 st.markdown(f"<div class='todo-colorbar' style='background:{color};'></div>", unsafe_allow_html=True)
