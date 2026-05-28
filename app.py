@@ -635,52 +635,7 @@ if selected_page == "Home":
         if col not in df_todos.columns:
             df_todos[col] = ""
 
-    # -------------------------------
-    # Log Hours Section
-    # -------------------------------
-    st.subheader("Log Hours")
-    if len(df_clients) == 0:
-        st.warning("Add clients first!")
-    else:
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
-        with col1:
-            client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
-        with col2:
-            date_val = st.date_input("Date", datetime.today(), key="log_date")
-        with col3:
-            hours = st.number_input("Hours", min_value=0.0, step=0.25, key="log_hours")
-        with col4:
-            description = st.text_input("Description", key="log_description")
-        with col5:
-            if st.button("Save Hours", key="save_hours"):
-                new_row = {
-                    "Date": str(date_val),
-                    "Client": client,
-                    "Hours": hours,
-                    "Description": description
-                }
-            
-                # Load unentered hours
-                if os.path.exists(UNENTERED_HOURS_FILE):
-                    unentered_df = pd.read_csv(UNENTERED_HOURS_FILE)
-                else:
-                    unentered_df = pd.DataFrame(
-                        columns=["Date", "Client", "Hours", "Description"]
-                    )
-            
-                unentered_df = pd.concat(
-                    [unentered_df, pd.DataFrame([new_row])],
-                    ignore_index=True
-                )
-            
-                unentered_df.to_csv(UNENTERED_HOURS_FILE, index=False)
-                push_to_github(
-                    "data/unentered_hours.csv",
-                    "Added new unentered hours"
-                )
-            
-                st.success("Hours added to unentered backlog.")
-            
+    
 
     # -------------------------------
     # Add To-Do Item Section
@@ -810,6 +765,52 @@ if selected_page == "Home":
             # spacing between items
             st.markdown("<div class='todo-row-spacer'></div>", unsafe_allow_html=True)
     # -------------------------------
+    # Log Hours Section
+    # -------------------------------
+    st.subheader("Log Hours")
+    if len(df_clients) == 0:
+        st.warning("Add clients first!")
+    else:
+        col1, col2, col3, col4, col5 = st.columns([2, 2, 1, 3, 1])
+        with col1:
+            client = st.selectbox("Client", df_clients["Client"].tolist(), key="log_client")
+        with col2:
+            date_val = st.date_input("Date", datetime.today(), key="log_date")
+        with col3:
+            hours = st.number_input("Hours", min_value=0.0, step=0.25, key="log_hours")
+        with col4:
+            description = st.text_input("Description", key="log_description")
+        with col5:
+            if st.button("Save Hours", key="save_hours"):
+                new_row = {
+                    "Date": str(date_val),
+                    "Client": client,
+                    "Hours": hours,
+                    "Description": description
+                }
+            
+                # Load unentered hours
+                if os.path.exists(UNENTERED_HOURS_FILE):
+                    unentered_df = pd.read_csv(UNENTERED_HOURS_FILE)
+                else:
+                    unentered_df = pd.DataFrame(
+                        columns=["Date", "Client", "Hours", "Description"]
+                    )
+            
+                unentered_df = pd.concat(
+                    [unentered_df, pd.DataFrame([new_row])],
+                    ignore_index=True
+                )
+            
+                unentered_df.to_csv(UNENTERED_HOURS_FILE, index=False)
+                push_to_github(
+                    "data/unentered_hours.csv",
+                    "Added new unentered hours"
+                )
+            
+                st.success("Hours added to unentered backlog.")
+             
+  # -------------------------------
     # Unentered Hours (Persistent Backlog)
     # -------------------------------
     st.subheader("Unentered Hours")
