@@ -655,7 +655,7 @@ if selected_page == "Home":
             priority = st.slider("Priority", 1, 5, 3, key="todo_priority")
         with col_btn:
             if st.button("Add Task", key="add_task"):
-                if todo_task.strip() and todo_category != "No categories":
+                if todo_task.strip() != "No categories":
                     df_todos.loc[len(df_todos)] = [todo_client, "General", todo_task, priority, str(todo_date), "", ""]
                     df_todos.to_csv(TODOS_FILE, index=False)
                     push_to_github("data/todos.csv", "Added new task")
