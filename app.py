@@ -38,40 +38,28 @@ st.set_page_config(layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
-.todo-row {
-  border: 1px solid #27272a;
-  border-radius: 10px;
-  background: rgba(26,26,46,0.6);
-  padding: 10px 12px;
-  margin: 10px 0;
-}
-
-.todo-row-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.todo-row-spacer { height: 10px; }
 
 .todo-colorbar {
   width: 10px;
-  height: 40px;
+  height: 48px;
   border-radius: 6px;
-  flex: 0 0 10px;
 }
 
-.todo-meta {
-  color: #a1a1aa;
-  font-size: 0.85rem;
-}
-
-.todo-title {
-  color: #ffffff;
+.todo-text {
   font-size: 1.05rem;
-  font-weight: 600;
-  margin: 0;
+  font-weight: 650;
+  color: #ffffff;
+  line-height: 1.1;
+}
+.todo-subtext {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+  margin-top: 2px;
 }
 </style>
 """, unsafe_allow_html=True)
+``
 
 
 # -------------------------------------------------
@@ -721,136 +709,106 @@ if selected_page == "Home":
                     st.error("Please enter a valid task and category.")
 
     # -------------------------------
-    # Active To-Dos Section (LIST VIEW)
+    # Active To-Dos (ONE ROW + AUTO-SAVE PRIORITY)
     # -------------------------------
     st.subheader("Active To-Dos")
 
-    # Defensive: normalize columns
-    for col in ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted", "Notes"]:
+    # Ensure required columns exist
+    required_cols = ["Client", "Category", "Task", "Priority", "DateCreated", "DateCompleted"]
+    for col in required_cols:
         if col not in df_todos.columns:
             df_todos[col] = ""
 
+    # Normalize fields
     df_todos["Client"] = df_todos["Client"].astype(str).fillna("").str.strip()
-    df_todos["Task"] = df_todos["Task"].astype(str).fillna("").str.strip()
     df_todos["Category"] = df_todos["Category"].astype(str).fillna("").str.strip()
-    df_todos["Notes"] = df_todos["Notes"].astype(str).fillna("")
+    df_todos["Task"] = df_todos["Task"].astype(str).fillna("").str.strip()
     df_todos["DateCompleted"] = df_todos["DateCompleted"].astype(str).fillna("").str.strip()
+    df_todos["Priority"] = pd.to_numeric(df_todos["Priority"], errors="coerce").fillna(3).astype(int)
 
     # Active = not completed AND task not blank
-    active_todos_all = df_todos[
-        (df_todos["DateCompleted"] == "") &
-        (df_todos["Task"] != "")
-    ].copy()
+    active_todos_all = df_todos[(df_todos["DateCompleted"] == "") & (df_todos["Task"] != "")].copy()
 
-    # Build filter options
+    # Build client filter options (keep your default behavior: only clients w/ active tasks selected by default)
     all_clients = sorted(set(
         df_clients["Client"].dropna().astype(str).str.strip().tolist()
         + df_todos["Client"].dropna().astype(str).str.strip().tolist()
     ))
+    clients_with_active = sorted(active_todos_all["Client"].dropna().unique().tolist())
 
-    clients_with_active_todos = sorted(active_todos_all["Client"].dropna().unique().tolist())
+    selected_clients = st.multiselect(
+        "Filter by Client",
+        options=all_clients,
+        default=clients_with_active,
+        key="filter_clients"
+    )
 
-    if not all_clients:
-        st.info("No clients available.")
+    active_todos = active_todos_all[active_todos_all["Client"].isin(selected_clients)].copy()
+
+    if active_todos.empty:
+        st.info("No active tasks for selected clients.")
     else:
-        selected_clients = st.multiselect(
-            "Filter by Client",
-            options=all_clients,
-            default=clients_with_active_todos,  # ✅ only clients that have active tasks by default
-            key="filter_clients"
-        )
+        # Sort: highest priority first, then newest date created if parseable
+        active_todos["_DateCreatedTs"] = pd.to_datetime(active_todos["DateCreated"], errors="coerce")
+        active_todos = active_todos.sort_values(by=["Priority", "_DateCreatedTs"], ascending=[False, False])
 
-        # Apply selected clients filter
-        active_todos = active_todos_all[active_todos_all["Client"].isin(selected_clients)].copy()
+        # Client -> color map
+        client_color_map = {}
+        if "Color" in df_clients.columns:
+            tmp = df_clients.dropna(subset=["Client"]).copy()
+            tmp["Client"] = tmp["Client"].astype(str).str.strip()
+            tmp["Color"] = tmp["Color"].astype(str).fillna("")
+            client_color_map = dict(zip(tmp["Client"], tmp["Color"]))
 
-        if len(active_todos) == 0:
-            st.info("No active tasks for selected clients.")
-        else:
-            # Normalize Priority numeric (for sorting)
-            active_todos["Priority"] = pd.to_numeric(active_todos["Priority"], errors="coerce").fillna(0).astype(int)
+        # Render: one row per todo
+        for idx, row in active_todos.iterrows():
+            client = row["Client"]
+            category = row.get("Category", "")
+            task = row["Task"]
+            created = row.get("DateCreated", "")
+            priority = int(row.get("Priority", 3))
+            color = client_color_map.get(client, "#333333")
 
-            # Optional: sort by priority desc, then date created desc if present
-            # DateCreated may be string; parse safely
-            active_todos["_DateCreatedTs"] = pd.to_datetime(active_todos["DateCreated"], errors="coerce")
-            active_todos = active_todos.sort_values(
-                by=["Priority", "_DateCreatedTs"],
-                ascending=[False, False]
-            )
+            # Layout: color | text | slider | button
+            c0, c1, c2, c3 = st.columns([0.06, 0.54, 0.22, 0.18], vertical_alignment="center")
 
-            # Build client -> color mapping
-            client_color_map = {}
-            if "Color" in df_clients.columns:
-                tmp = df_clients.dropna(subset=["Client"]).copy()
-                tmp["Client"] = tmp["Client"].astype(str).str.strip()
-                tmp["Color"] = tmp["Color"].astype(str).fillna("")
-                client_color_map = dict(zip(tmp["Client"], tmp["Color"]))
+            with c0:
+                st.markdown(f"<div class='todo-colorbar' style='background:{color};'></div>", unsafe_allow_html=True)
 
-            # Render as one vertical list
-            for row_i, (idx, row) in enumerate(active_todos.iterrows()):
-                client = row["Client"]
-                color = client_color_map.get(client, "#333333")
-
-                # A stable unique key prefix (important for widgets)
-                k = f"todo_{idx}"
-
-                # Row wrapper with left color bar + title/meta
+            with c1:
+                st.markdown(f"<div class='todo-text'>{task}</div>", unsafe_allow_html=True)
                 st.markdown(
-                    f"""
-                    <div class="todo-row">
-                      <div class="todo-row-header">
-                        <div class="todo-colorbar" style="background:{color};"></div>
-                        <div style="flex:1;">
-                          <div class="todo-title">{row['Task']}</div>
-                          <div class="todo-meta">
-                            <b>{client}</b> • {row.get('Category','')} • Priority: {int(row['Priority'])}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    """,
+                    f"<div class='todo-subtext'>{client} • {category} • Created: {created}</div>",
                     unsafe_allow_html=True
                 )
 
-                # Expander below the row for details/editing
-                with st.expander("Details / Edit", expanded=False):
-                    st.write(f"**Client:** {client}")
-                    st.write(f"**Category:** {row.get('Category','')}")
-                    st.write(f"**Created:** {row.get('DateCreated','')}")
+            # Priority slider (AUTO-SAVE)
+            with c2:
+                new_priority = st.slider(
+                    "Priority",
+                    1, 5, max(1, min(5, priority)),
+                    key=f"prio_{idx}",
+                    label_visibility="collapsed"
+                )
 
-                    new_priority = st.slider(
-                        "Priority",
-                        1, 5, int(row["Priority"]) if int(row["Priority"]) in [1,2,3,4,5] else 3,
-                        key=f"{k}_priority"
-                    )
-                    new_notes = st.text_area(
-                        "Notes",
-                        value=row.get("Notes", ""),
-                        key=f"{k}_notes"
-                    )
+            # Marked as entered button
+            with c3:
+                if st.button("Marked as entered", key=f"entered_{idx}", use_container_width=True):
+                    df_todos.at[idx, "DateCompleted"] = str(datetime.today().date())
+                    df_todos.to_csv(TODOS_FILE, index=False)
+                    push_to_github("data/todos.csv", "Marked task as entered/completed")
+                    st.rerun()
 
-                    c1, c2, c3 = st.columns([1, 1, 1])
+            # If slider moved, save immediately
+            if int(new_priority) != int(priority):
+                df_todos.at[idx, "Priority"] = int(new_priority)
+                df_todos.to_csv(TODOS_FILE, index=False)
+                push_to_github("data/todos.csv", "Auto-updated task priority")
+                # Optional: tiny toast-like feedback
+                # st.success("Priority saved!", icon="✅")
 
-                    with c1:
-                        if st.button("Save Changes", key=f"{k}_save"):
-                            df_todos.at[idx, "Priority"] = new_priority
-                            df_todos.at[idx, "Notes"] = new_notes
-                            df_todos.to_csv(TODOS_FILE, index=False)
-                            push_to_github("data/todos.csv", "Updated task notes and priority")
-                            st.success("Changes saved!")
-
-                    with c2:
-                        if st.button("Mark as Complete", key=f"{k}_complete"):
-                            df_todos.at[idx, "DateCompleted"] = str(datetime.today().date())
-                            df_todos.to_csv(TODOS_FILE, index=False)
-                            push_to_github("data/todos.csv", "Marked task as complete")
-                            st.success("Task marked as complete!")
-
-                    with c3:
-                        if st.button("Delete Task", key=f"{k}_delete"):
-                            df_todos = df_todos.drop(index=idx)
-                            df_todos.to_csv(TODOS_FILE, index=False)
-                            push_to_github("data/todos.csv", "Deleted a task")
-                            st.success("Task deleted!")
+            # spacing between items
+            st.markdown("<div class='todo-row-spacer'></div>", unsafe_allow_html=True)
     # -------------------------------
     # Unentered Hours (Persistent Backlog)
     # -------------------------------
