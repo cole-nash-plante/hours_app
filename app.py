@@ -793,7 +793,7 @@ if selected_page == "Home":
 
             # Marked as entered button
             with c3:
-                if st.button("Marked as entered", key=f"entered_{idx}", use_container_width=True):
+                if st.button("✓", key=f"entered_{idx}", use_container_width=True):
                     df_todos.at[idx, "DateCompleted"] = str(datetime.today().date())
                     df_todos.to_csv(TODOS_FILE, index=False)
                     push_to_github("data/todos.csv", "Marked task as entered/completed")
