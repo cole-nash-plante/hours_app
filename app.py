@@ -701,7 +701,7 @@ if selected_page == "Home":
     if len(df_clients) == 0:
         st.warning("Add clients first!")
     else:
-        col_date, col_client, col_task, col_priority, col_btn = st.columns([0.8, 1.5, 1.5, 3, 1, 1])
+        col_date, col_client, col_task, col_priority, col_btn = st.columns([0.8, 1.5, 1.5, 3, 1])
         with col_date:
             todo_date = st.date_input("Date Created", datetime.today(), key="todo_date")
         with col_client:
