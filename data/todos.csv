@@ -7,7 +7,7 @@ General Non-client,Streamlit App,Fix date created function,1.0,,2025-11-21 00:00
 General Non-client,Streamlit App,Follow up with Donna on master requirements,5.0,2025-12-02,2025-12-05,"Power BI, tableau, 5tran, snowflake, altryx"
 General Non-client,Streamlit App,look into changing power automate power bi changing data forms,5.0,2025-12-02,2025-12-05,
 University of Alaska,Develupment,Come up with a list of all distinct source tables used in iteration 1 and 2 dfor UA,5.0,2025-11-24,2025-11-24,"List all banner source tables, will be in UA_MartDesign"
-University of Alaska,Develupment,Add Source tables for Banner Freeze ,5.0,2025-11-24,2025-11-24,
+University of Alaska,Develupment,Add Source tables for Banner Freeze,5.0,2025-11-24,2025-11-24,
 University of Alaska,Unit Testing,Create DIM Application Decision,3.0,2025-11-20,2025-11-24,"--DIM_APPLICATION_DESCISION
 select 
 STVAPDC_CODE APPLICATION_DECISION_CODE, 
@@ -183,7 +183,7 @@ General Non-client,Streamlit App,Feedback,3.0,2026-02-24,2026-03-09,
 General Non-client,Streamlit App,Make changes to the python training,3.0,2026-02-26,2026-03-13,
 University of Alaska,Develupment,Move Tables over,5.0,2026-03-09,2026-03-09,
 University of Alaska,Unit Testing,Get all tables ready to be ran in slowly changing dimmensions,3.0,2026-03-09,2026-03-13,
-University of Alaska,Unit Testing, Monitor runs tomorrow on slowly changin dimmensions,3.0,2026-03-09,2026-03-13,"Check if there are specific terms with the problem
+University of Alaska,Unit Testing,Monitor runs tomorrow on slowly changin dimmensions,3.0,2026-03-09,2026-03-13,"Check if there are specific terms with the problem
 "
 University of Alaska,Unit Testing,tf_enrollment,3.0,2026-03-13,2026-03-20,Need to go back when SA is back up and test
 University of Alaska,Unit Testing,documentation updates,3.0,2026-03-13,2026-03-20,
@@ -212,7 +212,7 @@ CDOT,General,Start on a couple of example mappings,3.0,2026-04-15,2026-04-30,
 University of Alaska,Unit Testing,Migrate Banner to prod,3.0,2026-04-22,2026-04-30,
 CDOT,General,Folllow up with Weiyan,3.0,2026-04-23,2026-04-30,
 University of Alaska,Unit Testing,Rename FCT_GRADUATION,3.0,2026-04-23,2026-04-30,
-University of Alaska,Unit Testing,NSC Sent ,3.0,2026-04-23,2026-04-30,"- Create a view for the NSC sent file based on our list of PIDM's
+University of Alaska,Unit Testing,NSC Sent,3.0,2026-04-23,2026-04-30,"- Create a view for the NSC sent file based on our list of PIDM's
 - Create a second view based on the pidms that are missinf"
 CDOT,General,Follow up on ITS_COMFORMED access in prod,3.0,2026-05-01,2026-05-05,
 Regression Clients,General,Add to the analytics specialist spreadsheet,3.0,2026-05-01,2026-05-05,
@@ -224,5 +224,4 @@ Regression Clients,General,Fix Workaid for specifications,3.0,2026-05-19,2026-05
 AZDOA,General,Get Familiar with SFPT,1.0,2026-05-28,,
 OFM, General,Investigate column mismatch in multiple trx types,3.0,2026-05-28,,
 CDOT,General,Reorganize Document,3.0,2026-05-28,,
-University of Alaska,Unit Testing,Banner Freeze Taskflow,3.0,2026-05-28,,
 University of Alaska,Unit Testing,Banner Freeze Taskflow,3.0,2026-05-28,,
