@@ -927,7 +927,7 @@ if selected_page == "Home":
         if clients_in_table:
             selected_client = st.selectbox("Mark entries as entered (by client)", clients_in_table)
     
-            if st.button("Mark as Entered"):
+            if st.button("✓"):
                 to_post = detail_only[detail_only["Client"] == selected_client].copy()
                 remaining = detail_only[detail_only["Client"] != selected_client].copy()
     
