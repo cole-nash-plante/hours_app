@@ -1,9 +1,9 @@
 Date,Client,Hours,Description
 2026-06-16,AZDOA,0.5,Service Connector setup
-2026-06-16,OFM,0.75,API Snowflake column matching
-2026-06-16,OFM,0.5,Upload Tools and Error-Handling Project Standup (Microsoft Teams Meeting)
-2026-06-16,University of Alaska,1.0,Freeze investigation and migrating new table
 2026-06-16,AZDOA,0.5,CAI working session
+2026-06-16,CDOT,1.0,CDOT Working Session (Microsoft Teams Meeting)
+2026-06-16,OFM,1.0,API Snowflake column matching and investigation
+2026-06-16,OFM,0.5,Upload Tools and Error-Handling Project Standup (Microsoft Teams Meeting)
 2026-06-16,OFM,0.75,OFM Code Review (Microsoft Teams Meeting)
 2026-06-16,OFM,0.75,UI Develupment
-2026-06-16,CDOT,1.0,CDOT Working Session (Microsoft Teams Meeting)
+2026-06-16,University of Alaska,1.0,Freeze investigation and migrating new table
