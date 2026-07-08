@@ -1,12 +1,11 @@
 Date,Client,Hours,Description
+2026-06-23,CDOT,4.25,IPU development
+2026-06-24,CDOT,3.5,IPU development and handoff tasks
 2026-07-07,CDOT,0.5,Required Trainings
 2026-07-07,CODOR,0.5,OLCM Stand-up - Data Migration
 2026-07-07,CODOR,1.5,Account Setup and Help Desk calls
 2026-07-08,CODOR,0.5,Account Access communication and additional azure requests
 2026-07-08,CODOR,0.25,CDOR internal standup (Online Meeting)
-2026-06-23,CDOT,4.25,IPU development
-2026-06-24,CDOT,3.5,IPU development and handoff tasks
 2026-07-08,CODOR,0.25,Alex Sync
 2026-07-08,General Non-client,0.5,Creating template streamlit app for interns
-2026-07-08,General Non-client,0.25,CDOT IPU Sync (Microsoft Teams Meeting)
-2026-07-08,General Non-client,0.25,CDOT IPU Sync (Microsoft Teams Meeting)
+2026-07-08,CDOT,0.25,CDOT IPU Sync (Microsoft Teams Meeting)
