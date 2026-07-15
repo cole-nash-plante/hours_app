@@ -860,7 +860,7 @@ if selected_page == "Home":
     totals = (
         raw.groupby(["Client", "Date"], as_index=False)["Hours"]
         .sum()
-        .sort_values(by=["Client", "Date"])
+        .sort_values(by=["Date","Client"])
         .reset_index(drop=True)
     )
     totals["Description"] = "TOTAL"
