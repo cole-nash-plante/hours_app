@@ -1,26 +1,18 @@
 Date,Client,Hours,Description
-2026-07-13,CDOT,1.0,CDOT stand up (Microsoft Teams Meeting)
-2026-07-13,CDOT,1.5,IPU Shared Sequence develupment and migration preperation
 2026-07-13,CODOR,0.25,CDOR internal standup (Online Meeting)
 2026-07-13,CODOR,0.75,OIT Help Desk troubleshooting and ticket creation
+2026-07-14,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
+2026-07-15,CODOR,0.25,CDOR internal standup (Online Meeting)
 2026-07-13,COIT,0.5,Onboarding document review
+2026-07-13,General Non-client,0.5,Streamlit check in (Microsoft Teams Meeting)
+2026-07-14,General Non-client,0.75,Streamlet development guidance
+2026-07-15,General Non-client,0.5,"Software Renewal Touch Base (DENV - Mt Harvard CR 4SW (Denver, Colorado, US))"
+2026-07-15,General Non-client,0.25,CDOR internal standup (Online Meeting)
 2026-07-13,University of Alaska,0.5,Investigation into job freeze reference tables
 2026-07-13,University of Alaska,1.0,Freeze inserting record and develupment
 2026-07-14,University of Alaska,1.75,Freeze investigation on multiple jobs running the same freeze tyoe
-2026-07-14,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-07-14,CDOT,0.5,MS2 Working Session (Microsoft Teams Meeting)
-2026-07-14,CDOT,1.75,IPU Migration and Troubleshooting
 2026-07-14,University of Alaska,1.25,Investigating empty tables and emailing Lara update on empty tables
 2026-07-14,University of Alaska,0.5,client emails
-2026-07-13,General Non-client,0.5,Streamlit check in (Microsoft Teams Meeting)
-2026-07-14,General Non-client,0.75,Streamlet development guidance
-2026-07-15,CDOT,0.5,CDOT Migration Debug (Microsoft Teams Meeting)
-2026-07-15,CDOT,1.5,IPU Migration
-2026-07-15,General Non-client,0.5,"Software Renewal Touch Base (DENV - Mt Harvard CR 4SW (Denver, Colorado, US))"
-2026-07-15,General Non-client,0.25,CDOR internal standup (Online Meeting)
-2026-07-15,CODOR,0.25,CDOR internal standup (Online Meeting)
 2026-07-15,University of Alaska,1.0,Freeze Taskflow investigation
 2026-07-15,University of Alaska,0.5,Client communication
-2026-07-15,CDOT,0.25,Alex Quick Sync
-2026-07-15,CDOT,1.75,IPU Migration with Alex
 2026-07-15,University of Alaska,0.5,UA Development Touch Base (Microsoft Teams Meeting)
