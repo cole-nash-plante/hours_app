@@ -851,47 +851,96 @@ if selected_page == "Home":
     raw = raw.dropna(subset=["Date"])
     raw = raw[raw["Client"] != ""].copy()
     # -----------------
-    # Date Filters
+    # Filters
     # -----------------
-    st.markdown("### Filter Unentered Hours")
+    st.markdown("### Filters")
+    
+    filtered_raw = raw.copy()
     
     if len(raw) > 0:
-        min_date = raw["Date"].min()
-        max_date = raw["Date"].max()
     
-        fcol1, fcol2 = st.columns(2)
+        # Available dates (newest first)
+        available_dates = sorted(
+            raw["Date"].dropna().unique(),
+            reverse=True
+        )
     
-        with fcol1:
-            filter_start = st.date_input(
-                "Start Date",
-                value=min_date,
-                min_value=min_date,
-                max_value=max_date,
-                key="unentered_start_date"
-            )
+        selected_dates = st.multiselect(
+            "Dates",
+            options=available_dates,
+            default=available_dates,
+            format_func=lambda x: x.strftime("%Y-%m-%d"),
+            key="unentered_date_filter"
+        )
     
-        with fcol2:
-            filter_end = st.date_input(
-                "End Date",
-                value=max_date,
-                min_value=min_date,
-                max_value=max_date,
-                key="unentered_end_date"
-            )
+        if selected_dates:
+            filtered_raw = filtered_raw[
+                filtered_raw["Date"].isin(selected_dates)
+            ].copy()
     
-        # Apply filter
-        raw = raw[
-            (raw["Date"] >= filter_start) &
-            (raw["Date"] <= filter_end)
-        ].copy()
-    clients = sorted(raw["Client"].dropna().unique())
-
-    selected_clients = st.multiselect(
-        "Client Filter",
-        options=clients,
-        default=clients,
-        key="unentered_client_filter"
-      
+        available_clients = sorted(
+            filtered_raw["Client"]
+            .dropna()
+            .astype(str)
+            .unique()
+            .tolist()
+        )
+    
+        selected_client = st.selectbox(
+            "Client",
+            ["All Clients"] + available_clients,
+            key="unentered_client_filter"
+        )
+    
+        if selected_client != "All Clients":
+            filtered_raw = filtered_raw[
+                filtered_raw["Client"] == selected_client
+            ].copy()
+    
+    else:
+        filtered_raw = raw.copy()
+    
+    # Detail rows (for editing)
+    detail = filtered_raw.copy()
+    detail["Date"] = pd.to_datetime(
+        detail["Date"],
+        errors="coerce"
+    ).dt.strftime("%Y-%m-%d")
+    
+    detail = detail.sort_values(
+        by=["Client", "Date"]
+    ).reset_index(drop=True)
+    
+    # Computed totals (for display only)
+    totals = (
+        filtered_raw.groupby(
+            ["Client", "Date"],
+            as_index=False
+        )["Hours"]
+        .sum()
+        .sort_values(
+            by=["Date", "Client"]
+        )
+        .reset_index(drop=True)
+    )
+    
+    totals["Description"] = "TOTAL"
+    totals["Date"] = pd.to_datetime(
+        totals["Date"],
+        errors="coerce"
+    ).dt.strftime("%Y-%m-%d")
+    
+    # Display = details first, totals at bottom
+    unentered_display = pd.concat(
+        [detail, totals],
+        ignore_index=True
+    )
+    
+    edited_unentered = st.data_editor(
+        unentered_display,
+        num_rows="dynamic",
+        hide_index=True,
+        key="unentered_hours_editor"
     )
     
     raw = raw[raw["Client"].isin(selected_clients)]
