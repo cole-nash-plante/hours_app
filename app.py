@@ -850,7 +850,51 @@ if selected_page == "Home":
     # Drop empty rows
     raw = raw.dropna(subset=["Date"])
     raw = raw[raw["Client"] != ""].copy()
+    # -----------------
+    # Date Filters
+    # -----------------
+    st.markdown("### Filter Unentered Hours")
     
+    if len(raw) > 0:
+        min_date = raw["Date"].min()
+        max_date = raw["Date"].max()
+    
+        fcol1, fcol2 = st.columns(2)
+    
+        with fcol1:
+            filter_start = st.date_input(
+                "Start Date",
+                value=min_date,
+                min_value=min_date,
+                max_value=max_date,
+                key="unentered_start_date"
+            )
+    
+        with fcol2:
+            filter_end = st.date_input(
+                "End Date",
+                value=max_date,
+                min_value=min_date,
+                max_value=max_date,
+                key="unentered_end_date"
+            )
+    
+        # Apply filter
+        raw = raw[
+            (raw["Date"] >= filter_start) &
+            (raw["Date"] <= filter_end)
+        ].copy()
+    clients = sorted(raw["Client"].dropna().unique())
+
+    selected_clients = st.multiselect(
+        "Client Filter",
+        options=clients,
+        default=clients,
+        key="unentered_client_filter"
+      
+    )
+    
+    raw = raw[raw["Client"].isin(selected_clients)]
     # Detail rows (for editing)
     detail = raw.copy()
     detail["Date"] = pd.to_datetime(detail["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
