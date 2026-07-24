@@ -1,19 +1,8 @@
 Date,Client,Hours,Description
-2026-07-20,CODOR,0.25,CDOR internal standup (Online Meeting)
-2026-07-21,CODOR,0.5,OLCM Stand-up - Data Migration
-2026-07-21,CODOR,0.5,Snowflake Access Troubleshooting and resolution
-2026-07-21,CODOR,0.25,Emailing CDOT for DOR AD Groups
-2026-07-22,CODOR,0.5,Access Communication and troubleshooting
-2026-07-22,CODOR,0.5,CDOR internal standup
-2026-07-22,CODOR,0.5,CDOT Manager communication
-2026-07-22,CODOR,0.5,Final push - Gaining access to Snowflake
-2026-07-23,CODOR,1.75,Critical Data Elements Data Quality Investigation
 2026-07-20,COIT,0.5,PRJ1073934 - CIM Enhancement/Expansion
 2026-07-21,COIT,0.75,Onboarding
 2026-07-22,COIT,0.5,Access troubleshooting
 2026-07-23,COIT,0.5,Onboarding
 2026-07-20,General Non-client,0.5,Software renewal check in (Microsoft Teams Meeting)
 2026-07-21,TDH,0.5,Additional Tennessee Department of Health Python Trainings (Microsoft Teams Meeting)
-2026-07-23,CODOR,0.5,CDOR Sync (Microsoft Teams Meeting)
-2026-07-23,CODOR,0.5,Final Access blockers to snowflake schemas
 2026-07-23,General Non-client,0.75,Software Renewal Check In  (Microsoft Teams Meeting)
