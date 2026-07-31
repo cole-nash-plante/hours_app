@@ -6,3 +6,29 @@ Date,Client,Hours,Description
 2026-07-30,CDOT,0.5,VPN and Secure Agent troubleshooting
 2026-07-30,CDOT,1.0,CDOT sync (Microsoft Teams Meeting)
 2026-07-30,General Non-client,0.25,Quick software renewal touch base
+Date,Client,Hours,Description
+2026-07-29,CDOT,0.25,Morning checks
+2026-07-29,CDOT,0.75,Chain Station Data (Microsoft Teams Meeting)
+2026-07-29,CODOR,0.25,CDOR internal standup (Online Meeting)
+2026-07-29,CODOR,0.5,CDOR Working Session
+2026-07-29,General Non-client,0.25,Software Check In
+2026-07-29,General Non-client,0.75,Software Renewal Reporting Planning (Microsoft Teams Meeting)
+2026-07-29,University of Alaska,1.0,Research and Finance Freeze investigation and email to client
+2026-07-29,University of Alaska,0.5,July Freeze's metadata review
+2026-07-29,University of Alaska,0.5,Taskflow working session
+2026-07-29,CODOR,0.75,CDOR Working Session
+2026-07-29,University of Alaska,0.5,UA Development Touch Base (Microsoft Teams Meeting)
+2026-07-29,University of Alaska,0.5,Fixing Streamlit app NULL vs strings
+2026-07-29,University of Alaska,0.5,Client communication and testing errors from emails
+2026-07-29,CDOT,1.0,CDOT CDI sync (Microsoft Teams Meeting)
+2026-07-29,CODOR,0.25,Quick sync with Alex
+Date,Client,Hours,Description
+2026-07-28,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
+2026-07-28,CDOT,0.5,VM Setup
+2026-07-28,CDOT,1.5,GIS Working session with alex
+2026-07-28,CDOT,1.75,GIS  Downstream updates
+2026-07-28,CODOR,0.75,OLCM: Data Quality Sync (https://meet.google.com/xbo-sbsx-fwy)
+2026-07-28,CDOT,0.5,Informatica ticket
+2026-07-28,General Non-client,0.75,Software Renewal Check In (Microsoft Teams Meeting)
+2026-07-28,CDOT,1.5,Dim Lane investigation
+2026-07-28,University of Alaska,0.75,Investigation into Secure Agent shutdown and emailing Lara
