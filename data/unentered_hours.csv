@@ -1,15 +1,11 @@
 Date,Client,Hours,Description
 2026-08-04,CODOR,0.5,CDOR internal standup (Online Meeting)
 2026-08-04,General Non-client,0.5,Morning touch base on access errors
-2026-08-04,CDOT,0.75,Access troubleshooting and investigation
-2026-08-04,CODOR,0.5,Azure access troubleshooting 
+2026-08-04,CODOR,0.5,Azure access troubleshooting
 2026-08-04,CODOR,0.75,Read through DQ Summary table looking for all sensitive information
 2026-08-04,CODOR,1.0,OLCM: Data Quality Sync (https://meet.google.com/xbo-sbsx-fwy)
-2026-08-04,CDOT,1.0,POC testing to achieve GBQ Pushdown in Informatica
 2026-08-04,CODOR,0.25,Client communication
-2026-08-04,CDOT,0.75,Touch base with Alex
 2026-08-04,CODOR,0.25,Touch base with Alex on new items from Jacob
 2026-08-05,CODOR,0.25,CDOR internal standup (Online Meeting)
-2026-08-05,CDOT,0.25,Morning checks and sync with alex
 2026-08-05,CODOR,4.25,Supporting Jacob with templates
 2026-08-05,University of Alaska,0.25,UA Development Touch Base (Microsoft Teams Meeting)
