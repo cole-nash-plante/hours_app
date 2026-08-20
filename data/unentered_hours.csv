@@ -4,6 +4,8 @@ Date,Client,Hours,Description
 2026-08-18,CDOT,1.0,Detectors testing and revising initial develupment
 2026-08-19,CDOT,0.75,CDOT Detectors Develupment
 2026-08-19,CDOT,0.5,CDOT Detectors Sync (Microsoft Teams Meeting)
+2026-08-20,CDOT,0.75,Removing patrol_txt columns from mapping
+2026-08-20,CDOT,0.25,Weekly Status Meeting
 2026-08-17,CODOR,0.5,CDOR Data Quality Sync (Microsoft Teams Meeting)
 2026-08-17,CODOR,0.25,CDOR internal standup (Online Meeting)
 2026-08-17,CODOR,2.25,Data Quality investigation and meeting preparation
@@ -15,7 +17,9 @@ Date,Client,Hours,Description
 2026-08-19,CODOR,0.5,Morning Sync with Adam
 2026-08-19,CODOR,0.5,Refining templates based on Jacobs recomendations
 2026-08-19,CODOR,2.25,"Reviewing Tuesday meeting transcript and notes, follow up on action items"
-2026-08-20,CODOR,2.5,"After Hours Data quality review, and meeting prep for database design"
+2026-08-19,CODOR,2.5,"After Hours Data quality review, and meeting prep for database design"
+2026-08-20,CODOR,1.25,Meeting prep and duplicate SSN examples refinement
+2026-08-20,CODOR,1.25,Meeting prep and duplicate SSN examples refinement
 2026-08-17,COIT,0.25,PRJ1073934 - CIM Enhancement/Expansion (https://meet.google.com/jic-jbgj-kgu)
 2026-08-17,General Non-client,0.5,Renewal Software Intro Call  (Microsoft Teams Meeting)
 2026-08-18,General Non-client,0.5,Software Renewal Working Session (Microsoft Teams Meeting; DENV - Mt of the Holy Cross CR 4E)
@@ -28,7 +32,3 @@ Date,Client,Hours,Description
 2026-08-19,University of Alaska,0.5,UA Working Session (Microsoft Teams Meeting)
 2026-08-19,University of Alaska,0.75,Streamlit Develupment
 2026-08-19,University of Alaska,0.75,Working Session with Amy and looking into Dev freeze
-2026-08-20,CDOT,0.75,Removing patrol_txt columns from mapping
-2026-08-20,CDOT,0.25,Weekly Status Meeting
-2026-08-20,CODOR,1.25,Meeting prep and duplicate SSN examples refinement
-2026-08-20,CODOR,1.25,Meeting prep and duplicate SSN examples refinement
