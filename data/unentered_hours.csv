@@ -1,21 +1,5 @@
 Date,Client,Hours,Description
-2026-08-17,CODOR,0.5,CDOR Data Quality Sync (Microsoft Teams Meeting)
-2026-08-17,CODOR,0.25,CDOR internal standup (Online Meeting)
-2026-08-17,CODOR,2.25,Data Quality investigation and meeting preparation
-2026-08-17,CODOR,0.75,Templete creation and work
-2026-08-18,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-08-18,CODOR,1.0,OLCM: Data Quality Sync (https://meet.google.com/xbo-sbsx-fwy)
-2026-08-18,CODOR,2.5,"SSN script review, meeting prep, and responding to Jacobs requests"
-2026-08-19,CODOR,0.25,CDOR internal standup (Online Meeting)
-2026-08-19,CODOR,0.5,Morning Sync with Adam
-2026-08-19,CODOR,0.5,Refining templates based on Jacobs recomendations
 2026-08-19,CODOR,2.25,"Reviewing Tuesday meeting transcript and notes, follow up on action items"
-2026-08-19,CODOR,2.5,"After Hours Data quality review, and meeting prep for database design"
-2026-08-20,CODOR,1.25,Meeting prep and duplicate SSN examples refinement
-2026-08-20,CODOR,1.0,Refining SSN examples post meeting and emailing Michael
-2026-08-20,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-08-21,CODOR,0.5,Meeting Prep
-2026-08-21,CODOR,0.75,OLCM Stand-up + Organization of action items
 2026-08-17,COIT,0.25,PRJ1073934 - CIM Enhancement/Expansion (https://meet.google.com/jic-jbgj-kgu)
 2026-08-21,COIT,0.5,OIT CIM Working Session (Microsoft Teams Meeting)
 2026-08-17,General Non-client,0.5,Renewal Software Intro Call  (Microsoft Teams Meeting)
@@ -33,6 +17,4 @@ Date,Client,Hours,Description
 2026-08-19,University of Alaska,0.75,Working Session with Amy and looking into Dev freeze
 2026-08-20,University of Alaska,1.0,Monitoring Student Freeze
 2026-08-21,University of Alaska,0.5,Checking Freeze Results
-2026-08-21,CODOR,0.5,CDOR Sync (Microsoft Teams Meeting)
-2026-08-21,CODOR,2.0,Creating reference queries for Michael duplicates by division
 2026-08-21,University of Alaska,2.5,Streamlit App Development
