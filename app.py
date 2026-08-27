@@ -1238,7 +1238,15 @@ if selected_page == "Home":
         )
 
         # First column holds the grand-total BAN
-        with summary_columnsst.markdown(
+        summary_columns = st.columns(
+            number_of_metrics,
+            gap="small"
+        )
+
+        # First column holds the grand-total BAN
+        total_col = summary_columns[0]
+        with total_col:
+            st.markdown(
                 '<div class="unentered-summary-marker"></div>',
                 unsafe_allow_html=True
             )
@@ -1253,7 +1261,9 @@ if selected_page == "Home":
             daily_unentered.itertuples(index=False),
             start=1
         ):
-            with summary_columnsst.metric(
+            day_col = summary_columns[metric_position]
+            with day_col:
+                st.metric(
                     daily_row.Date.strftime("%a %m/%d"),
                     f"{float(daily_row.Hours):.2f}"
                 )
