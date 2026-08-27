@@ -15,18 +15,18 @@ Date,Client,Hours,Description
 2026-08-26,University of Alaska,1.0,Rewriting streamlit section of the runbook
 2026-08-26,General Non-client,1.0,Software Renewal Sync (Microsoft Teams Meeting) + Follow-up items
 2026-08-26,General Non-client,0.75,Software Renewal Working Session  (Microsoft Teams Meeting)
-2026-08-26,CODOR,4.5,Data quality investigations for Thursday call with all divisions based on Sudeep input
-2026-08-26,CODOR,0.75,Meeting with Sudeep (Gov2Biz)
-2026-08-26,CODOR,0.5,CDOR Working Session (Microsoft Teams Meeting)
-2026-08-26,CODOR,0.25,CDOR internal standup (Online Meeting)
 2026-08-26,CODOR,0.75,Finalizing csv examples and sending writeup to clients
-2026-08-25,CODOR,3.75,Creating example csvs for divisions
-2026-08-25,CODOR,0.5,Database Design - Plante Moran Sync (https://meet.google.com/vtv-foiu-nws)
-2026-08-25,CODOR,2.0,Tuesday meeting prep / DQ rules investigation
+2026-08-26,CODOR,0.25,CDOR internal standup (Online Meeting)
+2026-08-26,CODOR,0.25,CDOR Working Session with Alex
+2026-08-26,CODOR,0.75,Meeting with Sudeep (Gov2Biz)
+2026-08-26,CODOR,4.5,Data quality investigations for Thursday call with all divisions based on Sudeep input
 2026-08-25,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-08-24,CODOR,1.25,Data Quality Review
-2026-08-24,CODOR,0.5,Sync with Claire
-2026-08-24,CODOR,0.75,Creating ODS Tracker
-2026-08-24,CODOR,1.25,Creatin ODS Layer
-2026-08-24,CODOR,0.5,CDOR internal standup (Online Meeting)
+2026-08-25,CODOR,2.0,Tuesday meeting prep / DQ rules investigation
+2026-08-25,CODOR,0.5,Database Design - Plante Moran Sync (https://meet.google.com/vtv-foiu-nws)
+2026-08-25,CODOR,3.75,Creating example csvs for divisions
 2026-08-24,CODOR,0.5,Morning Touch Base DOR
+2026-08-24,CODOR,0.5,CDOR internal standup (Online Meeting)
+2026-08-24,CODOR,1.25,Creatin ODS Layer
+2026-08-24,CODOR,0.75,Creating ODS Tracker
+2026-08-24,CODOR,0.5,Sync with Claire
+2026-08-24,CODOR,1.25,Data Quality Review
