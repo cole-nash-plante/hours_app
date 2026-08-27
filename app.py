@@ -809,8 +809,7 @@ if selected_page == "Home":
                 )
             
                 st.success("Hours added to unentered backlog.")
-             
-      # =========================================================
+        # =========================================================
     # UNENTERED HOURS
     # Recent Entries, Summary, and Client Sections
     # =========================================================
@@ -1238,6 +1237,7 @@ if selected_page == "Home":
             gap="small"
         )
 
+        # First column holds the grand-total BAN
         with summary_columnsst.markdown(
                 '<div class="unentered-summary-marker"></div>',
                 unsafe_allow_html=True
@@ -1248,6 +1248,7 @@ if selected_page == "Home":
                 f"{total_unentered_hours:.2f}"
             )
 
+        # Remaining columns hold one BAN per day
         for metric_position, daily_row in enumerate(
             daily_unentered.itertuples(index=False),
             start=1
@@ -1613,7 +1614,7 @@ if selected_page == "Home":
                         )
                         st.rerun()
 
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)        
 
 elif selected_page == "Reports":
     st.title("Reports")
