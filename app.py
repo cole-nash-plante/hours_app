@@ -1093,9 +1093,8 @@ if selected_page == "Home":
         )
 
         recent_display = recent_five.copy()
-        recent_display["Date"] = recent_display["Date"].dt.strftime(
-            "%Y-%m-%d"
-        )
+        # DateColumn needs real date objects, not strings
+        recent_display["Date"] = recent_display["Date"].dt.date
 
         edited_recent = st.data_editor(
             recent_display[
@@ -1388,9 +1387,8 @@ if selected_page == "Home":
             )
 
             client_display = client_rows.copy()
-            client_display["Date"] = client_display["Date"].dt.strftime(
-                "%Y-%m-%d"
-            )
+            # DateColumn needs real date objects, not strings
+            client_display["Date"] = client_display["Date"].dt.date
 
             # -------------------------------------------------
             # Calculated daily totals
