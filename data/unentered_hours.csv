@@ -46,3 +46,4 @@ Date,Client,Hours,Description
 2026-08-27,CODOR,4.25,Implementing Data quality and creating ODS layer in Dev Ops and Snowflake
 2026-08-28,CODOR,2.25,Creating Curated layer based on templetes and DQ challenges
 2026-08-28,CODOR,1.75,Updating Retention Periods and ensuring tables are fully qualified
+2026-08-28,CODOR,1.75,OLCM Stand-up - Data Migration 
