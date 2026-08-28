@@ -4,29 +4,7 @@ Date,Client,Hours,Description
 2026-08-26,COIT,0.5,PRJ1073934 - CIM Enhancement/Expansion
 2026-08-26,General Non-client,1.0,Software Renewal Sync (Microsoft Teams Meeting) + Follow-up items
 2026-08-26,General Non-client,0.75,Software Renewal Working Session  (Microsoft Teams Meeting)
-2026-08-26,CODOR,3.5,Data quality investigations for Thursday call with all divisions based on Sudeep input
-2026-08-26,CODOR,0.75,Meeting with Sudeep (Gov2Biz)
-2026-08-25,CODOR,3.75,Creating example csvs for divisions
-2026-08-25,CODOR,0.5,Database Design - Plante Moran Sync (https://meet.google.com/vtv-foiu-nws)
-2026-08-25,CODOR,2.0,Tuesday meeting prep / DQ rules investigation
-2026-08-25,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-08-24,CODOR,1.25,Data Quality Review
-2026-08-24,CODOR,0.5,Sync with Claire
-2026-08-24,CODOR,0.75,Creating ODS Tracker
-2026-08-24,CODOR,1.25,Creatin ODS Layer
-2026-08-24,CODOR,0.5,CDOR internal standup (Online Meeting)
-2026-08-24,CODOR,0.5,Morning Touch Base DOR
-2026-08-26,CODOR,1.25,Exploring recomendations for data quality challenges and emailing client
-2026-08-26,CODOR,0.25,CDOR Working Session with Alex
-2026-08-26,CODOR,0.25,CDOR internal standup (Online Meeting)
-2026-08-26,CODOR,0.75,Finalizing csv examples and sending writeup to clients
-2026-08-27,CODOR,0.75,DQ Meeting review / Notes planning ODS layer
 2026-08-27,COIT,0.25,OIT CIM Touchpoints (Microsoft Teams Meeting)
-2026-08-27,CODOR,1.5,CDOR Google Meeting
-2026-08-27,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-08-27,CODOR,0.25,Communication with divisions before meeting
-2026-08-27,CODOR,1.0,Providing divisions additional examples from meeting and preparing rules for starting on ODS layer
-2026-08-27,CODOR,1.25,ODS develupment
 2026-08-27,University of Alaska,0.75,Alaska Internal check in (Microsoft Teams Meeting)
 2026-08-26,University of Alaska,0.25,client communication
 2026-08-26,University of Alaska,1.0,Rewriting streamlit section of the runbook
@@ -36,13 +14,5 @@ Date,Client,Hours,Description
 2026-08-24,University of Alaska,0.5,CIM Org Connection Setup (Microsoft Teams Meeting)
 2026-08-24,University of Alaska,0.5,DWM/PM - DW IT Work Session
 2026-08-24,University of Alaska,0.5,Meeting demom preperation
-2026-08-28,CODOR,0.5,OLCM Stand-up - Data Migration
-2026-08-28,CODOR,1.75,Updating Retention Periods and ensuring tables are fully qualified
-2026-08-28,CODOR,2.25,Creating Curated layer based on templetes and DQ challenges
-2026-08-27,CODOR,4.25,Implementing Data quality and creating ODS layer in Dev Ops and Snowflake
-2026-08-27,CODOR,0.25,CDOR Sync with Alex
-2026-08-28,CODOR,1.75,"Troubleshooting DevOps with Michael, drafing email, and uploading csv's for Sudeep"
-2026-08-28,CODOR,1.0,CDOR Code Review (Microsoft Teams Meeting)
 2026-08-28,General Non-client,0.5,Software Renewal Touchbase (Microsoft Teams Meeting)
 2026-08-28,COIT,0.5,PRJ1073934 - CIM Enhancement/Expansion
-2026-08-28,CODOR,0.25,CDOR internal standup (Online Meeting)
