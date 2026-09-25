@@ -1,7 +1,6 @@
 Date,Client,Hours,Description
 2026-09-18,General Non-client,0.5,Regression Sync with Natalia and quick refresh on columns used
 2026-09-18,General Non-client,0.5,Python training (Microsoft Teams Meeting)
-2026-09-21,COIT,0.5,AD OAuth w/ Plante Moran - for Informatica Integrations (https://meet.google.com/mrw-anuw-dyh)
 2026-09-21,CDOT,0.5,DWM/PM - DW IT Work Session
 2026-09-21,CDOT,3.0,Detectors Dim testing
 2026-09-21,CDOT,1.5,CDOT CDI sync (Microsoft Teams Meeting)
@@ -9,14 +8,10 @@ Date,Client,Hours,Description
 2026-09-22,General Non-client,1.0,Regression Script changes and develupment
 2026-09-21,University of Alaska,0.75,Freeze Monitoring and testing after
 2026-09-22,General Non-client,0.5,Finding and testing MD->Jupyter script and emailing out to Natalia and Amy
-2026-09-22,COIT,0.25,OIT CIM Touchpoints (Microsoft Teams Meeting)
 2026-09-22,CDOT,0.75,Drafting Email on DIM_ZONE problems
 2026-09-22,University of Alaska,0.25,Responding to Lara's email regarding new Freeze Date
 2026-09-22,General Non-client,0.75,McMc Regression Sync (Microsoft Teams Meeting) + Running regression before meeting
-2026-09-22,COIT,1.0,OIT CIM WS (Microsoft Teams Meeting)
-2026-09-23,COIT,0.25,OIT CAI Working Session (Microsoft Teams Meeting)
 2026-09-23,General Non-client,1.0,Regression Working Session with Natalia
-2026-09-23,COIT,0.25,PRJ1073934 - CIM Enhancement/Expansion (https://meet.google.com/zqi-pssy-beb)
 2026-09-23,CDOT,0.25,CDOT Sync (Microsoft Teams Meeting)
 2026-09-23,CODOR,0.75,Sync with Alex
 2026-09-23,CODOR,0.5,anonymizing the data for fdd
@@ -36,10 +31,8 @@ Date,Client,Hours,Description
 2026-09-23,CODOR,1.75,Investigating Null Data Retention Records
 2026-09-23,General Non-client,1.25,Regression Script Adjustments for outlier investigation
 2026-09-23,General Non-client,0.5,McMc Regression working Session (Microsoft Teams Meeting)
-2026-09-23,COIT,0.5,OIT Permission WS 2 (Microsoft Teams Meeting)
 2026-09-23,CODOR,1.0,Finalizing Null analysis and sendingh email
 2026-09-23,CODOR,0.25,Internal email on progress
-2026-09-24,COIT,0.75,OIT Permission WS 2 (Microsoft Teams Meeting)
 2026-09-24,CODOR,0.5,CDOR Code Review (Microsoft Teams Meeting)
 2026-09-24,CODOR,0.75,Client communication and MLO Reports evaluation
 2026-09-23,University of Alaska,0.75,"Monitoring Freeze, fixing snowflake view, and emailing client"
@@ -50,7 +43,6 @@ Date,Client,Hours,Description
 2026-09-25,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
 2026-09-25,General Non-client,0.5,McMc Regression Analysis Discussion (Microsoft Teams Meeting)
 2026-09-25,General Non-client,0.5,McMc Pre-Meeting Sync (Microsoft Teams Meeting)
-2026-09-25,COIT,0.25,PRJ1073934 - CIM Enhancement/Expansion (https://meet.google.com/zqi-pssy-beb)
 2026-09-25,CODOR,0.5,Review DIM_ZONE (Microsoft Teams Meeting)
 2026-09-25,CODOR,0.5,CDOR Google Meeting
 2026-09-25,CDOT,0.5,Regression Evaluation before meeting
@@ -59,3 +51,11 @@ Date,Client,Hours,Description
 2026-09-25,CDOT,0.5,CDOT Working Session (Microsoft Teams Meeting)
 2026-09-25,CODOR,1.0,Updating DOR tables in Drive and updating license script / creating ODS tables for payments script
 2026-09-25,COIT,0.25,Weekly Update
+2026-09-25,COIT,0.25,PRJ1073934 - CIM Enhancement/Expansion (https://meet.google.com/zqi-pssy-beb)
+2026-09-24,COIT,0.75,OIT Permission WS 2 (Microsoft Teams Meeting)
+2026-09-23,COIT,0.0,
+2026-09-23,COIT,0.25,PRJ1073934 - CIM Enhancement/Expansion (https://meet.google.com/zqi-pssy-beb)
+2026-09-23,COIT,0.25,OIT CAI Working Session (Microsoft Teams Meeting)
+2026-09-22,COIT,1.0,OIT CIM WS (Microsoft Teams Meeting)
+2026-09-22,COIT,0.25,OIT CIM Touchpoints (Microsoft Teams Meeting)
+2026-09-21,COIT,0.5,AD OAuth w/ Plante Moran - for Informatica Integrations (https://meet.google.com/mrw-anuw-dyh)
