@@ -61,8 +61,8 @@ Date,Client,Hours,Description
 2026-10-08,University of Alaska,0.75,UA Sync (Microsoft Teams Meeting)
 2026-10-08,CDOT,0.25,Morning Checks and quick investigation
 2026-10-08,CODOR,0.25,Meeting prep reading though yesterdays messages and responses
-2026-10-08,CDOT,0.25,Weekly status meeting
-2026-10-08,CODOR,0.5,investigating UDO table problems
-2026-10-08,CODOR,3.0,"Compiling UDO sheets in packets, csvs into sample excels, and begining reformatting Claires sheets"
-2026-10-09,CODOR,0.0,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
 2026-10-09,CODOR,0.5,CDOR Google Meeting
+2026-10-09,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
+2026-10-08,CODOR,3.0,"Compiling UDO sheets in packets, csvs into sample excels, and begining reformatting Claires sheets"
+2026-10-08,CODOR,0.5,investigating UDO table problems
+2026-10-08,CDOT,0.25,Weekly status meeting
