@@ -1,6 +1,4 @@
 Date,Client,Hours,Description
-2026-09-22,TDH,0.5,Finding and testing MD->Jupyter script and emailing out to Natalia and Amy
-2026-09-18,TDH,0.5,Python training (Microsoft Teams Meeting)
 2026-10-01,INPRS,1.5,Data Governance Council (In Office - First Thursday) (INPRS 1NC 4th Fl Conf Rom 490)
 2026-10-01,CODOR,1.25,Updating Business Info FLL number and checking AID template before switching to validation
 2026-10-01,CODOR,0.5,Pre Meeting work
@@ -43,7 +41,6 @@ Date,Client,Hours,Description
 2026-10-06,INPRS,0.5,AI Governance Roadmap - Data Analysis & Handling (Microsoft Teams Meeting)
 2026-10-06,CODOR,0.5,DOR Sync with Claire (Microsoft Teams Meeting)
 2026-10-06,INPRS,0.5,Compiling meeting notes and reviewing information
-2026-10-06,TDH,0.25,Sync with Natalia
 2026-10-06,CODOR,0.5,Ticket Submission
 2026-10-07,CDOT,0.25,"Morning checks, no major failures"
 2026-10-07,CODOR,0.75,Checking connection to VPN and pre-meeting prep
@@ -71,18 +68,21 @@ Date,Client,Hours,Description
 2026-10-09,CODOR,1.25,Adding Gaming Read Me file and organizing UDO scripts
 2026-10-09,CODOR,0.5,Meeting with Sudeep
 2026-10-09,University of Alaska,1.75,Creating Snowflake Inventory and finding Oracle Tables
-2026-10-09,TDH,1.5,Advanced python training
 2026-10-12,CDOT,0.25,Check Monitor
 2026-10-12,University of Alaska,1.25,Data Ingestion for HR
 2026-10-12,CODOR,1.5,"Fixing License table from last week requests,  adding filter"
 2026-10-12,CODOR,1.0,CDOR Morning Standup
 2026-10-12,COIT,0.5,Bi-Weekly CIM Project Knowledge Transfer (Plante Moran / OIT) (https://meet.google.com/ptb-sopv-jsc)
-2026-10-12,TDH,0.5,TDH training review before meeting
-2026-10-12,TDH,0.75,TDH Advanced Python Working Sesison (Microsoft Teams Meeting)
 2026-10-12,University of Alaska,1.0,DWM/PM - DW IT Work Session
 2026-10-12,University of Alaska,0.75,UA Working Session + solo work
 2026-10-12,University of Alaska,0.5,Investigating Snowflake emails and sending out email to Alaska
 2026-10-12,CODOR,1.25,Preparing and scheduling sendout of emails on Packets
 2026-10-12,CODOR,0.5,DOR Validation Sync (Microsoft Teams Meeting)
-2026-10-12,TDH,0.5,Reiterating and organizing day 1 training
 2026-10-12,University of Alaska,0.5,Freeze checks
+2026-10-12,TDH,0.5,Reiterating and organizing day 1 training
+2026-10-12,TDH,0.75,TDH Advanced Python Working Sesison (Microsoft Teams Meeting)
+2026-10-12,TDH,0.5,TDH training review before meeting
+2026-10-09,TDH,1.5,Advanced python training
+2026-10-06,TDH,0.25,Sync with Natalia
+2026-10-06,TDH,0.5,Finding and testing MD->Jupyter script and emailing out to Natalia and Amy
+2026-10-06,TDH,0.5,Python training (Microsoft Teams Meeting)
