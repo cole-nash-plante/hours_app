@@ -1,72 +1,26 @@
 Date,Client,Hours,Description
 2026-10-01,INPRS,1.5,Data Governance Council (In Office - First Thursday) (INPRS 1NC 4th Fl Conf Rom 490)
-2026-10-01,CODOR,1.25,Updating Business Info FLL number and checking AID template before switching to validation
-2026-10-01,CODOR,0.5,Pre Meeting work
-2026-10-01,CODOR,0.5,Post Meeting internal
-2026-10-01,CODOR,0.75,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-10-01,CODOR,1.0,CDOR Google Meeting
 2026-10-01,University of Alaska,0.5,Monitor Freeze and ensure complete run
-2026-10-01,CODOR,0.5,Sync with Alex
-2026-10-01,CODOR,0.5,Code Review
-2026-10-01,CODOR,0.5,DOR Scripts Creation
 2026-10-02,University of Alaska,0.5,Creating quick roles and permissions scripts
 2026-10-02,University of Alaska,0.25,Emailing Lara on Freezes
-2026-10-02,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-10-02,CODOR,0.5,DOR Brainstorm (Microsoft Teams Meeting)
-2026-10-02,CODOR,0.5,CDOR Google Meeting
-2026-10-02,CODOR,0.5,Sync with Fazeel
-2026-10-02,CODOR,0.5,Data Validation Column by column evaluation
-2026-10-05,CODOR,0.25,Updating Felicia on the DQM Weekly meeting
-2026-10-02,CODOR,0.75,MED final script
-2026-10-02,CODOR,0.5,Working Session with Fazeel
-2026-10-02,CODOR,1.5,Filling out Data Validation Tracker
-2026-10-05,CODOR,0.75,Internal Sync
-2026-10-05,CODOR,0.5,Debrief AI Roadmap Meetings (Microsoft Teams Meeting)
 2026-10-05,University of Alaska,2.5,Fixing Freeze metadata
 2026-10-05,University of Alaska,0.75,Freeze mapping error investigation
 2026-10-05,University of Alaska,0.5,Quick UA Sync (Microsoft Teams Meeting)
 2026-10-05,University of Alaska,1.0,Parameters investigation and fixing scripts for parameter extract
-2026-10-05,CODOR,0.75,UDO  analysis before tomorrow meeting
 2026-10-05,INPRS,0.5,Organizing Investments Notes and adding them to document
-2026-10-06,CODOR,0.25,DOR Sync (Microsoft Teams Meeting)
-2026-10-06,CODOR,3.0,"DOR UDO Summary Creation, meeting prep, and sample data preperation"
-2026-10-06,CODOR,0.5,OLCM: Data Quality Sync (https://meet.google.com/xbo-sbsx-fwy)
 2026-10-06,INPRS,0.5,AI Governance Roadmap - Business and Operational Requestors  (Microsoft Teams Meeting)
 2026-10-06,INPRS,0.5,AI Governance Roadmap - Data Analysis & Handling (Microsoft Teams Meeting)
-2026-10-06,CODOR,0.5,DOR Sync with Claire (Microsoft Teams Meeting)
 2026-10-06,INPRS,0.5,Compiling meeting notes and reviewing information
-2026-10-06,CODOR,0.5,Ticket Submission
-2026-10-07,CODOR,0.75,Checking connection to VPN and pre-meeting prep
-2026-10-07,CODOR,0.75,CDOR Stand Up
-2026-10-07,CODOR,0.5,Sync with Claire on Templates
-2026-10-07,CODOR,3.0,10/6-10/7 Action items for AID
-2026-10-07,CODOR,2.25,"Organizing Packet creation, updating FDD, creating Relationship table, and communicating changes to Claire and Fazeel"
-2026-10-07,CODOR,0.5,Sync with Fazeel
 2026-10-07,University of Alaska,0.25,Sync with Michael
-2026-10-07,CODOR,0.25,Sync with Adam
 2026-10-07,INPRS,0.5,Meeting Prep for Roadmap call
 2026-10-07,INPRS,0.5,AI Governance Roadmap - Center of Excellence  (Microsoft Teams Meeting)
-2026-10-08,CODOR,4.25,"writing scripts and pulling sample csv's for my divisions, making updates from mornign meeting"
 2026-10-08,University of Alaska,0.75,UA Sync (Microsoft Teams Meeting)
-2026-10-08,CODOR,0.25,Meeting prep reading though yesterdays messages and responses
-2026-10-09,CODOR,0.5,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
-2026-10-09,CODOR,0.5,CDOR Google Meeting
-2026-10-08,CODOR,0.5,investigating UDO table problems
-2026-10-08,CODOR,3.0,"Compiling UDO sheets in packets, csvs into sample excels, and begining reformatting Claires sheets"
-2026-10-09,CODOR,0.5,Packets Sync (Microsoft Teams Meeting)
-2026-10-09,CODOR,0.5,Morning meeting prep
-2026-10-09,CODOR,1.25,Adding Gaming Read Me file and organizing UDO scripts
-2026-10-09,CODOR,0.5,Meeting with Sudeep
 2026-10-09,University of Alaska,1.75,Creating Snowflake Inventory and finding Oracle Tables
 2026-10-12,University of Alaska,1.25,Data Ingestion for HR
-2026-10-12,CODOR,1.5,"Fixing License table from last week requests,  adding filter"
-2026-10-12,CODOR,1.0,CDOR Morning Standup
 2026-10-12,COIT,0.5,Bi-Weekly CIM Project Knowledge Transfer (Plante Moran / OIT) (https://meet.google.com/ptb-sopv-jsc)
 2026-10-12,University of Alaska,1.0,DWM/PM - DW IT Work Session
 2026-10-12,University of Alaska,0.75,UA Working Session + solo work
 2026-10-12,University of Alaska,0.5,Investigating Snowflake emails and sending out email to Alaska
-2026-10-12,CODOR,1.25,Preparing and scheduling sendout of emails on Packets
-2026-10-12,CODOR,0.5,DOR Validation Sync (Microsoft Teams Meeting)
 2026-10-12,University of Alaska,0.5,Freeze checks
 2026-10-12,TDH,0.5,Reiterating and organizing day 1 training
 2026-10-12,TDH,0.75,TDH Advanced Python Working Sesison (Microsoft Teams Meeting)
@@ -76,26 +30,15 @@ Date,Client,Hours,Description
 2026-10-06,TDH,0.5,Python training (Microsoft Teams Meeting)
 2026-10-13,TDH,0.5,TDH training review before meeting
 2026-10-13,University of Alaska,1.0,Flint Data  (Microsoft Teams Meeting)
-2026-10-13,CODOR,0.5,CDOR Morning Standup
 2026-10-13,University of Alaska,1.75,HR iteration workshop
 2026-10-12,University of Alaska,0.5,HR Freeze monitoring and checks
-2026-10-13,CODOR,1.0,OLCM: Data Quality Sync (https://meet.google.com/xbo-sbsx-fwy)
 2026-10-13,TDH,1.0,TDH Advanced Python Working Session (Microsoft Teams Meeting)
 2026-10-13,TDH,0.75,TDH Advanced training
-2026-10-13,CODOR,1.0,Meeting prep
-2026-10-13,CODOR,1.0,"Adjusting emails, configuring sharing privlages and"
-2026-10-14,CODOR,0.75,CDOR Morning Standup
-2026-10-14,CODOR,0.75,QA adjustments for Sheets
-2026-10-14,CODOR,1.5,"Communication with Divisions and Gov2Biz (followups, DQ questions)"
 2026-10-14,TDH,0.75,API and HL7 research
 2026-10-15,TDH,0.5,Internal communication and requirements overview
 2026-10-14,University of Alaska,0.5,Testing 10/12 freeze and syncing back to test
-2026-10-15,CODOR,0.5,Cole/Adam/Loren/Claire (Microsoft Teams Meeting)
 2026-10-15,TDH,1.5,Advanced python training research and develupment
-2026-10-15,CODOR,1.0,OLCM Stand-up - Data Migration (https://meet.google.com/cyz-zgbt-xrp)
 2026-10-15,INPRS,0.5,AI Governance Roadmap - ARB  & Software Request Process follow up breakout   (Microsoft Teams Meeting)
 2026-10-15,INPRS,0.5,Updating Meeting Notes
 2026-10-15,INPRS,0.75,Beginning review of assessment
 2026-10-15,TDH,0.75,Sync with Jonathan and Natalia
-2026-10-15,CODOR,0.5,Code Review
-2026-10-15,CODOR,0.75,DOR Follow Up (Microsoft Teams Meeting)
