@@ -1,31 +1,12 @@
 Date,Client,Hours,Description
 2026-10-01,INPRS,1.5,Data Governance Council (In Office - First Thursday) (INPRS 1NC 4th Fl Conf Rom 490)
-2026-10-01,University of Alaska,0.5,Monitor Freeze and ensure complete run
-2026-10-02,University of Alaska,0.5,Creating quick roles and permissions scripts
-2026-10-02,University of Alaska,0.25,Emailing Lara on Freezes
-2026-10-05,University of Alaska,2.5,Fixing Freeze metadata
-2026-10-05,University of Alaska,0.75,Freeze mapping error investigation
-2026-10-05,University of Alaska,0.5,Quick UA Sync (Microsoft Teams Meeting)
-2026-10-05,University of Alaska,1.0,Parameters investigation and fixing scripts for parameter extract
 2026-10-05,INPRS,0.5,Organizing Investments Notes and adding them to document
 2026-10-06,INPRS,0.5,AI Governance Roadmap - Business and Operational Requestors  (Microsoft Teams Meeting)
 2026-10-06,INPRS,0.5,AI Governance Roadmap - Data Analysis & Handling (Microsoft Teams Meeting)
 2026-10-06,INPRS,0.5,Compiling meeting notes and reviewing information
-2026-10-07,University of Alaska,0.25,Sync with Michael
 2026-10-07,INPRS,0.5,Meeting Prep for Roadmap call
 2026-10-07,INPRS,0.5,AI Governance Roadmap - Center of Excellence  (Microsoft Teams Meeting)
-2026-10-08,University of Alaska,0.75,UA Sync (Microsoft Teams Meeting)
-2026-10-09,University of Alaska,1.75,Creating Snowflake Inventory and finding Oracle Tables
-2026-10-12,University of Alaska,1.25,Data Ingestion for HR
 2026-10-12,COIT,0.5,Bi-Weekly CIM Project Knowledge Transfer (Plante Moran / OIT) (https://meet.google.com/ptb-sopv-jsc)
-2026-10-12,University of Alaska,1.0,DWM/PM - DW IT Work Session
-2026-10-12,University of Alaska,0.75,UA Working Session + solo work
-2026-10-12,University of Alaska,0.5,Investigating Snowflake emails and sending out email to Alaska
-2026-10-12,University of Alaska,0.5,Freeze checks
-2026-10-13,University of Alaska,1.0,Flint Data  (Microsoft Teams Meeting)
-2026-10-13,University of Alaska,1.75,HR iteration workshop
-2026-10-12,University of Alaska,0.5,HR Freeze monitoring and checks
-2026-10-14,University of Alaska,0.5,Testing 10/12 freeze and syncing back to test
 2026-10-15,INPRS,0.5,AI Governance Roadmap - ARB  & Software Request Process follow up breakout   (Microsoft Teams Meeting)
 2026-10-15,INPRS,0.5,Updating Meeting Notes
 2026-10-15,INPRS,0.75,Beginning review of assessment
