@@ -7,37 +7,13 @@ Date,Client,Hours,Description
 2026-10-19,COIT,0.25,Weekly Update
 2026-10-16,TDH,1.0,TDH Working Session (Microsoft Teams Meeting)
 2026-10-19,University of Alaska,0.5,Sync Prod to Dev and checking freeze results
-2026-10-19,CODOR,0.5,Sync with Fazeel on requests from gov2biz and racing
-2026-10-19,CODOR,0.25,Relationships Meeting Prep
-2026-10-19,CODOR,0.5,Relationships Meeting
-2026-10-19,CODOR,0.25,Packet Tracker Updates
-2026-10-16,CODOR,0.5,Communicating with Fazeel on Packet Tracker and updating tracker
-2026-10-16,CODOR,0.5,Cole:Alex sync (Microsoft Teams Meeting)
-2026-10-16,CODOR,0.75,CDOR Meeting prep and internal communications
-2026-10-16,CODOR,0.5,CDOR Google Meeting
-2026-10-16,CODOR,0.75,CDOR Morning Standup
 2026-10-19,University of Alaska,1.0,DWM/PM - DW IT Work Session
-2026-10-19,CODOR,0.25,Review Fazeels email to divisions
-2026-10-19,CODOR,0.75,CDOR Morning Standup
-2026-10-19,CODOR,0.25,Pre Meeting Prep
-2026-10-19,CODOR,0.5,Troubleshooting and explaining Action items to fazeel
 2026-10-19,INPRS,0.75,Review Assesment
 2026-10-19,INPRS,0.5,CDOR Sync (Microsoft Teams Meeting)
 2026-10-20,TDH,4.0,TDH Python Traing Teams
-2026-10-20,CODOR,0.75,Morning coordination on Afternoon meetin expectations with internal team and Gov2Biz
-2026-10-20,CODOR,0.75,Testing Jacobs new Relationship query to be familiar before Gov2Biz working session
-2026-10-20,CODOR,0.75,Meeting Prep
-2026-10-20,CODOR,1.0,OLCM: Data Quality Sync (https://meet.google.com/xbo-sbsx-fwy)
-2026-10-20,CODOR,1.0,Relationships Working Session (https://meet.google.com/ctm-gazz-whe)
-2026-10-21,CODOR,0.75,"Check in with Alex, evaluating Relationships requirement, and emailing internal team to discuss."
 2026-10-21,INPRS,0.25,Creating a couple quick graphics
 2026-10-20,INPRS,1.5,Review Assessment
 2026-10-20,TDH,0.5,Coordinating with Natalia on timing and uploading new training to my computer/ verifying code runs successfully befor reviewing AI draft
-2026-10-20,CODOR,0.5,Coordinating addtional relationships and PP requests and creating summary table
-2026-10-21,CODOR,0.5,CDOR Morning Standup
-2026-10-21,CODOR,0.75,Pre-Stand Up Review of existing workstreams
-2026-10-21,CODOR,0.25,CDOR Google Meeting
-2026-10-21,CODOR,0.75,DOR planning with Alex
 2026-10-21,INPRS,1.0,Document Review and Iteration
 2026-10-21,TDH,0.5,TDH Planning Session (Microsoft Teams Meeting)
 2026-10-21,INPRS,0.25,Quick Sync with cole
@@ -49,32 +25,56 @@ Date,Client,Hours,Description
 2026-10-22,University of Alaska,0.75,CDOR Morning Standup
 2026-10-22,TDH,0.5,Advanced Python Training
 2026-10-22,University of Alaska,1.0,"Creating Users, Roles and Sending out Emails"
-2026-10-22,CODOR,0.75,Relationships PP meeting prep and PP investigation
-2026-10-22,CODOR,0.5,CDOR Google Meeting
-2026-10-22,CODOR,0.5,CDOR Code Review (Microsoft Teams Meeting)
-2026-10-22,CODOR,0.5,Follow-up on Relationship and PP meeting
-2026-10-22,CODOR,0.25,Creating Agenda for tomorrows Validation meeting
 2026-10-22,COIT,0.25,CIM Sync (Microsoft Teams Meeting)
 2026-10-22,COIT,0.5,OIT Sync (Microsoft Teams Meeting)
-2026-10-23,CODOR,0.5,CDOR Google Meeting
-2026-10-23,CODOR,0.75,"Communication with Sudeep, Jacob, updating relationthip table and Meeting prep"
-2026-10-23,CODOR,0.5,CDOR Morning Standup
-2026-10-22,CODOR,0.25,Reviewing packet tracker and communicating with Emissions
 2026-10-23,COIT,0.5,CIM Stand Up
-2026-10-23,CODOR,1.0,PSR Meeting
-2026-10-23,CODOR,0.5,CDOR Internal Planning Session (Microsoft Teams Meeting)
 2026-10-26,TDH,0.5,Initial Review of Deliverables Gate 1 - AI Roadmap  (Microsoft Teams Meeting)
 2026-10-25,INPRS,1.25,Document Review and communication with Cole on results
-2026-10-25,CODOR,3.75,"Cleaning Snowflake, creating reusable procs"
 2026-10-25,TDH,0.75,Day 1 Training Review
 2026-10-23,TDH,2.75,"converting to Snowflake, creating startup scripts, configuring enviroment"
-2026-10-26,CODOR,0.5,KS Prep
-2026-10-26,CODOR,1.0,CDOR KS (Microsoft Teams Meeting)
-2026-10-26,CODOR,2.5,"Reload Troubleshooting, extract, and communication with team and Jacob"
-2026-10-26,CODOR,0.75,Quick meeting with Adam and updating proc
-2026-10-27,CODOR,0.75,Gaming Division KT (Microsoft Teams Meeting)
-2026-10-27,CODOR,2.5,CDOR Morning Standup
 2026-10-27,INPRS,0.5,AI Roadmap- Initial Review of Deliverables Gate 1 (reschedule) - Project Coordination Meeting Series INPRS/ Plante (Microsoft Teams Meeting)
 2026-10-27,TDH,0.25,Internal Communication
-2026-10-27,CODOR,1.5,Finalizing data refresh
 2026-10-27,CODOR,2.5,Ad Hoc meeting prep
+2026-10-27,CODOR,1.5,Finalizing data refresh
+2026-10-27,CODOR,0.5,CDOR Morning Standup
+2026-10-27,CODOR,0.75,Gaming Division KT (Microsoft Teams Meeting)
+2026-10-26,CODOR,0.75,Quick meeting with Adam and updating proc
+2026-10-26,CODOR,2.5,"Reload Troubleshooting, extract, and communication with team and Jacob"
+2026-10-26,CODOR,1.0,CDOR KS (Microsoft Teams Meeting)
+2026-10-26,CODOR,0.5,KS Prep
+2026-10-25,CODOR,3.75,"Cleaning Snowflake, creating reusable procs"
+2026-10-23,CODOR,0.5,CDOR Internal Planning Session (Microsoft Teams Meeting)
+2026-10-23,CODOR,1.0,PSR Meeting
+2026-10-23,CODOR,0.5,CDOR Morning Standup
+2026-10-23,CODOR,0.75,"Communication with Sudeep, Jacob, updating relationthip table and Meeting prep"
+2026-10-23,CODOR,0.5,CDOR Google Meeting
+2026-10-22,CODOR,0.25,Reviewing packet tracker and communicating with Emissions
+2026-10-22,CODOR,0.25,Creating Agenda for tomorrows Validation meeting
+2026-10-22,CODOR,0.5,Follow-up on Relationship and PP meeting
+2026-10-22,CODOR,0.5,CDOR Code Review (Microsoft Teams Meeting)
+2026-10-22,CODOR,0.5,CDOR Google Meeting
+2026-10-22,CODOR,0.75,Relationships PP meeting prep and PP investigation
+2026-10-21,CODOR,0.75,DOR planning with Alex
+2026-10-21,CODOR,0.25,CDOR Google Meeting
+2026-10-21,CODOR,0.75,Pre-Stand Up Review of existing workstreams
+2026-10-21,CODOR,0.5,CDOR Morning Standup
+2026-10-21,CODOR,0.75,"Check in with Alex, evaluating Relationships requirement, and emailing internal team to discuss."
+2026-10-20,CODOR,0.5,Coordinating addtional relationships and PP requests and creating summary table
+2026-10-20,CODOR,1.0,Relationships Working Session (https://meet.google.com/ctm-gazz-whe)
+2026-10-20,CODOR,1.0,OLCM: Data Quality Sync (https://meet.google.com/xbo-sbsx-fwy)
+2026-10-20,CODOR,0.75,Meeting Prep
+2026-10-20,CODOR,0.75,Testing Jacobs new Relationship query to be familiar before Gov2Biz working session
+2026-10-20,CODOR,0.75,Morning coordination on Afternoon meetin expectations with internal team and Gov2Biz
+2026-10-19,CODOR,0.5,Troubleshooting and explaining Action items to fazeel
+2026-10-19,CODOR,0.25,Pre Meeting Prep
+2026-10-19,CODOR,0.75,CDOR Morning Standup
+2026-10-19,CODOR,0.25,Review Fazeels email to divisions
+2026-10-19,CODOR,0.25,Packet Tracker Updates
+2026-10-19,CODOR,0.5,Relationships Meeting
+2026-10-19,CODOR,0.25,Relationships Meeting Prep
+2026-10-19,CODOR,0.5,Sync with Fazeel on requests from gov2biz and racing
+2026-10-16,CODOR,0.75,CDOR Morning Standup
+2026-10-16,CODOR,0.5,CDOR Google Meeting
+2026-10-16,CODOR,0.75,CDOR Meeting prep and internal communications
+2026-10-16,CODOR,0.5,Cole:Alex sync (Microsoft Teams Meeting)
+2026-10-16,CODOR,0.5,Communicating with Fazeel on Packet Tracker and updating tracker
